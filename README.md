@@ -1,7 +1,7 @@
 # Web35-teamMars
-부스트캠프 멤버십 웹 7기 그룹 프로젝트 - 제목 (미정)
+부스트캠프 멤버십 웹 7기 그룹 프로젝트 - CryptoGraph
 
-### 커밋 컨벤션 (예시)
+### 커밋 컨벤션
    * [참고링크](https://doublesprogramming.tistory.com/256)
    ```
    {타입} : {제목} {이슈변호}
