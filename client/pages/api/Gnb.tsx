@@ -14,10 +14,10 @@ export default function Gnb({}) {
     justify-content:space-between;
     width: 100%;
   `
-  const LogoStyle = styled.image`
+  const LogoStyle = styled.div`
     margin: 33px 0px 28px 50px;
   `
-  const UserInfoStyle = styled.image`
+  const UserInfoStyle = styled.div`
     margin: 20px 64px 20px 0px;
   `
 
