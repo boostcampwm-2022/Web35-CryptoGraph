@@ -7,7 +7,7 @@ import { CacheProvider, EmotionCache } from '@emotion/react'
 import theme from '../src/theme'
 import createEmotionCache from '../src/createEmotionCache'
 import Gnb from './api/Gnb'
-
+import { Global, css } from '@emotion/react'
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
 
@@ -15,6 +15,13 @@ interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
 
+const GlobalStyle = css`
+  html,
+  body,
+  div#__next {
+    height: 100%;
+  }
+`
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
   return (
@@ -25,6 +32,7 @@ export default function MyApp(props: MyAppProps) {
       <ThemeProvider theme={theme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
+        <Global styles={GlobalStyle} />
         <Gnb />
         <Component {...pageProps} />
       </ThemeProvider>
