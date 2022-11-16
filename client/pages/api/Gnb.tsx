@@ -21,7 +21,6 @@ export default function Gnb({}) {
   const UserInfoStyle = styled.div`
     margin: 16px 64px 16px 0px;
   `
-
   return (
     <>
       <BackgroundStyle>
