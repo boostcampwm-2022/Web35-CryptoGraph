@@ -12,66 +12,53 @@ function updateChart(
   const Y_MAX = 700 // <-크기조절 안되지 않나여?
   const STEP = 15
   const [min, max] = getMinMax(data)
-  const ratio = (max - min) / Y_MAX
+  const myScale = d3.scaleLinear().domain([min, max]).range([Y_MAX, 0])
   d3.select(svgRef.current)
     .selectAll<SVGSVGElement, CandleData>('g')
     .data(data)
     .join(
       enter => {
-        const g = enter.append('g')
-        g.append('rect')
+        const $g = enter.append('g')
+        $g.append('rect')
           .attr('width', STEP)
           .attr('height', d =>
-            Math.abs(
-              getStartHeight(d, min, ratio) - getEndHeight(d, min, ratio)
-            )
+            Math.abs(myScale(d.trade_price) - myScale(d.opening_price))
           )
           .attr('x', (d, i) => X_MAX - STEP * i)
-          .attr(
-            'y',
-            d =>
-              Y_MAX -
-              Math.max(
-                getStartHeight(d, min, ratio) - getEndHeight(d, min, ratio)
-              )
+          .attr('y', d =>
+            Math.min(myScale(d.trade_price), myScale(d.opening_price))
           )
           .attr('fill', d => (d.opening_price < d.trade_price ? 'red' : 'blue'))
-        g.append('line')
+        $g.append('line')
           .attr('x1', (d, i) => X_MAX + 7 - STEP * i)
           .attr('x2', (d, i) => X_MAX + 7 - STEP * i)
-          .attr('y1', d => Y_MAX - getHighHeight(d, min, ratio))
-          .attr('y2', d => Y_MAX - getLowHeight(d, min, ratio))
+          .attr('y1', d => myScale(d.low_price))
+          .attr('y2', d => myScale(d.high_price))
           .attr('stroke', d =>
             d.opening_price < d.trade_price ? 'red' : 'blue'
           )
-        return g
+        return $g
       },
       update => {
         update
           .select('rect')
           .attr('width', STEP)
           .attr('height', d =>
-            Math.abs(
-              getStartHeight(d, min, ratio) - getEndHeight(d, min, ratio)
-            )
+            Math.abs(myScale(d.trade_price) - myScale(d.opening_price)) <= 0
+              ? 1
+              : Math.abs(myScale(d.trade_price) - myScale(d.opening_price))
           )
           .attr('x', (d, i) => X_MAX - STEP * i)
-          .attr(
-            'y',
-            d =>
-              Y_MAX -
-              Math.max(
-                getStartHeight(d, min, ratio),
-                getEndHeight(d, min, ratio)
-              )
+          .attr('y', d =>
+            Math.min(myScale(d.trade_price), myScale(d.opening_price))
           )
           .attr('fill', d => (d.opening_price < d.trade_price ? 'red' : 'blue'))
         update
           .select('line')
           .attr('x1', (d, i) => X_MAX + 7 - STEP * i)
           .attr('x2', (d, i) => X_MAX + 7 - STEP * i)
-          .attr('y1', d => Y_MAX - getHighHeight(d, min, ratio))
-          .attr('y2', d => Y_MAX - getLowHeight(d, min, ratio))
+          .attr('y1', d => myScale(d.low_price))
+          .attr('y2', d => myScale(d.high_price))
           .attr('stroke', d =>
             d.opening_price < d.trade_price ? 'red' : 'blue'
           )
@@ -108,22 +95,4 @@ function getMinMax(data: CandleData[]): number[] {
     if (candleData.high_price > max) max = candleData.high_price
   })
   return [min, max]
-}
-
-// D3.scale로 refactoring 해야한다. (ㅇ얘는 무조건 할 수 있음)
-function getStartHeight(data: CandleData, min: number, ratio: number) {
-  return transHeight(data.opening_price, min, ratio)
-}
-function getEndHeight(data: CandleData, min: number, ratio: number) {
-  return transHeight(data.trade_price, min, ratio)
-}
-function getHighHeight(data: CandleData, min: number, ratio: number) {
-  return transHeight(data.high_price, min, ratio)
-}
-function getLowHeight(data: CandleData, min: number, ratio: number) {
-  return transHeight(data.low_price, min, ratio)
-}
-
-function transHeight(value: number, min: number, ratio: number) {
-  return Math.round((value - min) / ratio)
 }
