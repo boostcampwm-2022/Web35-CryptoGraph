@@ -3,13 +3,15 @@ import { CandleData } from '@/types/ChartTypes'
 import { CandleChart } from 'components/CandleChart'
 import { DEFAULT_CANDLE_CHART_OPTION } from '../../../constants/ChartConstants'
 import { getCandleDataArray } from '@/utils/upbitManager'
+import { useRealTimeUpbitData } from 'hooks/useRealTimeUpbitData'
 export default function CandleChartPage({
   candleData
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const realtimeCandleData = useRealTimeUpbitData('BTC', candleData) //얘가 가공해서 준다.
   return (
     <div>
       <CandleChart
-        candleData={candleData}
+        candleData={realtimeCandleData}
         option={DEFAULT_CANDLE_CHART_OPTION}
       ></CandleChart>
     </div>

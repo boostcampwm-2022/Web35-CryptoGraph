@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { CandleData, ChartOption } from '../types/ChartTypes'
+import { CandleData, ChartOption } from '@/types/ChartTypes'
 import * as d3 from 'd3'
 import { DEFAULT_CANDLE_CHART_OPTION } from '@/constants/ChartConstants'
 
@@ -11,11 +11,11 @@ function updateChart(
   const X_MAX = 900 //
   const Y_MAX = 700 // <-크기조절 안되지 않나여?
   const STEP = 15
-  const [min, max] = getMinMax(data)
+  const [min, max] = getMinMax(data.slice(0, 60))
   const myScale = d3.scaleLinear().domain([min, max]).range([Y_MAX, 0])
   d3.select(svgRef.current)
     .selectAll<SVGSVGElement, CandleData>('g')
-    .data(data)
+    .data(data.slice(0, 60))
     .join(
       enter => {
         const $g = enter.append('g')
@@ -28,14 +28,16 @@ function updateChart(
           .attr('y', d =>
             Math.min(myScale(d.trade_price), myScale(d.opening_price))
           )
-          .attr('fill', d => (d.opening_price < d.trade_price ? 'red' : 'blue'))
+          .attr('fill', d =>
+            d.opening_price <= d.trade_price ? 'red' : 'blue'
+          )
         $g.append('line')
           .attr('x1', (d, i) => X_MAX + 7 - STEP * i)
           .attr('x2', (d, i) => X_MAX + 7 - STEP * i)
           .attr('y1', d => myScale(d.low_price))
           .attr('y2', d => myScale(d.high_price))
           .attr('stroke', d =>
-            d.opening_price < d.trade_price ? 'red' : 'blue'
+            d.opening_price <= d.trade_price ? 'red' : 'blue'
           )
         return $g
       },

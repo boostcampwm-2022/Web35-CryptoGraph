@@ -1,4 +1,5 @@
 export interface CandleData {
+  code: string
   market: string
   trade_date: string
   trade_time: string
@@ -12,6 +13,9 @@ export interface CandleData {
   change_rate: number
   change_price: number
   trade_volume: number
+  candle_date_time_kst: string
+  timestamp: number
+  trade_timestamp: number
 }
 
 export interface ChartOption {
