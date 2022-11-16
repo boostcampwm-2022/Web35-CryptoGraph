@@ -26,7 +26,7 @@ export default function Gnb({}) {
       <BackgroundStyle>
         <ContentStyle>
           <LogoStyle>
-            <Image src="/logo-white.svg" alt="" width={291.31} height={79} />
+            <Image src="/logo-white.svg" alt="" width={288} height={80} />
           </LogoStyle>
           <TextField
             InputProps={{
@@ -34,7 +34,7 @@ export default function Gnb({}) {
                 backgroundColor: 'white',
                 height: '80px',
                 width: '720px',
-                margin: '32px 0px 32px 0px',
+                margin: '32px 192px 32px 0px',
                 p: 2,
                 gap: 2
               },

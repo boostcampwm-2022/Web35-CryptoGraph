@@ -12,7 +12,7 @@ export default function Home() {
   }
 
   const config = {
-    treeMapWidth : 1856,
+    treeMapWidth : sideBarOpen ? "80%" : "96%",
     treeMapHeight : 896,
   }
 
@@ -35,8 +35,8 @@ export default function Home() {
           width: config["treeMapWidth"],
           height: config["treeMapHeight"],
           border: "4px dashed black",
-          "border-radius": "35px",
-          margin: "20px 35px"
+          "border-radius": "32px",
+          margin: "16px 32px"
         }}
       />
     </BackgroundStyle>

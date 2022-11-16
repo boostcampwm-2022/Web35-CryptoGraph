@@ -4,8 +4,22 @@ import styled from '@emotion/styled'
 
 export default function SideBar (props : any) {
 
+  interface widthConfig {
+    outerBoxWidth : number,
+    boxHeight : number,
+    innerBoxWidth : number,
+    innerBoxHeight : number,
+  }
+
+  const widthConfig = {
+    outerBoxWidth : "20%",
+    innerBoxWidth : "96%",
+  }
+
   const BoxStyle = styled.div`
-    display: ${props.openSideBar ? 'block' : 'none'}
+    display: ${props.openSideBar ? 'block' : 'none'};
+    width: ${widthConfig["outerBoxWidth"]};
+    height: 952px,
   `
 
   return (
@@ -13,16 +27,14 @@ export default function SideBar (props : any) {
       <BoxStyle>
         <Box 
           sx={{
-            width: 400,
-            height: 952,
             border: "4px dashed black",
-            "border-radius": "32px",
-            margin: "16px 8px"
+            "border-radius": "16px",
+            margin: "16px 0px 16px 8px"
           }}
         >
           <Box 
             sx={{
-              width: 376,
+              width: widthConfig["innerBoxWidth"],
               height: 56,
               border: "4px dashed black",
               "border-radius": "16px",
@@ -31,7 +43,7 @@ export default function SideBar (props : any) {
           />
           <Box 
             sx={{
-              width: 376,
+              width: widthConfig["innerBoxWidth"],
               height: 416,
               border: "4px dashed black",
               "border-radius": "16px",
@@ -40,7 +52,7 @@ export default function SideBar (props : any) {
           />
           <Box 
             sx={{
-              width: 376,
+              width: widthConfig["innerBoxWidth"],
               height: 352,
               border: "4px dashed black",
               "border-radius": "16px",
@@ -49,7 +61,7 @@ export default function SideBar (props : any) {
           />
           <Box 
             sx={{
-              width: 376,
+              width: widthConfig["innerBoxWidth"],
               height: 48,
               border: "4px dashed black",
               "border-radius": "16px",
