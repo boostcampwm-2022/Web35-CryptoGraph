@@ -11,14 +11,15 @@ export default function Gnb({}) {
   `
   const ContentStyle = styled.div`
     display: flex;
+    align-items: center;
     justify-content: space-between;
     width: 100%;
   `
   const LogoStyle = styled.div`
-    margin: 33px 0px 28px 50px;
+    margin: 32px 0px 32px 48px;
   `
   const UserInfoStyle = styled.div`
-    margin: 20px 64px 20px 0px;
+    margin: 16px 64px 16px 0px;
   `
 
   return (
@@ -32,9 +33,9 @@ export default function Gnb({}) {
             InputProps={{
               sx: {
                 backgroundColor: 'white',
-                height: '79px',
-                width: '710px',
-                margin: '33px 0px 28px 0px',
+                height: '80px',
+                width: '720px',
+                margin: '32px 0px 32px 0px',
                 p: 2,
                 gap: 2
               },
@@ -42,9 +43,9 @@ export default function Gnb({}) {
               startAdornment: <SearchIcon sx={{ opacity: 0.2 }} />,
               endAdornment: <HighlightOffIcon sx={{ opacity: 0.2 }} />
             }}
-          ></TextField>
+          />
           <UserInfoStyle>
-            <Image src="/userInfo.svg" alt="" width={100} height={100} />
+            <Image src="/userInfo.svg" alt="" width={96} height={96} />
           </UserInfoStyle>
         </ContentStyle>
       </BackgroundStyle>
