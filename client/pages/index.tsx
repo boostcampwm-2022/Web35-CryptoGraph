@@ -6,14 +6,14 @@ import SideBar from './api/Sidebar'
 
 export default function Home() {
   const [sideBarOpen, setSideBarOpen] = useState(false);
-  interface config {
-    treeMapWidth : number,
+  interface treeMapconfig {
+    treeMapWidth : string,
     treeMapHeight : number,
   }
 
-  const config = {
+  const treeMapconfig = {
     treeMapWidth : sideBarOpen ? "80%" : "96%",
-    treeMapHeight : 896,
+    treeMapHeight : 952,
   }
 
   const BackgroundStyle = styled.div`
@@ -32,8 +32,8 @@ export default function Home() {
       <SideBar openSideBar={sideBarOpen}/>
       <Box
         sx={{
-          width: config["treeMapWidth"],
-          height: config["treeMapHeight"],
+          width: treeMapconfig["treeMapWidth"],
+          height: treeMapconfig["treeMapHeight"],
           border: "4px dashed black",
           "border-radius": "32px",
           margin: "16px 32px"
