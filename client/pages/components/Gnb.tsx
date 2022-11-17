@@ -14,6 +14,7 @@ export default function Gnb({}) {
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    min-width : fit-content;
   `
   const LogoStyle = styled.div`
     margin: 32px 0px 32px 48px;

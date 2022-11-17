@@ -62,6 +62,7 @@ export default function SideBar (props : any) {
   const BoxStyle = styled.div`
     display: ${props.openSideBar ? 'block' : 'none'};
     width: ${widthConfig["outerBoxWidth"]};
+    min-width: fit-content;
   `
 
   const ButtonStyle = styled.div`
@@ -145,7 +146,7 @@ export default function SideBar (props : any) {
           sx={{
             border: "1px solid black",
             "border-radius": "16px",
-            margin: "16px 0px 16px 8px"
+            margin: "16px 0px 16px 8px",
           }}
         >
           <Box

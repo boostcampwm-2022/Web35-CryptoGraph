@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Box from '@mui/material/Box'
 import styled from '@emotion/styled'
 import Image from 'next/image'
-import SideBar from './api/Sidebar'
+import SideBar from './components/Sidebar'
 
 export default function Home() {
   const [sideBarOpen, setSideBarOpen] = useState(false);
@@ -36,7 +36,8 @@ export default function Home() {
           height: treeMapconfig["treeMapHeight"],
           border: "1px solid black",
           "border-radius": "32px",
-          margin: "16px 32px"
+          margin: "16px 32px",
+          'min-width': '1536px'
         }}
       />
     </BackgroundStyle>
