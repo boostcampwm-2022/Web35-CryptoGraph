@@ -34,7 +34,7 @@ export default function Home() {
         sx={{
           width: treeMapconfig["treeMapWidth"],
           height: treeMapconfig["treeMapHeight"],
-          border: "4px dashed black",
+          border: "1px solid black",
           "border-radius": "32px",
           margin: "16px 32px"
         }}

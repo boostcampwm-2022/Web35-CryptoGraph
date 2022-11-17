@@ -1,7 +1,9 @@
 import Box from '@mui/material/Box'
-import { EventHandler, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from '@emotion/styled'
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import Image from 'next/image'
 
 export default function SideBar (props : any) {
   const [buttonSelect, setButtonSelect] = useState('treeMap')
@@ -35,16 +37,18 @@ export default function SideBar (props : any) {
     ...buttonSelect === 'treeMap' ? buttonColorConfig["onButton"] : buttonColorConfig["offButton"], 
     width: "44%", 
     height: "48px", 
-    margin: "0px 19px", 
-    "border-radius": "100px"
+    margin: "0px 16px",
+    "border-radius": "100px",
+    "font-size": "24px"
   }
 
   const runningButtonConfig = {
     ...buttonSelect === 'running' ? buttonColorConfig["onButton"] : buttonColorConfig["offButton"], 
       width: "44%", 
       height: "48px", 
-      margin: "0px 19px", 
-      "border-radius": "100px"
+      margin: "0px 16px", 
+      "border-radius": "100px",
+      "font-size": "24px"
     }
 
   const BoxStyle = styled.div`
@@ -58,12 +62,48 @@ export default function SideBar (props : any) {
     align-items: center;
   `
 
-  const treeMapButtonSelectHandler = function (e : MouseEventHandler<HTMLButtonElement>) {
+  const SelectCoinInnerLayerStyle = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 16px 48px;
+  `
+
+  const SelectCoinInnerBoxStyle = styled.div`
+    display: flex;
+    align-items: center;
+  `
+
+  const SelectCoinInnerBoxFontStyle = styled.div`
+    margin: 16px;
+    font-size: 24px;
+  `
+  const SelectCoinTitleStyle = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin: 48px;
+    align-items: center;
+  `
+
+  const SelectCoinTitleFontStyle = styled.div`
+    font-size: 32px;
+  `
+
+  const SelectCoinTitleBoxStyle = styled.div`
+    display: flex;
+    align-items: center;
+  `
+
+  const SelectCoinTitleBoxFontStyle = styled.div`
+    font-size: 24px;
+  `
+
+  const treeMapButtonSelectHandler = function (e : React.MouseEvent<HTMLElement>) {
     e.preventDefault();
     setButtonSelect('treeMap');
   }
 
-  const runningButtonSelectHandler = function (e : MouseEventHandler<HTMLElement>) {
+  const runningButtonSelectHandler = function (e : React.MouseEvent<HTMLElement>) {
     e.preventDefault();
     setButtonSelect('running');
   }
@@ -73,7 +113,7 @@ export default function SideBar (props : any) {
       <BoxStyle>
         <Box 
           sx={{
-            border: "4px dashed black",
+            border: "1px solid black",
             "border-radius": "16px",
             margin: "16px 0px 16px 8px"
           }}
@@ -82,7 +122,7 @@ export default function SideBar (props : any) {
             sx={{
               width: widthConfig["innerBoxWidth"],
               height: 56,
-              border: "4px dashed black",
+              border: "1px solid black",
               "border-radius": "16px",
               margin: "16px 8px",
             }}
@@ -90,7 +130,8 @@ export default function SideBar (props : any) {
             <ButtonStyle>
               <Button variant="contained" 
                 onClick={treeMapButtonSelectHandler}
-                sx={treeMapButtonConfig}>TreeMap</Button>
+                sx={treeMapButtonConfig}
+                >TreeMap</Button>
               <Button variant="contained"
                onClick={runningButtonSelectHandler}
                sx={runningButtonConfig}>Running</Button>
@@ -100,16 +141,40 @@ export default function SideBar (props : any) {
             sx={{
               width: widthConfig["innerBoxWidth"],
               height: 416,
-              border: "4px dashed black",
+              border: "1px solid black",
               "border-radius": "16px",
               margin: "16px 8px"
             }}
-          />
+          >
+            <div className='selectCoin'>
+              <SelectCoinTitleStyle>
+                <SelectCoinTitleFontStyle>코인선택</SelectCoinTitleFontStyle>
+                <SelectCoinTitleBoxStyle>
+                  <SelectCoinTitleBoxFontStyle>전부 [선택/해제]</SelectCoinTitleBoxFontStyle>
+                  <Checkbox/>
+                </SelectCoinTitleBoxStyle>
+              </SelectCoinTitleStyle>
+              <SelectCoinInnerLayerStyle>
+                <SelectCoinInnerBoxStyle>
+                  <Image src="/btc.svg" alt="" width={40} height={40} />
+                  <SelectCoinInnerBoxFontStyle>BTC</SelectCoinInnerBoxFontStyle>
+                </SelectCoinInnerBoxStyle>
+                <Checkbox/>
+              </SelectCoinInnerLayerStyle>
+              <SelectCoinInnerLayerStyle>
+                <SelectCoinInnerBoxStyle>
+                  <Image src="/btc.svg" alt="" width={40} height={40} />
+                  <SelectCoinInnerBoxFontStyle>BTC</SelectCoinInnerBoxFontStyle>
+                </SelectCoinInnerBoxStyle>
+                <Checkbox/>
+              </SelectCoinInnerLayerStyle>
+            </div>
+          </Box>
           <Box 
             sx={{
               width: widthConfig["innerBoxWidth"],
               height: 352,
-              border: "4px dashed black",
+              border: "1px solid black",
               "border-radius": "16px",
               margin: "16px 8px"
             }}
@@ -118,11 +183,13 @@ export default function SideBar (props : any) {
             sx={{
               width: widthConfig["innerBoxWidth"],
               height: 48,
-              border: "4px dashed black",
+              border: "1px solid black",
               "border-radius": "16px",
               margin: "16px 8px"
             }}
-          />
+          >
+            Detail About Coin
+          </Box>
         </Box>
       </BoxStyle>
     </>
