@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Box from '@mui/material/Box'
 import styled from '@emotion/styled'
 import Image from 'next/image'
-import SideBar from './components/Sidebar'
+import SideBar from '../components/Sidebar'
 
 export default function Home() {
   const [sideBarOpen, setSideBarOpen] = useState(false);
