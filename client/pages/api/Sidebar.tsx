@@ -51,6 +51,14 @@ export default function SideBar (props : any) {
       "font-size": "24px"
     }
 
+    const detailButtonConfig = {
+      ...buttonColorConfig["onButton"],
+      width: "100%", 
+      height: "100%", 
+      "border-radius": "16px",
+      "font-size": "24px"
+    }
+
   const BoxStyle = styled.div`
     display: ${props.openSideBar ? 'block' : 'none'};
     width: ${widthConfig["outerBoxWidth"]};
@@ -96,6 +104,28 @@ export default function SideBar (props : any) {
 
   const SelectCoinTitleBoxFontStyle = styled.div`
     font-size: 24px;
+  `
+
+  const CoinIntroductionTitle = styled.div`
+    display: flex;
+    margin: 32px;
+    
+  `
+  const CoinIntroductionTitleContent = styled.div`
+    margin: 0px 48px 0px 32px;
+  `
+
+  const CoinIntroductionTitleCoin = styled.div`
+    font-size: 32px;
+  `
+
+  const CoinIntroductionTitleTicker = styled.div`
+    font-size: 24px;
+  `
+
+  const CoinIntroductionLayer = styled.div`
+    margin: 32px;
+    font-size: 16px;
   `
 
   const treeMapButtonSelectHandler = function (e : React.MouseEvent<HTMLElement>) {
@@ -178,7 +208,27 @@ export default function SideBar (props : any) {
               "border-radius": "16px",
               margin: "16px 8px"
             }}
-          />
+          >
+            <div className='CoinIntroduction'>
+              <CoinIntroductionTitle>
+                <Image src="/btc.svg" alt="" width={88} height={88} />
+                <CoinIntroductionTitleContent>
+                  <CoinIntroductionTitleCoin>BitCoin</CoinIntroductionTitleCoin>
+                  <CoinIntroductionTitleTicker>BTC</CoinIntroductionTitleTicker>
+                </CoinIntroductionTitleContent>
+              </CoinIntroductionTitle>
+              <CoinIntroductionLayer>
+                <div>코인 정보 (22.11.09 기준, coinmarketcap 제공)</div>
+                <div>시가총액 : 1,000,000 $ </div>
+                <div>일일 채굴량 : 1,000,000 $ </div>
+                <div>일일 거래량 : 1,000,000 $ </div>
+                <div>기타 : 1,000,000 $ </div>
+                <div>정보 : 1,000,000 $ </div>
+                <div>되는대로 추가하기 : 1,000,000 $ </div>
+                <div>etc:etcetc</div>
+              </CoinIntroductionLayer>
+            </div>
+          </Box>
           <Box 
             sx={{
               width: widthConfig["innerBoxWidth"],
@@ -188,7 +238,10 @@ export default function SideBar (props : any) {
               margin: "16px 8px"
             }}
           >
-            Detail About Coin
+            <Button variant="contained" 
+                onClick={treeMapButtonSelectHandler}
+                sx={detailButtonConfig}
+                >Detail About BTC</Button>
           </Box>
         </Box>
       </BoxStyle>
