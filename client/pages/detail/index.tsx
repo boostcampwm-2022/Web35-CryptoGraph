@@ -1,5 +1,7 @@
 import styled from '@emotion/styled'
 import { Button } from '@mui/material'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import Chartbutton from './components/ChartButton'
 
 const StyledMainSection = styled.div`
@@ -81,9 +83,15 @@ export default function Detail() {
       <StyledDetailRight>
         <StyledRTV>실시간 코인시세</StyledRTV>
         <StyledRTV>코인 상세정보</StyledRTV>
-        <Button style={{ minWidth: '100px' }} size="large" variant="contained">
-          Go To Main
-        </Button>
+        <Link href="/">
+          <Button
+            style={{ minWidth: '100px', width: '100%' }}
+            size="large"
+            variant="contained"
+          >
+            Go To Main
+          </Button>
+        </Link>
       </StyledDetailRight>
     </StyledMainSection>
   )
