@@ -8,14 +8,39 @@ function updateChart(
   data: CandleData[],
   options: ChartOption
 ) {
-  const X_MAX = 900 //
-  const Y_MAX = 700 // <-크기조절 안되지 않나여?
+  const CHART_CONTAINER_X_SIZE = 1000 // 나중에 옵션으로 반응형 크기 조절
+  const CHART_CONTAINER_Y_SIZE = 800 // <-크기조절 안되지 않나여?
+  const X_RIGHT_MARGIN = 100
+  const Y_RIGHT_MARGIN = 100
   const STEP = 15
-  const [min, max] = getMinMax(data.slice(0, 60))
-  const myScale = d3.scaleLinear().domain([min, max]).range([Y_MAX, 0])
-  d3.select(svgRef.current)
+  const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - X_RIGHT_MARGIN
+  const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - Y_RIGHT_MARGIN
+  const chartContainer = d3.select(svgRef.current)
+  chartContainer.attr('width', CHART_CONTAINER_X_SIZE)
+  chartContainer.attr('height', CHART_CONTAINER_Y_SIZE)
+  const chartArea = chartContainer.select('svg#chart-area')
+  chartArea.attr('width', CHART_AREA_X_SIZE)
+  chartArea.attr('height', CHART_AREA_Y_SIZE)
+  chartArea.attr('view')
+  const [min, max] = [
+    d3.min(data, d => d.low_price),
+    d3.max(data, d => d.high_price)
+  ]
+  if (!min || !max) {
+    console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
+    return
+  }
+  const myScale = d3
+    .scaleLinear()
+    .domain([min, max])
+    .range([CHART_CONTAINER_Y_SIZE, 0])
+  const yAxis = chartContainer
+    .select<SVGSVGElement>('g#y-axis')
+    .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
+    .call(d3.axisRight(myScale))
+  chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
-    .data(data.slice(0, 60))
+    .data(data)
     .join(
       enter => {
         const $g = enter.append('g')
@@ -24,7 +49,7 @@ function updateChart(
           .attr('height', d =>
             Math.abs(myScale(d.trade_price) - myScale(d.opening_price))
           )
-          .attr('x', (d, i) => X_MAX - STEP * i)
+          .attr('x', (d, i) => CHART_AREA_X_SIZE - STEP * (i + 1))
           .attr('y', d =>
             Math.min(myScale(d.trade_price), myScale(d.opening_price))
           )
@@ -32,8 +57,8 @@ function updateChart(
             d.opening_price <= d.trade_price ? 'red' : 'blue'
           )
         $g.append('line')
-          .attr('x1', (d, i) => X_MAX + 7 - STEP * i)
-          .attr('x2', (d, i) => X_MAX + 7 - STEP * i)
+          .attr('x1', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
+          .attr('x2', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
           .attr('y1', d => myScale(d.low_price))
           .attr('y2', d => myScale(d.high_price))
           .attr('stroke', d =>
@@ -50,15 +75,15 @@ function updateChart(
               ? 1
               : Math.abs(myScale(d.trade_price) - myScale(d.opening_price))
           )
-          .attr('x', (d, i) => X_MAX - STEP * i)
+          .attr('x', (d, i) => CHART_AREA_X_SIZE - STEP * (i + 1))
           .attr('y', d =>
             Math.min(myScale(d.trade_price), myScale(d.opening_price))
           )
           .attr('fill', d => (d.opening_price < d.trade_price ? 'red' : 'blue'))
         update
           .select('line')
-          .attr('x1', (d, i) => X_MAX + 7 - STEP * i)
-          .attr('x2', (d, i) => X_MAX + 7 - STEP * i)
+          .attr('x1', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
+          .attr('x2', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
           .attr('y1', d => myScale(d.low_price))
           .attr('y2', d => myScale(d.high_price))
           .attr('stroke', d =>
@@ -72,6 +97,11 @@ function updateChart(
     )
 }
 interface CandleChartProps {
+  // 200 -> 400 -> 600 ->
+  // 제화면에서 20개를 보여주고 있어요. 40개가 렌더링되고, 10개 움직이면 마우스가 떼질따마다 10~30번까지보여주잖아요 모자란 10개만 페치..
+  // 데이터 셋이.. 아 맞네요.. 유아 라이트.. 뭘 페치 아.. 그렇네요.. 맨 끝에 두개로 하면 되네요.
+  // 현재시점에서 내가 보여주고있는 데이터 개수만큼 정확히 예비데이타 있게끔 유지..
+  // 아니면 나중에.. 네트워크우선모드 / 성능우선모드 <- 이런식으로
   candleData: CandleData[]
   option: ChartOption
 }
@@ -83,18 +113,11 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
 
   return (
     <div id="chart">
-      <svg ref={chartSvg} width="1000" height="800" />
+      <svg id="chart-container" ref={chartSvg}>
+        <svg id="chart-area" />
+        <g id="y-axis" />
+        <g id="x-axis" />
+      </svg>
     </div>
   )
-}
-
-//D3 함수로 refactoring 필요
-function getMinMax(data: CandleData[]): number[] {
-  let min = Number.MAX_SAFE_INTEGER
-  let max = -1
-  data.forEach(candleData => {
-    if (candleData.low_price < min) min = candleData.low_price
-    if (candleData.high_price > max) max = candleData.high_price
-  })
-  return [min, max]
 }
