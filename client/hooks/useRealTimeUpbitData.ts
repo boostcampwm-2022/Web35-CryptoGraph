@@ -93,6 +93,7 @@ function updateData(
       newTickData.trade_price
     )
     prevData[0].trade_price = newTickData.trade_price
+    prevData[0].timestamp = newTickData.trade_timestamp
     return [...prevData]
   }
   //잃어버린 30초
@@ -100,12 +101,13 @@ function updateData(
   toInsert.opening_price = toInsert.trade_price
   toInsert.low_price = toInsert.trade_price
   toInsert.high_price = toInsert.trade_price
+  toInsert.timestamp = toInsert.trade_timestamp
 
   return [toInsert, ...prevData] //한화면에 보여주는 캔들 * 2
 }
 
-function transDate(timestamp: number, step = 60000): string {
-  const date = new Date(timestamp - (timestamp % step))
+function transDate(timestamp: number, period = 60): string {
+  const date = new Date(timestamp - (timestamp % (period * 1000)))
   date.setHours(date.getHours() + 9)
   return date.toISOString().substring(0, 19)
 }

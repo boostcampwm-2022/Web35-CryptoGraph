@@ -23,21 +23,33 @@ function updateChart(
   chartArea.attr('height', CHART_AREA_Y_SIZE)
   chartArea.attr('view')
   const [min, max] = [
-    d3.min(data, d => d.low_price),
-    d3.max(data, d => d.high_price)
+    d3.min(data.slice(0, CHART_AREA_X_SIZE / STEP), d => d.low_price),
+    d3.max(data.slice(0, CHART_AREA_X_SIZE / STEP), d => d.high_price)
   ]
   if (!min || !max) {
     console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
     return
   }
-  const myScale = d3
+  const makeDate = (timestamp: number, period: number): Date => {
+    return new Date(timestamp - (timestamp % (period * 1000)))
+  }
+  const yAxisScale = d3
     .scaleLinear()
     .domain([min, max])
-    .range([CHART_CONTAINER_Y_SIZE, 0])
+    .range([CHART_AREA_Y_SIZE, 0])
+
+  const xAxisScale = d3
+    .scaleTime()
+    .domain([makeDate(data[59].timestamp, 60), makeDate(data[0].timestamp, 60)]) //옵션화 필요함
+    .range([0, CHART_AREA_X_SIZE])
   const yAxis = chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
-    .call(d3.axisRight(myScale))
+    .call(d3.axisRight(yAxisScale))
+  const xAxis = chartContainer
+    .select<SVGSVGElement>('g#x-axis')
+    .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
+    .call(d3.axisBottom(xAxisScale))
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
     .data(data)
@@ -47,11 +59,11 @@ function updateChart(
         $g.append('rect')
           .attr('width', STEP)
           .attr('height', d =>
-            Math.abs(myScale(d.trade_price) - myScale(d.opening_price))
+            Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price))
           )
           .attr('x', (d, i) => CHART_AREA_X_SIZE - STEP * (i + 1))
           .attr('y', d =>
-            Math.min(myScale(d.trade_price), myScale(d.opening_price))
+            Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
           .attr('fill', d =>
             d.opening_price <= d.trade_price ? 'red' : 'blue'
@@ -59,8 +71,8 @@ function updateChart(
         $g.append('line')
           .attr('x1', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
           .attr('x2', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
-          .attr('y1', d => myScale(d.low_price))
-          .attr('y2', d => myScale(d.high_price))
+          .attr('y1', d => yAxisScale(d.low_price))
+          .attr('y2', d => yAxisScale(d.high_price))
           .attr('stroke', d =>
             d.opening_price <= d.trade_price ? 'red' : 'blue'
           )
@@ -71,21 +83,24 @@ function updateChart(
           .select('rect')
           .attr('width', STEP)
           .attr('height', d =>
-            Math.abs(myScale(d.trade_price) - myScale(d.opening_price)) <= 0
+            Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price)) <=
+            0
               ? 1
-              : Math.abs(myScale(d.trade_price) - myScale(d.opening_price))
+              : Math.abs(
+                  yAxisScale(d.trade_price) - yAxisScale(d.opening_price)
+                )
           )
           .attr('x', (d, i) => CHART_AREA_X_SIZE - STEP * (i + 1))
           .attr('y', d =>
-            Math.min(myScale(d.trade_price), myScale(d.opening_price))
+            Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
           .attr('fill', d => (d.opening_price < d.trade_price ? 'red' : 'blue'))
         update
           .select('line')
           .attr('x1', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
           .attr('x2', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
-          .attr('y1', d => myScale(d.low_price))
-          .attr('y2', d => myScale(d.high_price))
+          .attr('y1', d => yAxisScale(d.low_price))
+          .attr('y2', d => yAxisScale(d.high_price))
           .attr('stroke', d =>
             d.opening_price < d.trade_price ? 'red' : 'blue'
           )
