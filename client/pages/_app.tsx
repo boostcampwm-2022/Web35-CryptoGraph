@@ -15,12 +15,16 @@ interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
 
-const GlobalStyle = css `
-  body {
+const GlobalStyle = css`
+  html {
+    font-size: 62.5%;
+  }
+  html,
+  body,
+  div#__next {
     height: 100%;
   }
 `
-
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
   return (
