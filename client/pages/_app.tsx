@@ -16,6 +16,9 @@ interface MyAppProps extends AppProps {
 }
 
 const GlobalStyle = css`
+  html {
+    font-size: 62.5%;
+  }
   html,
   body,
   div#__next {

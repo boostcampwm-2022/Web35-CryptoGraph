@@ -1,15 +1,20 @@
 import styled from '@emotion/styled'
+import { Button } from '@mui/material'
 import Chartbutton from './components/ChartButton'
 
 const StyledMainSection = styled.div`
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  min-width: 1000px;
+  height: 80vh;
   /* background-color: violet; */
   display: flex;
 `
+//왼쪽 메인차트
 const StyledDetailLeft = styled.div`
-  width: 75%;
-  height: 80%;
+  width: 75vw;
+  min-width: fit-content;
+  height: 75vh;
+  min-height: 750px;
   margin: 24px;
   display: flex;
   flex-direction: column;
@@ -17,7 +22,9 @@ const StyledDetailLeft = styled.div`
 `
 const StyledChartButton = styled.div`
   width: 95%;
+  min-width: 700px;
   height: 10%;
+  min-height: 55px;
   background-color: #ffffff;
   margin: 0 24px;
   border: 1px solid #cac4d0;
@@ -29,16 +36,21 @@ const StyledChartButton = styled.div`
 `
 const StyledChart = styled.div`
   width: 95%;
+  min-width: 700px;
   height: 100%;
+  min-height: 480px;
   background-color: #ffffff;
   margin: 24px;
   border: 1px solid #cac4d0;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
 `
+//오른쪽 사이드바
 const StyledDetailRight = styled.div`
-  width: 20%;
-  height: 90%;
+  width: 18vw;
+  min-width: 250px;
+  height: 75vh;
+  min-height: 750px;
   margin: 24px;
   display: flex;
   flex-direction: column;
@@ -48,30 +60,14 @@ const StyledDetailRight = styled.div`
 const StyledRTV = styled.div`
   width: 100%;
   height: 43%;
+  min-height: 300px;
   background-color: #ffffff;
   border: 1px solid #cac4d0;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   padding-bottom: 24px;
 `
-const StyledGoToMainButton = styled.button`
-  width: 100%;
-  height: 7%;
-  background-color: #6750a4;
-  border: 1px solid #cac4d0;
-  border-radius: 10px;
-  padding-bottom: 24px;
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 20px;
-  align-items: center;
-  text-align: center;
-  letter-spacing: 0.1px;
 
-  color: #ffffff;
-`
 export default function Detail() {
   return (
     <StyledMainSection>
@@ -85,7 +81,9 @@ export default function Detail() {
       <StyledDetailRight>
         <StyledRTV>실시간 코인시세</StyledRTV>
         <StyledRTV>코인 상세정보</StyledRTV>
-        <StyledGoToMainButton>Go To Main</StyledGoToMainButton>
+        <Button style={{ minWidth: '100px' }} size="large" variant="contained">
+          Go To Main
+        </Button>
       </StyledDetailRight>
     </StyledMainSection>
   )

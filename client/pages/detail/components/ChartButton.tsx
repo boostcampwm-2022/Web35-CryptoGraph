@@ -8,11 +8,13 @@ const StyledTimeButton = styled.button`
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
-  font-size: 18px;
-  line-height: 20px;
-  margin: 8px 32px;
-  width: 12%;
+  font-size: 16px;
+  line-height: 2vh;
+  margin: 8px 16px;
+  width: 12vw;
   height: 55%;
+  min-width: 108px;
+  min-height: 30px;
 `
 export default function Chartbutton() {
   return (
