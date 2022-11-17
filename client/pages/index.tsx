@@ -1,28 +1,45 @@
-import * as React from 'react'
-import Container from '@mui/material/Container'
-import Typography from '@mui/material/Typography'
+import { useState } from 'react'
 import Box from '@mui/material/Box'
 import styled from '@emotion/styled'
+import Image from 'next/image'
+import SideBar from '../components/Sidebar'
+
 export default function Home() {
-  const Test = styled.div`
-    background-color: red;
+  const [sideBarOpen, setSideBarOpen] = useState(false);
+  interface treeMapconfig {
+    treeMapWidth : string,
+    treeMapHeight : number,
+  }
+
+  const treeMapconfig = {
+    treeMapWidth : sideBarOpen ? "80%" : "96%",
+    treeMapHeight : 952,
+  }
+
+  const BackgroundStyle = styled.div`
+    width: 100%;
+    display: flex;
+    align-items: center;
   `
+
+  const sideBarOpenHandler = () => {
+    setSideBarOpen(!sideBarOpen)
+  }
+
   return (
-    <Container maxWidth="lg">
+    <BackgroundStyle>
+      <Image onClick={sideBarOpenHandler} src="/openBtn.svg" alt="" width={32} height={140} />
+      <SideBar openSideBar={sideBarOpen}/>
       <Box
         sx={{
-          my: 4,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center'
+          width: treeMapconfig["treeMapWidth"],
+          height: treeMapconfig["treeMapHeight"],
+          border: "1px solid black",
+          "border-radius": "32px",
+          margin: "16px 32px",
+          'min-width': '1536px'
         }}
-      >
-        <Typography variant="h4" component="h1" gutterBottom>
-          MUI v5 + Next.js with TypeScript example
-        </Typography>
-        <Test>dfsdfsdasdasdassads</Test>
-      </Box>
-    </Container>
+      />
+    </BackgroundStyle>
   )
 }
