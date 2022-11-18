@@ -24,3 +24,11 @@ export interface ChartOption {
   isVolumeVislble: boolean
   isMovingAverageVisible: boolean
 }
+export interface ChartRenderOption {
+  fetchStartDataIndex: number
+  fetchEndDataIndex: number
+  renderStartDataIndex: number
+  renderEndDataIndex: number
+  candleWidth: number
+  howMany: number
+}
