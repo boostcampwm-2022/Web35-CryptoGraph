@@ -157,28 +157,18 @@ function initChart(
     return undefined
   }
   const xAxisScale = getXAxisScale(renderOpt, data)
-  const yAxis = chartContainer
+  chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
     .call(d3.axisRight(yAxisScale))
-  const xAxis = chartContainer
+  chartContainer
     .select<SVGSVGElement>('g#x-axis')
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
     .call(d3.axisBottom(xAxisScale))
-  const zoom = d3
-    .zoom<SVGSVGElement, CandleData>()
-    .scaleExtent([1, 1])
-    .translateExtent([
-      [-Infinity, 0],
-      [CHART_CONTAINER_X_SIZE, CHART_CONTAINER_Y_SIZE]
-    ])
-    .on('zoom', function (event) {
-      const newX = event.transform.rescaleX(xAxisScale)
-      const newY = event.transform.rescaleY(yAxisScale)
-      xAxis.call(d3.axisBottom(newX))
-      yAxis.call(d3.axisLeft(newY))
-      d3.select('#chart-area').selectAll('g').attr('transform', event.transform)
-    })
+  let isChartDragged = false
+  let originX = 0
+  let transalateX = 0
+  let diffX = 0
   d3.select<SVGSVGElement, CandleData>('#chart-container')
     //.call(zoom)
     .on('wheel', (e: WheelEvent) => {
@@ -188,6 +178,27 @@ function initChart(
           renderEndDataIndex: prev.renderEndDataIndex + (e.deltaY > 0 ? 1 : -1)
         }
       })
+    })
+    .on('mousedown', (e: MouseEvent) => {
+      isChartDragged = true
+      originX = e.clientX
+      return
+    })
+    .on('mousemove', (e: MouseEvent) => {
+      if (isChartDragged) {
+        diffX = e.clientX - originX
+        d3.select('#chart-area')
+          .selectAll('g')
+          .attr('transform', `translate(${diffX + transalateX})`)
+      }
+      return
+    })
+    .on('mouseup', (e: MouseEvent) => {
+      if (isChartDragged) {
+        transalateX += diffX
+      }
+      isChartDragged = false
+      return
     })
 }
 
