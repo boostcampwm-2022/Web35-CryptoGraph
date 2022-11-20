@@ -11,7 +11,9 @@ const X_RIGHT_MARGIN = 100
 const Y_RIGHT_MARGIN = 100
 const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - X_RIGHT_MARGIN
 const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - Y_RIGHT_MARGIN
-
+function makeDate(timestamp: number, period: number): Date {
+  return new Date(timestamp - (timestamp % (period * 1000)))
+}
 function calculateCandlewidth(
   renderOptions: ChartRenderOption,
   chartXSize: number
@@ -21,29 +23,53 @@ function calculateCandlewidth(
     (renderOptions.renderEndDataIndex - renderOptions.renderStartDataIndex)
   )
 }
-
-function updateChart(
-  svgRef: React.RefObject<SVGSVGElement>,
-  data: CandleData[],
-  renderOptions: ChartRenderOption,
-  options: ChartOption
-) {
-  console.log(renderOptions)
-  const candleWidth = calculateCandlewidth(renderOptions, CHART_AREA_X_SIZE)
-  const chartContainer = d3.select(svgRef.current)
-  const chartArea = chartContainer.select('svg#chart-area')
+function getYAxisScale(data: CandleData[]) {
   const [min, max] = [
-    d3.min(data.slice(0, CHART_AREA_X_SIZE / candleWidth), d => d.low_price),
-    d3.max(data.slice(0, CHART_AREA_X_SIZE / candleWidth), d => d.high_price)
+    d3.min(data, d => d.low_price),
+    d3.max(data, d => d.high_price)
   ]
   if (!min || !max) {
     console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
-    return
+    return undefined
   }
-  const yAxisScale = d3
-    .scaleLinear()
-    .domain([min, max])
-    .range([CHART_AREA_Y_SIZE, 0])
+  return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 0])
+}
+function getXAxisScale(renderOpt: ChartRenderOption, data: CandleData[]) {
+  return d3
+    .scaleTime()
+    .domain([
+      //데이터는 End가 최신 데이터이기 때문에, 순서를 반대로 해야 시간순서대로 들어온다?
+      makeDate(data[renderOpt.renderEndDataIndex].timestamp, 60),
+      makeDate(data[renderOpt.renderStartDataIndex].timestamp, 60)
+    ]) //옵션화 필요함
+    .range([0, CHART_AREA_X_SIZE])
+    .nice()
+}
+function updateChart(
+  svgRef: React.RefObject<SVGSVGElement>,
+  data: CandleData[],
+  renderOpt: ChartRenderOption,
+  options: ChartOption
+) {
+  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
+  const chartContainer = d3.select(svgRef.current)
+  const chartArea = chartContainer.select('svg#chart-area')
+  const yAxisScale = getYAxisScale(
+    data.slice(renderOpt.renderStartDataIndex, renderOpt.renderEndDataIndex)
+  )
+  if (!yAxisScale) {
+    console.error('받아온 API 데이터 에러')
+    return undefined
+  }
+  const xAxisScale = getXAxisScale(renderOpt, data)
+  chartContainer
+    .select<SVGSVGElement>('g#y-axis')
+    .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
+    .call(d3.axisRight(yAxisScale))
+  chartContainer
+    .select<SVGSVGElement>('g#x-axis')
+    .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
+    .call(d3.axisBottom(xAxisScale))
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
     .data(data)
@@ -123,33 +149,14 @@ function initChart(
   chartArea.attr('width', CHART_AREA_X_SIZE)
   chartArea.attr('height', CHART_AREA_Y_SIZE)
   chartArea.attr('view')
-  const [min, max] = [
-    d3.min(
-      data.slice(0, CHART_AREA_X_SIZE / renderOpt.candleWidth),
-      d => d.low_price
-    ),
-    d3.max(
-      data.slice(0, CHART_AREA_X_SIZE / renderOpt.candleWidth),
-      d => d.high_price
-    )
-  ]
-  if (!min || !max) {
-    console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
-    return
+  const yAxisScale = getYAxisScale(
+    data.slice(renderOpt.renderStartDataIndex, renderOpt.renderEndDataIndex)
+  )
+  if (!yAxisScale) {
+    console.error('받아온 API 데이터 에러')
+    return undefined
   }
-  const makeDate = (timestamp: number, period: number): Date => {
-    return new Date(timestamp - (timestamp % (period * 1000)))
-  }
-  const yAxisScale = d3
-    .scaleLinear()
-    .domain([min, max])
-    .range([CHART_AREA_Y_SIZE, 0])
-    .nice()
-  const xAxisScale = d3
-    .scaleTime()
-    .domain([makeDate(data[59].timestamp, 60), makeDate(data[0].timestamp, 60)]) //옵션화 필요함
-    .range([0, CHART_AREA_X_SIZE])
-    .nice()
+  const xAxisScale = getXAxisScale(renderOpt, data)
   const yAxis = chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
