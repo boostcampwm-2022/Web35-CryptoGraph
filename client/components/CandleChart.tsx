@@ -5,7 +5,7 @@ import {
   DEFAULT_CANDLER_CHART_RENDER_OPTION,
   DEFAULT_CANDLE_CHART_OPTION
 } from '@/constants/ChartConstants'
-import { D3DragEvent } from 'd3'
+import { D3ZoomEvent } from 'd3'
 const CHART_CONTAINER_X_SIZE = 1000
 const CHART_CONTAINER_Y_SIZE = 800
 const X_RIGHT_MARGIN = 100
@@ -19,10 +19,7 @@ function calculateCandlewidth(
   renderOptions: ChartRenderOption,
   chartXSize: number
 ): number {
-  return (
-    chartXSize /
-    (renderOptions.renderEndDataIndex - renderOptions.renderStartDataIndex)
-  )
+  return chartXSize / renderOptions.renderCandleCount
 }
 function getYAxisScale(data: CandleData[]) {
   const [min, max] = [
@@ -30,6 +27,7 @@ function getYAxisScale(data: CandleData[]) {
     d3.max(data, d => d.high_price)
   ]
   if (!min || !max) {
+    console.error(data, data.length)
     console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
     return undefined
   }
@@ -40,7 +38,11 @@ function getXAxisScale(renderOpt: ChartRenderOption, data: CandleData[]) {
     .scaleTime()
     .domain([
       //데이터는 End가 최신 데이터이기 때문에, 순서를 반대로 해야 시간순서대로 들어온다?
-      makeDate(data[renderOpt.renderEndDataIndex].timestamp, 60),
+      makeDate(
+        data[renderOpt.renderStartDataIndex + renderOpt.renderCandleCount]
+          .timestamp,
+        60
+      ),
       makeDate(data[renderOpt.renderStartDataIndex].timestamp, 60)
     ]) //옵션화 필요함
     .range([0, CHART_AREA_X_SIZE])
@@ -55,8 +57,16 @@ function updateChart(
   const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
   const chartContainer = d3.select(svgRef.current)
   const chartArea = chartContainer.select('svg#chart-area')
+  console.log(
+    '범위',
+    renderOpt.renderStartDataIndex,
+    renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
+  )
   const yAxisScale = getYAxisScale(
-    data.slice(renderOpt.renderStartDataIndex, renderOpt.renderEndDataIndex)
+    data.slice(
+      renderOpt.renderStartDataIndex,
+      renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
+    )
   )
   if (!yAxisScale) {
     console.error('받아온 API 데이터 에러')
@@ -166,8 +176,12 @@ function initChart(
   chartArea.attr('width', CHART_AREA_X_SIZE)
   chartArea.attr('height', CHART_AREA_Y_SIZE)
   chartArea.attr('view')
+  console.error(renderOpt.renderStartDataIndex, renderOpt.renderCandleCount)
   const yAxisScale = getYAxisScale(
-    data.slice(renderOpt.renderStartDataIndex, renderOpt.renderEndDataIndex)
+    data.slice(
+      renderOpt.renderStartDataIndex,
+      renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
+    )
   )
   if (!yAxisScale) {
     console.error('받아온 API 데이터 에러')
@@ -183,35 +197,39 @@ function initChart(
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
     .call(d3.axisBottom(xAxisScale))
   let transalateX = 0
+  let movedCandle = 0
+  const zoom = d3
+    .zoom<SVGSVGElement, CandleData>()
+    .scaleExtent([1, 1])
+    .translateExtent([
+      [-Infinity, 0],
+      [CHART_CONTAINER_X_SIZE, CHART_CONTAINER_Y_SIZE]
+    ])
+    .on('zoom', function (event: D3ZoomEvent<SVGSVGElement, CandleData>) {
+      transalateX = event.transform.x
+      CandleMetaDataSetter((prev: ChartRenderOption) => {
+        movedCandle = Math.floor(
+          transalateX / calculateCandlewidth(prev, CHART_AREA_X_SIZE)
+        )
+        return {
+          ...prev,
+          renderStartDataIndex: movedCandle
+        }
+      })
+      d3.select('#chart-area')
+        .selectAll<SVGSVGElement, CandleData>('g')
+        .attr('transform', `translate(${event.transform.x})`)
+    })
   d3.select<SVGSVGElement, CandleData>('#chart-container')
-    //.call(zoom)
+    .call(zoom)
     .on('wheel', (e: WheelEvent) => {
       CandleMetaDataSetter(prev => {
         return {
           ...prev,
-          renderEndDataIndex: prev.renderEndDataIndex + (e.deltaY > 0 ? 1 : -1)
+          renderCandleCount: prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1)
         }
       })
     })
-    .call(
-      d3
-        .drag<SVGSVGElement, CandleData>()
-        .on('start', (e: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
-          console.log('스타트')
-        })
-        .on('drag', (e: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
-          console.log('으악')
-          transalateX += e.dx
-          d3.select('#chart-area')
-            .selectAll('g')
-            .attr('transform', `translate(${transalateX})`)
-          return
-        })
-        .on('end', () => {
-          console.log('엔드')
-          return
-        })
-    )
 }
 
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {

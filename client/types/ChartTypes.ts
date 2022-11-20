@@ -26,7 +26,7 @@ export interface ChartOption {
 }
 export interface ChartRenderOption {
   fetchStartDataIndex: number
-  fetchEndDataIndex: number
+  fetchCandleCount: number
   renderStartDataIndex: number
-  renderEndDataIndex: number
+  renderCandleCount: number
 }
