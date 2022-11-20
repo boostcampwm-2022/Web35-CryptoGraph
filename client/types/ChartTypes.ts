@@ -29,6 +29,4 @@ export interface ChartRenderOption {
   fetchEndDataIndex: number
   renderStartDataIndex: number
   renderEndDataIndex: number
-  candleWidth: number
-  howMany: number
 }

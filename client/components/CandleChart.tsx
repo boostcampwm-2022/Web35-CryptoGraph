@@ -12,23 +12,29 @@ const Y_RIGHT_MARGIN = 100
 const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - X_RIGHT_MARGIN
 const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - Y_RIGHT_MARGIN
 
+function calculateCandlewidth(
+  renderOptions: ChartRenderOption,
+  chartXSize: number
+): number {
+  return (
+    chartXSize /
+    (renderOptions.renderEndDataIndex - renderOptions.renderStartDataIndex)
+  )
+}
+
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
   renderOptions: ChartRenderOption,
   options: ChartOption
 ) {
+  console.log(renderOptions)
+  const candleWidth = calculateCandlewidth(renderOptions, CHART_AREA_X_SIZE)
   const chartContainer = d3.select(svgRef.current)
   const chartArea = chartContainer.select('svg#chart-area')
   const [min, max] = [
-    d3.min(
-      data.slice(0, CHART_AREA_X_SIZE / renderOptions.candleWidth),
-      d => d.low_price
-    ),
-    d3.max(
-      data.slice(0, CHART_AREA_X_SIZE / renderOptions.candleWidth),
-      d => d.high_price
-    )
+    d3.min(data.slice(0, CHART_AREA_X_SIZE / candleWidth), d => d.low_price),
+    d3.max(data.slice(0, CHART_AREA_X_SIZE / candleWidth), d => d.high_price)
   ]
   if (!min || !max) {
     console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
@@ -45,14 +51,11 @@ function updateChart(
       enter => {
         const $g = enter.append('g')
         $g.append('rect')
-          .attr('width', renderOptions.candleWidth)
+          .attr('width', candleWidth)
           .attr('height', d =>
             Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price))
           )
-          .attr(
-            'x',
-            (d, i) => CHART_AREA_X_SIZE - renderOptions.candleWidth * (i + 1)
-          )
+          .attr('x', (d, i) => CHART_AREA_X_SIZE - candleWidth * (i + 1))
           .attr('y', d =>
             Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
@@ -60,16 +63,8 @@ function updateChart(
             d.opening_price <= d.trade_price ? 'red' : 'blue'
           )
         $g.append('line')
-          .attr(
-            'x1',
-            (d, i) =>
-              CHART_AREA_X_SIZE + 7 - renderOptions.candleWidth * (i + 1)
-          )
-          .attr(
-            'x2',
-            (d, i) =>
-              CHART_AREA_X_SIZE + 7 - renderOptions.candleWidth * (i + 1)
-          )
+          .attr('x1', (d, i) => CHART_AREA_X_SIZE + 7 - candleWidth * (i + 1))
+          .attr('x2', (d, i) => CHART_AREA_X_SIZE + 7 - candleWidth * (i + 1))
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
           .attr('stroke', d =>
@@ -80,7 +75,7 @@ function updateChart(
       update => {
         update
           .select('rect')
-          .attr('width', renderOptions.candleWidth)
+          .attr('width', candleWidth)
           .attr('height', d =>
             Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price)) <=
             0
@@ -89,26 +84,15 @@ function updateChart(
                   yAxisScale(d.trade_price) - yAxisScale(d.opening_price)
                 )
           )
-          .attr(
-            'x',
-            (d, i) => CHART_AREA_X_SIZE - renderOptions.candleWidth * (i + 1)
-          )
+          .attr('x', (d, i) => CHART_AREA_X_SIZE - candleWidth * (i + 1))
           .attr('y', d =>
             Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
           .attr('fill', d => (d.opening_price < d.trade_price ? 'red' : 'blue'))
         update
           .select('line')
-          .attr(
-            'x1',
-            (d, i) =>
-              CHART_AREA_X_SIZE + 7 - renderOptions.candleWidth * (i + 1)
-          )
-          .attr(
-            'x2',
-            (d, i) =>
-              CHART_AREA_X_SIZE + 7 - renderOptions.candleWidth * (i + 1)
-          )
+          .attr('x1', (d, i) => CHART_AREA_X_SIZE + 7 - candleWidth * (i + 1))
+          .attr('x2', (d, i) => CHART_AREA_X_SIZE + 7 - candleWidth * (i + 1))
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
           .attr('stroke', d =>
@@ -194,9 +178,7 @@ function initChart(
       CandleMetaDataSetter(prev => {
         return {
           ...prev,
-          howMany: prev.howMany + (e.deltaY > 0 ? 1 : -1),
-          candleWidth:
-            CHART_AREA_X_SIZE / (prev.howMany + (e.deltaY > 0 ? 1 : -1))
+          renderEndDataIndex: prev.renderEndDataIndex + (e.deltaY > 0 ? 1 : -1)
         }
       })
     })
