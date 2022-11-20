@@ -83,7 +83,7 @@ function updateData(
   // 첫번째 얘를 갱신이아니라 교체를 해줘야되는거아닌가
   // ticker로 들어온 데이터가 클라이언트의 데이터보다 최신인 경우 추가
   if (prevData[0].candle_date_time_kst === newTickData.candle_date_time_kst) {
-    console.log('틱 -> 틱')
+    //console.log('틱 -> 틱')
     prevData[0].low_price = Math.min(
       prevData[0].low_price,
       newTickData.trade_price
