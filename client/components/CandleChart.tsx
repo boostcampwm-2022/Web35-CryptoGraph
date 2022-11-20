@@ -5,6 +5,7 @@ import {
   DEFAULT_CANDLER_CHART_RENDER_OPTION,
   DEFAULT_CANDLE_CHART_OPTION
 } from '@/constants/ChartConstants'
+import { D3DragEvent } from 'd3'
 const CHART_CONTAINER_X_SIZE = 1000
 const CHART_CONTAINER_Y_SIZE = 800
 const X_RIGHT_MARGIN = 100
@@ -165,10 +166,7 @@ function initChart(
     .select<SVGSVGElement>('g#x-axis')
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
     .call(d3.axisBottom(xAxisScale))
-  let isChartDragged = false
-  let originX = 0
   let transalateX = 0
-  let diffX = 0
   d3.select<SVGSVGElement, CandleData>('#chart-container')
     //.call(zoom)
     .on('wheel', (e: WheelEvent) => {
@@ -179,27 +177,25 @@ function initChart(
         }
       })
     })
-    .on('mousedown', (e: MouseEvent) => {
-      isChartDragged = true
-      originX = e.clientX
-      return
-    })
-    .on('mousemove', (e: MouseEvent) => {
-      if (isChartDragged) {
-        diffX = e.clientX - originX
-        d3.select('#chart-area')
-          .selectAll('g')
-          .attr('transform', `translate(${diffX + transalateX})`)
-      }
-      return
-    })
-    .on('mouseup', (e: MouseEvent) => {
-      if (isChartDragged) {
-        transalateX += diffX
-      }
-      isChartDragged = false
-      return
-    })
+    .call(
+      d3
+        .drag<SVGSVGElement, CandleData>()
+        .on('start', (e: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
+          console.log('스타트')
+        })
+        .on('drag', (e: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
+          console.log('으악')
+          transalateX += e.dx
+          d3.select('#chart-area')
+            .selectAll('g')
+            .attr('transform', `translate(${transalateX})`)
+          return
+        })
+        .on('end', () => {
+          console.log('엔드')
+          return
+        })
+    )
 }
 
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
