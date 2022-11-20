@@ -90,8 +90,16 @@ function updateChart(
             d.opening_price <= d.trade_price ? 'red' : 'blue'
           )
         $g.append('line')
-          .attr('x1', (d, i) => CHART_AREA_X_SIZE + 7 - candleWidth * (i + 1))
-          .attr('x2', (d, i) => CHART_AREA_X_SIZE + 7 - candleWidth * (i + 1))
+          .attr(
+            'x1',
+            (d, i) =>
+              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+          )
+          .attr(
+            'x2',
+            (d, i) =>
+              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+          )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
           .attr('stroke', d =>
@@ -118,8 +126,16 @@ function updateChart(
           .attr('fill', d => (d.opening_price < d.trade_price ? 'red' : 'blue'))
         update
           .select('line')
-          .attr('x1', (d, i) => CHART_AREA_X_SIZE + 7 - candleWidth * (i + 1))
-          .attr('x2', (d, i) => CHART_AREA_X_SIZE + 7 - candleWidth * (i + 1))
+          .attr(
+            'x1',
+            (d, i) =>
+              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+          )
+          .attr(
+            'x2',
+            (d, i) =>
+              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+          )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
           .attr('stroke', d =>
