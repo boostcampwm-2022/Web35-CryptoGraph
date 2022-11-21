@@ -29,4 +29,5 @@ export interface ChartRenderOption {
   fetchCandleCount: number
   renderStartDataIndex: number
   renderCandleCount: number
+  translateX: number
 }

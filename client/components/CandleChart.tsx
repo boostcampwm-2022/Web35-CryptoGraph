@@ -3,7 +3,8 @@ import { CandleData, ChartOption, ChartRenderOption } from '@/types/ChartTypes'
 import * as d3 from 'd3'
 import {
   DEFAULT_CANDLER_CHART_RENDER_OPTION,
-  DEFAULT_CANDLE_CHART_OPTION
+  DEFAULT_CANDLE_CHART_OPTION,
+  MIN_CANDLE_COUNT
 } from '@/constants/ChartConstants'
 import { D3ZoomEvent } from 'd3'
 const CHART_CONTAINER_X_SIZE = 1000
@@ -33,20 +34,29 @@ function getYAxisScale(data: CandleData[]) {
   }
   return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 0])
 }
+function getOffSetX(renderOpt: ChartRenderOption) {
+  // CHART_AREA_X_SIZE 외부 변수사용
+  // renderOpt에 CHART관련 속성 추가 어떨지???
+  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
+  return renderOpt.translateX % candleWidth
+}
+// renderOpt period으로 60 대체
 function getXAxisScale(renderOpt: ChartRenderOption, data: CandleData[]) {
+  const offSetX = getOffSetX(renderOpt)
+  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
   return d3
     .scaleTime()
     .domain([
       //데이터는 End가 최신 데이터이기 때문에, 순서를 반대로 해야 시간순서대로 들어온다?
       makeDate(
         data[renderOpt.renderStartDataIndex + renderOpt.renderCandleCount]
-          .timestamp,
+          .timestamp -
+          60 * 1000,
         60
       ),
       makeDate(data[renderOpt.renderStartDataIndex].timestamp, 60)
     ]) //옵션화 필요함
-    .range([0, CHART_AREA_X_SIZE])
-    .nice()
+    .range([-(candleWidth - offSetX), CHART_AREA_X_SIZE + offSetX])
 }
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
@@ -76,11 +86,16 @@ function updateChart(
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
-    .call(d3.axisRight(yAxisScale))
+    .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * CHART_AREA_X_SIZE))
   chartContainer
     .select<SVGSVGElement>('g#x-axis')
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
-    .call(d3.axisBottom(xAxisScale))
+    .call(
+      d3
+        .axisBottom(xAxisScale)
+        .tickSizeInner(-1 * CHART_AREA_Y_SIZE)
+        .tickSizeOuter(0)
+    )
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
     .data(data)
@@ -176,6 +191,10 @@ function initChart(
   chartArea.attr('width', CHART_AREA_X_SIZE)
   chartArea.attr('height', CHART_AREA_Y_SIZE)
   chartArea.attr('view')
+  d3.select('svg#x-axis-container')
+    .attr('width', CHART_AREA_X_SIZE)
+    .attr('height', CHART_AREA_Y_SIZE + 20)
+
   console.error(renderOpt.renderStartDataIndex, renderOpt.renderCandleCount)
   const yAxisScale = getYAxisScale(
     data.slice(
@@ -191,11 +210,12 @@ function initChart(
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
-    .call(d3.axisRight(yAxisScale))
+    .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * CHART_AREA_X_SIZE))
   chartContainer
     .select<SVGSVGElement>('g#x-axis')
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
-    .call(d3.axisBottom(xAxisScale))
+    .attr('width', CHART_AREA_X_SIZE)
+    .call(d3.axisBottom(xAxisScale).tickSizeInner(-1 * CHART_AREA_Y_SIZE))
   let transalateX = 0
   let movedCandle = 0
   const zoom = d3
@@ -213,7 +233,8 @@ function initChart(
         )
         return {
           ...prev,
-          renderStartDataIndex: movedCandle
+          renderStartDataIndex: movedCandle,
+          translateX: event.transform.x
         }
       })
       d3.select('#chart-area')
@@ -226,7 +247,10 @@ function initChart(
       CandleMetaDataSetter(prev => {
         return {
           ...prev,
-          renderCandleCount: prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1)
+          renderCandleCount: Math.max(
+            prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1),
+            MIN_CANDLE_COUNT
+          )
         }
       })
     })
@@ -252,9 +276,11 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   return (
     <div id="chart">
       <svg id="chart-container" ref={chartSvg}>
-        <svg id="chart-area" />
         <g id="y-axis" />
-        <g id="x-axis" />
+        <svg id="x-axis-container">
+          <g id="x-axis" />
+        </svg>
+        <svg id="chart-area" />
       </svg>
     </div>
   )
