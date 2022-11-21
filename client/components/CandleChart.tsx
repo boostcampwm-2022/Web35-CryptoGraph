@@ -46,7 +46,6 @@ function getXAxisScale(renderOpt: ChartRenderOption, data: CandleData[]) {
       makeDate(data[renderOpt.renderStartDataIndex].timestamp, 60)
     ]) //옵션화 필요함
     .range([0, CHART_AREA_X_SIZE])
-    .nice()
 }
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
@@ -76,11 +75,11 @@ function updateChart(
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
-    .call(d3.axisRight(yAxisScale))
+    .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * CHART_AREA_X_SIZE))
   chartContainer
     .select<SVGSVGElement>('g#x-axis')
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
-    .call(d3.axisBottom(xAxisScale))
+    .call(d3.axisBottom(xAxisScale).tickSizeInner(-1 * CHART_AREA_Y_SIZE))
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
     .data(data)
@@ -92,7 +91,7 @@ function updateChart(
           .attr('height', d =>
             Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price))
           )
-          .attr('x', (d, i) => CHART_AREA_X_SIZE - candleWidth * (i + 1))
+          .attr('x', d => xAxisScale(new Date(d.candle_date_time_kst)))
           .attr('y', d =>
             Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
@@ -102,13 +101,11 @@ function updateChart(
         $g.append('line')
           .attr(
             'x1',
-            (d, i) =>
-              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+            d => xAxisScale(new Date(d.candle_date_time_kst)) + candleWidth / 2
           )
           .attr(
             'x2',
-            (d, i) =>
-              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+            d => xAxisScale(new Date(d.candle_date_time_kst)) + candleWidth / 2
           )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
@@ -129,7 +126,7 @@ function updateChart(
                   yAxisScale(d.trade_price) - yAxisScale(d.opening_price)
                 )
           )
-          .attr('x', (d, i) => CHART_AREA_X_SIZE - candleWidth * (i + 1))
+          .attr('x', d => xAxisScale(new Date(d.candle_date_time_kst)))
           .attr('y', d =>
             Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
@@ -138,13 +135,11 @@ function updateChart(
           .select('line')
           .attr(
             'x1',
-            (d, i) =>
-              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+            d => xAxisScale(new Date(d.candle_date_time_kst)) + candleWidth / 2
           )
           .attr(
             'x2',
-            (d, i) =>
-              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+            d => xAxisScale(new Date(d.candle_date_time_kst)) + candleWidth / 2
           )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
@@ -191,11 +186,11 @@ function initChart(
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
-    .call(d3.axisRight(yAxisScale))
+    .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * CHART_AREA_X_SIZE))
   chartContainer
     .select<SVGSVGElement>('g#x-axis')
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
-    .call(d3.axisBottom(xAxisScale))
+    .call(d3.axisBottom(xAxisScale).tickSizeInner(-1 * CHART_AREA_Y_SIZE))
   let transalateX = 0
   let movedCandle = 0
   const zoom = d3
@@ -252,9 +247,9 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   return (
     <div id="chart">
       <svg id="chart-container" ref={chartSvg}>
-        <svg id="chart-area" />
         <g id="y-axis" />
         <g id="x-axis" />
+        <svg id="chart-area" />
       </svg>
     </div>
   )
