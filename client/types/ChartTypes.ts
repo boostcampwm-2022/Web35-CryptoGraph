@@ -18,12 +18,32 @@ export interface CandleData {
   trade_timestamp: number
 }
 
-export interface ChartOption {
-  candlePeriod: '1m' | '3m' | '5m' | '1h' | '4h' | '1d' | '1w' | '1d' | '1w'
+type ChartPeriodItered<T> = {
+  [K in ChartPeriod]: T
+}
+export type ChartPeriod =
+  | 'minutes/1'
+  | 'minutes/3'
+  | 'minutes/5'
+  | 'minutes/60'
+  | 'minutes/240'
+  | 'days'
+  | 'weeks'
+export const DatePeriod: ChartPeriodItered<number> = {
+  'minutes/1': 60,
+  'minutes/3': 180,
+  'minutes/5': 300,
+  'minutes/60': 3600,
+  'minutes/240': 14400,
+  days: 86400,
+  weeks: 604800
+}
+
+export interface ChartRenderOption {
+  marketType: string
+  candlePeriod: ChartPeriod
   isVolumeVislble: boolean
   isMovingAverageVisible: boolean
-}
-export interface ChartRenderOption {
   fetchStartDataIndex: number
   fetchCandleCount: number
   renderStartDataIndex: number
