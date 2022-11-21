@@ -41,11 +41,10 @@ export const DatePeriod: ChartPeriodItered<number> = {
 
 export interface ChartRenderOption {
   marketType: string
-  candlePeriod: ChartPeriod
-  isVolumeVislble: boolean
-  isMovingAverageVisible: boolean
   fetchStartDataIndex: number
   fetchCandleCount: number
   renderStartDataIndex: number
   renderCandleCount: number
+  isVolumeVislble: boolean
+  isMovingAverageVisible: boolean
 }
