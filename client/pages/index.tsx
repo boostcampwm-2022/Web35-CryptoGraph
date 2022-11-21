@@ -4,23 +4,23 @@ import styled from '@emotion/styled'
 import Image from 'next/image'
 import SideBar from '../components/Sidebar'
 
+interface treeMapconfig {
+  treeMapWidth: string
+  treeMapHeight: number
+}
+const BackgroundStyle = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+`
+
 export default function Home() {
-  const [sideBarOpen, setSideBarOpen] = useState(false);
-  interface treeMapconfig {
-    treeMapWidth : string,
-    treeMapHeight : number,
-  }
+  const [sideBarOpen, setSideBarOpen] = useState(false)
 
-  const treeMapconfig = {
-    treeMapWidth : sideBarOpen ? "80%" : "96%",
-    treeMapHeight : 952,
+  const treeMapconfig: treeMapconfig = {
+    treeMapWidth: sideBarOpen ? '80%' : '96%',
+    treeMapHeight: 952
   }
-
-  const BackgroundStyle = styled.div`
-    width: 100%;
-    display: flex;
-    align-items: center;
-  `
 
   const sideBarOpenHandler = () => {
     setSideBarOpen(!sideBarOpen)
@@ -28,15 +28,21 @@ export default function Home() {
 
   return (
     <BackgroundStyle>
-      <Image onClick={sideBarOpenHandler} src="/openBtn.svg" alt="" width={32} height={140} />
-      <SideBar openSideBar={sideBarOpen}/>
+      <Image
+        onClick={sideBarOpenHandler}
+        src="/openBtn.svg"
+        alt=""
+        width={32}
+        height={140}
+      />
+      <SideBar openSideBar={sideBarOpen} />
       <Box
         sx={{
-          width: treeMapconfig["treeMapWidth"],
-          height: treeMapconfig["treeMapHeight"],
-          border: "1px solid black",
-          "border-radius": "32px",
-          margin: "16px 32px",
+          width: treeMapconfig['treeMapWidth'],
+          height: treeMapconfig['treeMapHeight'],
+          border: '1px solid black',
+          'border-radius': '32px',
+          margin: '16px 32px',
           'min-width': '1536px'
         }}
       />
