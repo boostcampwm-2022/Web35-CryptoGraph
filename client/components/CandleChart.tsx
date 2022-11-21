@@ -51,11 +51,6 @@ function updateChart(
   const candleWidth = calculateCandlewidth(option, CHART_AREA_X_SIZE)
   const chartContainer = d3.select(svgRef.current)
   const chartArea = chartContainer.select('svg#chart-area')
-  console.log(
-    '범위',
-    option.renderStartDataIndex,
-    option.renderStartDataIndex + option.renderCandleCount
-  )
   const yAxisScale = getYAxisScale(
     data.slice(
       option.renderStartDataIndex,
@@ -171,7 +166,6 @@ function initChart(
   chartArea.attr('width', CHART_AREA_X_SIZE)
   chartArea.attr('height', CHART_AREA_Y_SIZE)
   chartArea.attr('view')
-  console.error(option.renderStartDataIndex, option.renderCandleCount)
   const yAxisScale = getYAxisScale(
     data.slice(
       option.renderStartDataIndex,
