@@ -1,52 +1,83 @@
 import * as React from 'react'
-import { CandleData, ChartOption } from '@/types/ChartTypes'
+import { CandleData, ChartOption, ChartRenderOption } from '@/types/ChartTypes'
 import * as d3 from 'd3'
-import { DEFAULT_CANDLE_CHART_OPTION } from '@/constants/ChartConstants'
-
+import {
+  DEFAULT_CANDLER_CHART_RENDER_OPTION,
+  DEFAULT_CANDLE_CHART_OPTION
+} from '@/constants/ChartConstants'
+import { D3ZoomEvent } from 'd3'
+const CHART_CONTAINER_X_SIZE = 1000
+const CHART_CONTAINER_Y_SIZE = 800
+const X_RIGHT_MARGIN = 100
+const Y_RIGHT_MARGIN = 100
+const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - X_RIGHT_MARGIN
+const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - Y_RIGHT_MARGIN
+function makeDate(timestamp: number, period: number): Date {
+  return new Date(timestamp - (timestamp % (period * 1000)))
+}
+function calculateCandlewidth(
+  renderOptions: ChartRenderOption,
+  chartXSize: number
+): number {
+  return chartXSize / renderOptions.renderCandleCount
+}
+function getYAxisScale(data: CandleData[]) {
+  const [min, max] = [
+    d3.min(data, d => d.low_price),
+    d3.max(data, d => d.high_price)
+  ]
+  if (!min || !max) {
+    console.error(data, data.length)
+    console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
+    return undefined
+  }
+  return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 0])
+}
+function getXAxisScale(renderOpt: ChartRenderOption, data: CandleData[]) {
+  return d3
+    .scaleTime()
+    .domain([
+      //데이터는 End가 최신 데이터이기 때문에, 순서를 반대로 해야 시간순서대로 들어온다?
+      makeDate(
+        data[renderOpt.renderStartDataIndex + renderOpt.renderCandleCount]
+          .timestamp,
+        60
+      ),
+      makeDate(data[renderOpt.renderStartDataIndex].timestamp, 60)
+    ]) //옵션화 필요함
+    .range([0, CHART_AREA_X_SIZE])
+    .nice()
+}
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
+  renderOpt: ChartRenderOption,
   options: ChartOption
 ) {
-  const CHART_CONTAINER_X_SIZE = 1000 // 나중에 옵션으로 반응형 크기 조절
-  const CHART_CONTAINER_Y_SIZE = 800 // <-크기조절 안되지 않나여?
-  const X_RIGHT_MARGIN = 100
-  const Y_RIGHT_MARGIN = 100
-  const STEP = 15
-  const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - X_RIGHT_MARGIN
-  const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - Y_RIGHT_MARGIN
+  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
   const chartContainer = d3.select(svgRef.current)
-  chartContainer.attr('width', CHART_CONTAINER_X_SIZE)
-  chartContainer.attr('height', CHART_CONTAINER_Y_SIZE)
   const chartArea = chartContainer.select('svg#chart-area')
-  chartArea.attr('width', CHART_AREA_X_SIZE)
-  chartArea.attr('height', CHART_AREA_Y_SIZE)
-  chartArea.attr('view')
-  const [min, max] = [
-    d3.min(data.slice(0, CHART_AREA_X_SIZE / STEP), d => d.low_price),
-    d3.max(data.slice(0, CHART_AREA_X_SIZE / STEP), d => d.high_price)
-  ]
-  if (!min || !max) {
-    console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
-    return
+  console.log(
+    '범위',
+    renderOpt.renderStartDataIndex,
+    renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
+  )
+  const yAxisScale = getYAxisScale(
+    data.slice(
+      renderOpt.renderStartDataIndex,
+      renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
+    )
+  )
+  if (!yAxisScale) {
+    console.error('받아온 API 데이터 에러')
+    return undefined
   }
-  const makeDate = (timestamp: number, period: number): Date => {
-    return new Date(timestamp - (timestamp % (period * 1000)))
-  }
-  const yAxisScale = d3
-    .scaleLinear()
-    .domain([min, max])
-    .range([CHART_AREA_Y_SIZE, 0])
-
-  const xAxisScale = d3
-    .scaleTime()
-    .domain([makeDate(data[59].timestamp, 60), makeDate(data[0].timestamp, 60)]) //옵션화 필요함
-    .range([0, CHART_AREA_X_SIZE])
-  const yAxis = chartContainer
+  const xAxisScale = getXAxisScale(renderOpt, data)
+  chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
     .call(d3.axisRight(yAxisScale))
-  const xAxis = chartContainer
+  chartContainer
     .select<SVGSVGElement>('g#x-axis')
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
     .call(d3.axisBottom(xAxisScale))
@@ -57,11 +88,11 @@ function updateChart(
       enter => {
         const $g = enter.append('g')
         $g.append('rect')
-          .attr('width', STEP)
+          .attr('width', candleWidth)
           .attr('height', d =>
             Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price))
           )
-          .attr('x', (d, i) => CHART_AREA_X_SIZE - STEP * (i + 1))
+          .attr('x', (d, i) => CHART_AREA_X_SIZE - candleWidth * (i + 1))
           .attr('y', d =>
             Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
@@ -69,8 +100,16 @@ function updateChart(
             d.opening_price <= d.trade_price ? 'red' : 'blue'
           )
         $g.append('line')
-          .attr('x1', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
-          .attr('x2', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
+          .attr(
+            'x1',
+            (d, i) =>
+              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+          )
+          .attr(
+            'x2',
+            (d, i) =>
+              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+          )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
           .attr('stroke', d =>
@@ -81,7 +120,7 @@ function updateChart(
       update => {
         update
           .select('rect')
-          .attr('width', STEP)
+          .attr('width', candleWidth)
           .attr('height', d =>
             Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price)) <=
             0
@@ -90,15 +129,23 @@ function updateChart(
                   yAxisScale(d.trade_price) - yAxisScale(d.opening_price)
                 )
           )
-          .attr('x', (d, i) => CHART_AREA_X_SIZE - STEP * (i + 1))
+          .attr('x', (d, i) => CHART_AREA_X_SIZE - candleWidth * (i + 1))
           .attr('y', d =>
             Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
           .attr('fill', d => (d.opening_price < d.trade_price ? 'red' : 'blue'))
         update
           .select('line')
-          .attr('x1', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
-          .attr('x2', (d, i) => CHART_AREA_X_SIZE + 7 - STEP * (i + 1))
+          .attr(
+            'x1',
+            (d, i) =>
+              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+          )
+          .attr(
+            'x2',
+            (d, i) =>
+              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+          )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
           .attr('stroke', d =>
@@ -112,19 +159,95 @@ function updateChart(
     )
 }
 interface CandleChartProps {
-  // 200 -> 400 -> 600 ->
-  // 제화면에서 20개를 보여주고 있어요. 40개가 렌더링되고, 10개 움직이면 마우스가 떼질따마다 10~30번까지보여주잖아요 모자란 10개만 페치..
-  // 데이터 셋이.. 아 맞네요.. 유아 라이트.. 뭘 페치 아.. 그렇네요.. 맨 끝에 두개로 하면 되네요.
-  // 현재시점에서 내가 보여주고있는 데이터 개수만큼 정확히 예비데이타 있게끔 유지..
-  // 아니면 나중에.. 네트워크우선모드 / 성능우선모드 <- 이런식으로
   candleData: CandleData[]
   option: ChartOption
 }
+
+function initChart(
+  svgRef: React.RefObject<SVGSVGElement>,
+  data: CandleData[],
+  renderOpt: ChartRenderOption,
+  CandleMetaDataSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>
+) {
+  const chartContainer = d3.select(svgRef.current)
+  chartContainer.attr('width', CHART_CONTAINER_X_SIZE)
+  chartContainer.attr('height', CHART_CONTAINER_Y_SIZE)
+  const chartArea = chartContainer.select('svg#chart-area')
+  chartArea.attr('width', CHART_AREA_X_SIZE)
+  chartArea.attr('height', CHART_AREA_Y_SIZE)
+  chartArea.attr('view')
+  console.error(renderOpt.renderStartDataIndex, renderOpt.renderCandleCount)
+  const yAxisScale = getYAxisScale(
+    data.slice(
+      renderOpt.renderStartDataIndex,
+      renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
+    )
+  )
+  if (!yAxisScale) {
+    console.error('받아온 API 데이터 에러')
+    return undefined
+  }
+  const xAxisScale = getXAxisScale(renderOpt, data)
+  chartContainer
+    .select<SVGSVGElement>('g#y-axis')
+    .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
+    .call(d3.axisRight(yAxisScale))
+  chartContainer
+    .select<SVGSVGElement>('g#x-axis')
+    .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
+    .call(d3.axisBottom(xAxisScale))
+  let transalateX = 0
+  let movedCandle = 0
+  const zoom = d3
+    .zoom<SVGSVGElement, CandleData>()
+    .scaleExtent([1, 1])
+    .translateExtent([
+      [-Infinity, 0],
+      [CHART_CONTAINER_X_SIZE, CHART_CONTAINER_Y_SIZE]
+    ])
+    .on('zoom', function (event: D3ZoomEvent<SVGSVGElement, CandleData>) {
+      transalateX = event.transform.x
+      CandleMetaDataSetter((prev: ChartRenderOption) => {
+        movedCandle = Math.floor(
+          transalateX / calculateCandlewidth(prev, CHART_AREA_X_SIZE)
+        )
+        return {
+          ...prev,
+          renderStartDataIndex: movedCandle
+        }
+      })
+      d3.select('#chart-area')
+        .selectAll<SVGSVGElement, CandleData>('g')
+        .attr('transform', `translate(${event.transform.x})`)
+    })
+  d3.select<SVGSVGElement, CandleData>('#chart-container')
+    .call(zoom)
+    .on('wheel', (e: WheelEvent) => {
+      CandleMetaDataSetter(prev => {
+        return {
+          ...prev,
+          renderCandleCount: prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1)
+        }
+      })
+    })
+}
+
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = React.useRef<SVGSVGElement>(null)
+  const [chartRenderOption, setRenderOption] =
+    React.useState<ChartRenderOption>(DEFAULT_CANDLER_CHART_RENDER_OPTION)
   React.useEffect(() => {
-    updateChart(chartSvg, props.candleData, DEFAULT_CANDLE_CHART_OPTION)
-  }, [props.candleData])
+    initChart(chartSvg, props.candleData, chartRenderOption, setRenderOption)
+  }, [])
+
+  React.useEffect(() => {
+    updateChart(
+      chartSvg,
+      props.candleData,
+      chartRenderOption,
+      DEFAULT_CANDLE_CHART_OPTION
+    )
+  }, [props.candleData, chartRenderOption])
 
   return (
     <div id="chart">
