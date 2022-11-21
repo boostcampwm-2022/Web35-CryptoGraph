@@ -20,7 +20,6 @@ export interface CandleData {
 
 export interface ChartOption {
   candlePeriod: '1m' | '3m' | '5m' | '1h' | '4h' | '1d' | '1w' | '1d' | '1w'
-  defaultCandleCount: number
   isVolumeVislble: boolean
   isMovingAverageVisible: boolean
 }
