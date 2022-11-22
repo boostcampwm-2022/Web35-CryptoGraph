@@ -55,7 +55,7 @@ function getXAxisScale(renderOpt: ChartRenderOption, data: CandleData[]) {
         60
       ),
       makeDate(data[renderOpt.renderStartDataIndex].timestamp, 60)
-    ]) //옵션화 필요함
+    ])
     .range([-(candleWidth - offSetX), CHART_AREA_X_SIZE + offSetX])
 }
 function updateChart(
@@ -67,11 +67,6 @@ function updateChart(
   const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
   const chartContainer = d3.select(svgRef.current)
   const chartArea = chartContainer.select('svg#chart-area')
-  console.log(
-    '범위',
-    renderOpt.renderStartDataIndex,
-    renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
-  )
   const yAxisScale = getYAxisScale(
     data.slice(
       renderOpt.renderStartDataIndex,
@@ -79,7 +74,6 @@ function updateChart(
     )
   )
   if (!yAxisScale) {
-    console.error('받아온 API 데이터 에러')
     return undefined
   }
   const xAxisScale = getXAxisScale(renderOpt, data)
@@ -95,6 +89,7 @@ function updateChart(
         .axisBottom(xAxisScale)
         .tickSizeInner(-1 * CHART_AREA_Y_SIZE)
         .tickSizeOuter(0)
+        .ticks(5)
     )
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
@@ -215,7 +210,12 @@ function initChart(
     .select<SVGSVGElement>('g#x-axis')
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
     .attr('width', CHART_AREA_X_SIZE)
-    .call(d3.axisBottom(xAxisScale).tickSizeInner(-1 * CHART_AREA_Y_SIZE))
+    .call(
+      d3
+        .axisBottom(xAxisScale)
+        .tickSizeInner(-1 * CHART_AREA_Y_SIZE)
+        .ticks(5)
+    )
   let transalateX = 0
   let movedCandle = 0
   const zoom = d3
