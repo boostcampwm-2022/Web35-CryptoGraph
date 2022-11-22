@@ -165,6 +165,8 @@ function initChart(
   let transalateX = 0
   let movedCandle = 0
   let debounce = false
+
+  let newData = data //on('zoom')내에서 data동기화를 위해 newData변수를 만들었습니다.
   const zoom = d3
     .zoom<SVGSVGElement, CandleData>()
     .scaleExtent([1, 1])
@@ -173,22 +175,26 @@ function initChart(
       [CHART_CONTAINER_X_SIZE, CHART_CONTAINER_Y_SIZE]
     ])
     .on('zoom', function (event: D3ZoomEvent<SVGSVGElement, CandleData>) {
+      data = newData
       transalateX = event.transform.x
       optionSetter((prev: ChartRenderOption) => {
         movedCandle = Math.floor(
           transalateX / calculateCandlewidth(prev, CHART_AREA_X_SIZE)
         )
-        //여기서 movdeCandle개수를 체크 후 100개 이하로 남으면 추가 fetch
-        // console.log('전체개수 : ', data.length)
-        // console.log('movedCandle : ', movedCandle)
-        async function setNewCandleData() {
-          debounce = true
 
-          const newData: CandleData[] = await getCandleDataArray(
+        //1. 전체개수 200개 - movedCandle < 100개가 되는지 확인한다.
+        //2. 100개 미만으로 떨어지면 데이터를 200개만큼 추가로 가져온다. data = [...newData, ...data]
+        //3. 이때 getCandleDataArray 비동기작업이 진행되므로 디바운싱 처리를 통해 기다린다.
+        //    -> 비동기작업이 진행중일때는 fetch 추가요청 하지않게 막아줌
+        async function setNewCandleData() {
+          debounce = true // 디바운싱 시작
+
+          const newFetchedData: CandleData[] = await getCandleDataArray(
             DEFAULT_CANDLE_PERIOD,
             DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
             200,
             makeDate(
+              //endTime설정
               data[option.renderStartDataIndex + movedCandle].timestamp,
               60
             )
@@ -197,19 +203,15 @@ function initChart(
               .concat('Z')
               .replaceAll(':', '%3A')
           )
-          candleDataSetter([...newData, ...data])
-          // console.log('데이터 추가작업완료')
-          debounce = false
+          candleDataSetter([...newFetchedData, ...data])
+          newData = [...newFetchedData, ...data]
+          debounce = false // 데이터 fetching 완료 및 디바운싱 해제
         }
+        //디바운싱이 작동되지 않을때만 fetch시작
         if (data.length - movedCandle < 100 && !debounce) {
           setNewCandleData()
-        } else {
-          // console.log('작업중입니다.')
         }
-        //1. 전체개수 200개 - movedCandle < 100개가 되는지 확인한다.
-        //2. 100개 미만으로 떨어지면 데이터를 200개만큼 추가로 가져온다. data = [...newData, ...data]
-        //3. 이때 getCandleDataArray 비동기작업이 진행되므로 디바운싱 처리를 통해 기다린다.
-        //    -> 비동기작업이 진행중일때는 fetch 추가요청 하지않게 막아줌
+
         return {
           ...prev,
           renderStartDataIndex: movedCandle

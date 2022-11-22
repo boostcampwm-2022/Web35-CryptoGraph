@@ -17,7 +17,7 @@ export default function CandleChartPage({
   const [chartRenderOption, setRenderOption] = useState<ChartRenderOption>(
     DEFAULT_CANDLER_CHART_RENDER_OPTION
   )
-  const [setRealtimeCandleData, realtimeCandleData] = useRealTimeUpbitData(
+  const [realtimeCandleData, setRealtimeCandleData] = useRealTimeUpbitData(
     candlePeriod,
     chartRenderOption.marketType, //파싱
     candleData
