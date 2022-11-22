@@ -1,8 +1,7 @@
 import styled from '@emotion/styled'
 import { Button } from '@mui/material'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import Chartbutton from './components/ChartButton'
+import Chartbutton from '@/components/ChartButton'
 
 const StyledMainSection = styled.div`
   width: 100vw;
