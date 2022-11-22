@@ -1,8 +1,10 @@
 import { CandleData } from '@/types/ChartTypes'
-import { useEffect, useState } from 'react'
-import { DatePeriod, ChartPeriod } from '@/types/ChartTypes'
+import { useEffect, useState, useRef } from 'react'
+import { ChartPeriod } from '@/types/ChartTypes'
 import { getCandleDataArray } from '@/utils/upbitManager'
+import { transDate } from '@/utils/dateManager'
 let socket: WebSocket | undefined
+
 export const useRealTimeUpbitData = (
   period: ChartPeriod,
   market: string,
@@ -10,6 +12,11 @@ export const useRealTimeUpbitData = (
 ): CandleData[] => {
   const [realtimeCandleData, setRealtimeCandleData] =
     useState<CandleData[]>(initData)
+  const isInitialMount = useRef(true)
+  const fetchData = async () => {
+    const fetched: CandleData[] = await getCandleDataArray(period, market, 200)
+    setRealtimeCandleData(fetched)
+  }
 
   useEffect(() => {
     connectWS(market)
@@ -19,15 +26,8 @@ export const useRealTimeUpbitData = (
   }, [])
 
   useEffect(() => {
-    const fetchData = async () => {
-      const fetched: CandleData[] = await getCandleDataArray(
-        period,
-        market,
-        200
-      )
-      setRealtimeCandleData(fetched)
-    }
-    fetchData()
+    if (!isInitialMount.current) fetchData() //첫 마운트면
+    else isInitialMount.current = false
     if (!socket) {
       console.error('분봉 설정 관련 error')
       return
@@ -109,10 +109,4 @@ function updateData(
   toInsert.timestamp = toInsert.trade_timestamp
 
   return [toInsert, ...prevData] //한화면에 보여주는 캔들 * 2
-}
-
-function transDate(timestamp: number, period: ChartPeriod): string {
-  const date = new Date(timestamp - (timestamp % (DatePeriod[period] * 1000)))
-  date.setHours(date.getHours() + 9)
-  return date.toISOString().substring(0, 19)
 }
