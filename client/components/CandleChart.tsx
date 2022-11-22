@@ -11,8 +11,12 @@ import {
   CHART_AREA_X_SIZE,
   CHART_AREA_Y_SIZE,
   CHART_CONTAINER_X_SIZE,
-  CHART_CONTAINER_Y_SIZE
+  CHART_CONTAINER_Y_SIZE,
+  DEFAULT_CANDLER_CHART_RENDER_OPTION,
+  DEFAULT_CANDLE_PERIOD
 } from '@/constants/ChartConstants'
+import { makeDate } from '@/utils/dateManager'
+import { getCandleDataArray } from '@/utils/upbitManager'
 
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
@@ -128,6 +132,7 @@ interface CandleChartProps {
 function initChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
+  candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>,
   option: ChartRenderOption,
   optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>
 ) {
@@ -159,6 +164,7 @@ function initChart(
     .call(d3.axisBottom(xAxisScale))
   let transalateX = 0
   let movedCandle = 0
+  let debounce = false
   const zoom = d3
     .zoom<SVGSVGElement, CandleData>()
     .scaleExtent([1, 1])
@@ -173,8 +179,32 @@ function initChart(
           transalateX / calculateCandlewidth(prev, CHART_AREA_X_SIZE)
         )
         //여기서 movdeCandle개수를 체크 후 100개 이하로 남으면 추가 fetch
-        console.log('전체개수 : ', data.length)
-        console.log('movedCandle : ', movedCandle)
+        // console.log('전체개수 : ', data.length)
+        // console.log('movedCandle : ', movedCandle)
+        async function setNewCandleData() {
+          debounce = true
+          const newData: CandleData[] = await getCandleDataArray(
+            DEFAULT_CANDLE_PERIOD,
+            DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
+            200,
+            makeDate(
+              data[option.renderStartDataIndex + movedCandle].timestamp,
+              60
+            )
+              .toJSON()
+              .slice(0, -5)
+              .concat('Z')
+              .replaceAll(':', '%3A')
+          )
+          candleDataSetter([...newData, ...data])
+          console.log('데이터 추가작업완료')
+          debounce = false
+        }
+        if (data.length - movedCandle < 100 && !debounce) {
+          setNewCandleData()
+        } else {
+          console.log('작업중입니다.')
+        }
         //1. 전체개수 200개 - movedCandle < 100개가 되는지 확인한다.
         //2. 100개 미만으로 떨어지면 데이터를 200개만큼 추가로 가져온다. data = [...newData, ...data]
         //3. 이때 getCandleDataArray 비동기작업이 진행되므로 디바운싱 처리를 통해 기다린다.
@@ -203,7 +233,13 @@ function initChart(
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = React.useRef<SVGSVGElement>(null)
   React.useEffect(() => {
-    initChart(chartSvg, props.candleData, props.option, props.optionSetter)
+    initChart(
+      chartSvg,
+      props.candleData,
+      props.candleDataSetter,
+      props.option,
+      props.optionSetter
+    )
   }, [])
 
   React.useEffect(() => {
