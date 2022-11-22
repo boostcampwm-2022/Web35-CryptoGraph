@@ -183,6 +183,7 @@ function initChart(
         // console.log('movedCandle : ', movedCandle)
         async function setNewCandleData() {
           debounce = true
+
           const newData: CandleData[] = await getCandleDataArray(
             DEFAULT_CANDLE_PERIOD,
             DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
@@ -197,13 +198,13 @@ function initChart(
               .replaceAll(':', '%3A')
           )
           candleDataSetter([...newData, ...data])
-          console.log('데이터 추가작업완료')
+          // console.log('데이터 추가작업완료')
           debounce = false
         }
         if (data.length - movedCandle < 100 && !debounce) {
           setNewCandleData()
         } else {
-          console.log('작업중입니다.')
+          // console.log('작업중입니다.')
         }
         //1. 전체개수 200개 - movedCandle < 100개가 되는지 확인한다.
         //2. 100개 미만으로 떨어지면 데이터를 200개만큼 추가로 가져온다. data = [...newData, ...data]
