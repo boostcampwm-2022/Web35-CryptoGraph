@@ -1,9 +1,9 @@
-import styled from '@emotion/styled'
+import { styled } from '@mui/material/styles'
 import { Button } from '@mui/material'
 import Link from 'next/link'
 import Chartbutton from '@/components/ChartButton'
 
-const StyledMainSection = styled.div`
+const StyledMainSection = styled('div')`
   width: 100vw;
   min-width: 1000px;
   height: 80vh;
@@ -11,7 +11,7 @@ const StyledMainSection = styled.div`
   display: flex;
 `
 //왼쪽 메인차트
-const StyledDetailLeft = styled.div`
+const StyledDetailLeft = styled('div')`
   width: 75vw;
   min-width: fit-content;
   height: 75vh;
@@ -21,7 +21,7 @@ const StyledDetailLeft = styled.div`
   flex-direction: column;
   justify-content: space-between;
 `
-const StyledChartButton = styled.div`
+const StyledChartButton = styled('div')`
   width: 95%;
   min-width: 700px;
   height: 10%;
@@ -35,7 +35,7 @@ const StyledChartButton = styled.div`
   justify-content: center;
   align-items: center;
 `
-const StyledChart = styled.div`
+const StyledChart = styled('div')`
   width: 95%;
   min-width: 700px;
   height: 100%;
@@ -47,7 +47,7 @@ const StyledChart = styled.div`
   border-radius: 20px;
 `
 //오른쪽 사이드바
-const StyledDetailRight = styled.div`
+const StyledDetailRight = styled('div')`
   width: 18vw;
   min-width: 250px;
   height: 75vh;
@@ -58,7 +58,7 @@ const StyledDetailRight = styled.div`
   justify-content: space-between;
 `
 
-const StyledRTV = styled.div`
+const StyledRTV = styled('div')`
   width: 100%;
   height: 43%;
   min-height: 300px;

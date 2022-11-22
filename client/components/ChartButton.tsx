@@ -1,7 +1,7 @@
-import styled from '@emotion/styled'
+import { styled } from '@mui/material/styles'
 import Image from 'next/image'
 
-const StyledTimeButton = styled.button`
+const StyledTimeButton = styled('button')`
   background: #e7e5ef;
   border-radius: 100px;
   font-family: 'Roboto';
