@@ -11,6 +11,15 @@ export const roboto = Roboto({
 
 // Create a theme instance.
 const theme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1200,
+      xl: 1920
+    }
+  },
   palette: {
     primary: {
       main: '#6750a4'
