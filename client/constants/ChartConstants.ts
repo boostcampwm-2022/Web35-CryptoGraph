@@ -1,5 +1,12 @@
 import { ChartPeriod, ChartRenderOption } from '@/types/ChartTypes'
 
+export const CHART_CONTAINER_X_SIZE = 1000
+export const CHART_CONTAINER_Y_SIZE = 800
+export const X_RIGHT_MARGIN = 100
+export const Y_RIGHT_MARGIN = 100
+export const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - X_RIGHT_MARGIN
+export const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - Y_RIGHT_MARGIN
+
 export const DEFAULT_CANDLE_COUNT = 2000
 export const DEFAULT_CANDLE_RENDER_COUNT = 30
 export const DEFAULT_CANDLE_PERIOD: ChartPeriod = 'minutes/1'

@@ -2,47 +2,18 @@ import * as React from 'react'
 import { CandleData, ChartRenderOption } from '@/types/ChartTypes'
 import * as d3 from 'd3'
 import { D3ZoomEvent } from 'd3'
-const CHART_CONTAINER_X_SIZE = 1000
-const CHART_CONTAINER_Y_SIZE = 800
-const X_RIGHT_MARGIN = 100
-const Y_RIGHT_MARGIN = 100
-const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - X_RIGHT_MARGIN
-const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - Y_RIGHT_MARGIN
-function makeDate(timestamp: number, period: number): Date {
-  return new Date(timestamp - (timestamp % (period * 1000)))
-}
-function calculateCandlewidth(
-  option: ChartRenderOption,
-  chartXSize: number
-): number {
-  return chartXSize / option.renderCandleCount
-}
-function getYAxisScale(data: CandleData[]) {
-  const [min, max] = [
-    d3.min(data, d => d.low_price),
-    d3.max(data, d => d.high_price)
-  ]
-  if (!min || !max) {
-    console.error(data, data.length)
-    console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
-    return undefined
-  }
-  return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 0])
-}
-function getXAxisScale(option: ChartRenderOption, data: CandleData[]) {
-  return d3
-    .scaleTime()
-    .domain([
-      //데이터는 End가 최신 데이터이기 때문에, 순서를 반대로 해야 시간순서대로 들어온다?
-      makeDate(
-        data[option.renderStartDataIndex + option.renderCandleCount].timestamp,
-        60
-      ),
-      makeDate(data[option.renderStartDataIndex].timestamp, 60)
-    ]) //옵션화 필요함
-    .range([0, CHART_AREA_X_SIZE])
-    .nice()
-}
+import {
+  calculateCandlewidth,
+  getYAxisScale,
+  getXAxisScale
+} from '@/utils/chartManager'
+import {
+  CHART_AREA_X_SIZE,
+  CHART_AREA_Y_SIZE,
+  CHART_CONTAINER_X_SIZE,
+  CHART_CONTAINER_Y_SIZE
+} from '@/constants/ChartConstants'
+
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
