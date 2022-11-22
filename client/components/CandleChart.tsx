@@ -120,6 +120,7 @@ function updateChart(
 }
 interface CandleChartProps {
   candleData: CandleData[]
+  candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>
   option: ChartRenderOption
   optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>
 }
@@ -171,6 +172,13 @@ function initChart(
         movedCandle = Math.floor(
           transalateX / calculateCandlewidth(prev, CHART_AREA_X_SIZE)
         )
+        //여기서 movdeCandle개수를 체크 후 100개 이하로 남으면 추가 fetch
+        console.log('전체개수 : ', data.length)
+        console.log('movedCandle : ', movedCandle)
+        //1. 전체개수 200개 - movedCandle < 100개가 되는지 확인한다.
+        //2. 100개 미만으로 떨어지면 데이터를 200개만큼 추가로 가져온다. data = [...newData, ...data]
+        //3. 이때 getCandleDataArray 비동기작업이 진행되므로 디바운싱 처리를 통해 기다린다.
+        //    -> 비동기작업이 진행중일때는 fetch 추가요청 하지않게 막아줌
         return {
           ...prev,
           renderStartDataIndex: movedCandle
