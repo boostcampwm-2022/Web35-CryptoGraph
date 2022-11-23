@@ -205,6 +205,7 @@ function updateCurrentPrice(
     .attr('fill', strokeColor)
     .attr('font-size', 15)
     .attr('transform', `translate(${CHART_AREA_X_SIZE + 3}, ${yCoord})`)
+    .attr('dominant-baseline', 'middle')
     .text(data[0].trade_price.toLocaleString())
 }
 
@@ -215,6 +216,15 @@ function updatePointerUI(
   renderOpt: ChartRenderOption,
   data: CandleData[]
 ) {
+  const { priceText, color } = getPriceInfo(
+    pointerInfo.positionX,
+    renderOpt,
+    data
+  )
+  d3.select('text#price-info')
+    .attr('fill', color ? color : 'black')
+    .attr('font-size', 15)
+    .text(priceText)
   d3.select('svg#mouse-pointer-UI')
     .selectAll('g')
     .data(transPointerInfoToArray(pointerInfo))
@@ -273,11 +283,39 @@ function getTimeText(
   renderOpt: ChartRenderOption,
   data: CandleData[]
 ) {
+  const timeString =
+    data[getDataIndexFromPosX(positionX, renderOpt)].candle_date_time_kst
+  return `${timeString.substring(5, 10)} ${timeString.substring(11, 16)}`
+}
+
+// 마우스 포인터 x좌표와 renderOpt를 이용해 몇번째 데이터인지 인덱스 반환
+function getDataIndexFromPosX(positionX: number, renderOpt: ChartRenderOption) {
   const offSetX = renderOpt.translateX + (CHART_AREA_X_SIZE - positionX)
   const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
-  const timeString =
-    data[Math.floor(offSetX / candleWidth)].candle_date_time_kst
-  return timeString.substring(5, 10) + '\n' + timeString.substring(11, 16)
+  return Math.floor(offSetX / candleWidth)
+}
+
+// 마우스 포인터가 가르키는 위치의 분봉데이터를 찾아 렌더링될 가격정보를 반환
+function getPriceInfo(
+  positionX: number,
+  renderOpt: ChartRenderOption,
+  data: CandleData[]
+) {
+  if (positionX < 0) {
+    return { priceText: '' }
+  }
+  const index = getDataIndexFromPosX(positionX, renderOpt)
+  const candleUnitData = data[index]
+  return {
+    priceText: [
+      `고가: ${candleUnitData.high_price}`,
+      `저가: ${candleUnitData.low_price}`,
+      `시가: ${candleUnitData.opening_price}`,
+      `종가: ${candleUnitData.trade_price}`
+    ].join('  '),
+    color:
+      candleUnitData.opening_price < candleUnitData.trade_price ? 'red' : 'blue'
+  }
 }
 
 // 격자를 생성할 path요소의 내용 index가 0이라면 세로선 1이라면 가로선
@@ -332,6 +370,8 @@ function initChart(
     .attr('height', CHART_AREA_Y_SIZE + 20)
   // currentPrice초기값 설정
   chartContainer.select('svg#current-price').attr('height', CHART_AREA_Y_SIZE)
+  // text 위치설정 매직넘버? 반응형 고려하면 변수화도 고려되어야할듯
+  chartContainer.select('text#price-info').attr('x', 20).attr('y', 20)
   const yAxisScale = getYAxisScale(
     data.slice(
       renderOpt.renderStartDataIndex,
@@ -444,6 +484,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
           <text />
         </svg>
         <svg id="mouse-pointer-UI"></svg>
+        <text id="price-info">sdfsdf</text>
       </svg>
     </div>
   )
