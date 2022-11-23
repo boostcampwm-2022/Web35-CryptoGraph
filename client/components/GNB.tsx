@@ -19,9 +19,6 @@ const GNBContainer = styled('div')`
   justify-content: space-between;
   width: 100%;
 `
-const LogoContainer = styled('div')`
-  margin: 0px 0px;
-`
 
 export default function GNB() {
   const theme = useTheme()

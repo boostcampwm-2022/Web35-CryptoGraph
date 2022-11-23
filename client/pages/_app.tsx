@@ -36,10 +36,18 @@ export default function MyApp(props: MyAppProps) {
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
         <Global styles={GlobalStyle} />
-        <GNB />
-        <Container disableGutters maxWidth="xl">
-          <Component {...pageProps} />
-        </Container>
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          <GNB />
+          <Container maxWidth="xl" sx={{ height: '100%', margin: '16px 0px' }}>
+            <Component {...pageProps} />
+          </Container>
+        </div>
       </ThemeProvider>
     </CacheProvider>
   )
