@@ -1,88 +1,39 @@
 import * as React from 'react'
-import { CandleData, ChartOption, ChartRenderOption } from '@/types/ChartTypes'
+import { CandleData, ChartRenderOption } from '@/types/ChartTypes'
 import * as d3 from 'd3'
+import { D3ZoomEvent } from 'd3'
 import {
-  DEFAULT_CANDLER_CHART_RENDER_OPTION,
-  DEFAULT_CANDLE_CHART_OPTION,
+  calculateCandlewidth,
+  getYAxisScale,
+  getXAxisScale
+} from '@/utils/chartManager'
+import {
+  CHART_AREA_X_SIZE,
+  CHART_AREA_Y_SIZE,
+  CHART_CONTAINER_X_SIZE,
+  CHART_CONTAINER_Y_SIZE,
   MIN_CANDLE_COUNT
 } from '@/constants/ChartConstants'
-import { D3ZoomEvent } from 'd3'
-const CHART_CONTAINER_X_SIZE = 1000
-const CHART_CONTAINER_Y_SIZE = 800
-const X_RIGHT_MARGIN = 100
-const Y_RIGHT_MARGIN = 100
-const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - X_RIGHT_MARGIN
-const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - Y_RIGHT_MARGIN
-function makeDate(timestamp: number, period: number): Date {
-  return new Date(timestamp - (timestamp % (period * 1000)))
-}
-function calculateCandlewidth(
-  renderOptions: ChartRenderOption,
-  chartXSize: number
-): number {
-  return chartXSize / renderOptions.renderCandleCount
-}
-function getYAxisScale(data: CandleData[]) {
-  const [min, max] = [
-    d3.min(data, d => d.low_price),
-    d3.max(data, d => d.high_price)
-  ]
-  if (!min || !max) {
-    console.error(data, data.length)
-    console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
-    return undefined
-  }
-  return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 0])
-}
-function getOffSetX(renderOpt: ChartRenderOption) {
-  // CHART_AREA_X_SIZE 외부 변수사용
-  // renderOpt에 CHART관련 속성 추가 어떨지???
-  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
-  return renderOpt.translateX % candleWidth
-}
-// renderOpt period으로 60 대체
-function getXAxisScale(renderOpt: ChartRenderOption, data: CandleData[]) {
-  const offSetX = getOffSetX(renderOpt)
-  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
-  return d3
-    .scaleTime()
-    .domain([
-      //데이터는 End가 최신 데이터이기 때문에, 순서를 반대로 해야 시간순서대로 들어온다?
-      makeDate(
-        data[renderOpt.renderStartDataIndex + renderOpt.renderCandleCount]
-          .timestamp -
-          60 * 1000,
-        60
-      ),
-      makeDate(data[renderOpt.renderStartDataIndex].timestamp, 60)
-    ]) //옵션화 필요함
-    .range([-(candleWidth - offSetX), CHART_AREA_X_SIZE + offSetX])
-}
+
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
-  renderOpt: ChartRenderOption,
-  options: ChartOption
+  option: ChartRenderOption
 ) {
-  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
+  const candleWidth = calculateCandlewidth(option, CHART_AREA_X_SIZE)
   const chartContainer = d3.select(svgRef.current)
   const chartArea = chartContainer.select('svg#chart-area')
-  console.log(
-    '범위',
-    renderOpt.renderStartDataIndex,
-    renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
-  )
   const yAxisScale = getYAxisScale(
     data.slice(
-      renderOpt.renderStartDataIndex,
-      renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
+      option.renderStartDataIndex,
+      option.renderStartDataIndex + option.renderCandleCount
     )
   )
   if (!yAxisScale) {
     console.error('받아온 API 데이터 에러')
     return undefined
   }
-  const xAxisScale = getXAxisScale(renderOpt, data)
+  const xAxisScale = getXAxisScale(option, data)
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
@@ -175,14 +126,15 @@ function updateChart(
 }
 interface CandleChartProps {
   candleData: CandleData[]
-  option: ChartOption
+  option: ChartRenderOption
+  optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>
 }
 
 function initChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
-  renderOpt: ChartRenderOption,
-  CandleMetaDataSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>
+  option: ChartRenderOption,
+  optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>
 ) {
   const chartContainer = d3.select(svgRef.current)
   chartContainer.attr('width', CHART_CONTAINER_X_SIZE)
@@ -195,18 +147,17 @@ function initChart(
     .attr('width', CHART_AREA_X_SIZE)
     .attr('height', CHART_AREA_Y_SIZE + 20)
 
-  console.error(renderOpt.renderStartDataIndex, renderOpt.renderCandleCount)
   const yAxisScale = getYAxisScale(
     data.slice(
-      renderOpt.renderStartDataIndex,
-      renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
+      option.renderStartDataIndex,
+      option.renderStartDataIndex + option.renderCandleCount
     )
   )
   if (!yAxisScale) {
     console.error('받아온 API 데이터 에러')
     return undefined
   }
-  const xAxisScale = getXAxisScale(renderOpt, data)
+  const xAxisScale = getXAxisScale(option, data)
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
@@ -227,7 +178,7 @@ function initChart(
     ])
     .on('zoom', function (event: D3ZoomEvent<SVGSVGElement, CandleData>) {
       transalateX = event.transform.x
-      CandleMetaDataSetter((prev: ChartRenderOption) => {
+      optionSetter((prev: ChartRenderOption) => {
         movedCandle = Math.floor(
           transalateX / calculateCandlewidth(prev, CHART_AREA_X_SIZE)
         )
@@ -244,7 +195,7 @@ function initChart(
   d3.select<SVGSVGElement, CandleData>('#chart-container')
     .call(zoom)
     .on('wheel', (e: WheelEvent) => {
-      CandleMetaDataSetter(prev => {
+      optionSetter(prev => {
         return {
           ...prev,
           renderCandleCount: Math.max(
@@ -258,20 +209,13 @@ function initChart(
 
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = React.useRef<SVGSVGElement>(null)
-  const [chartRenderOption, setRenderOption] =
-    React.useState<ChartRenderOption>(DEFAULT_CANDLER_CHART_RENDER_OPTION)
   React.useEffect(() => {
-    initChart(chartSvg, props.candleData, chartRenderOption, setRenderOption)
+    initChart(chartSvg, props.candleData, props.option, props.optionSetter)
   }, [])
 
   React.useEffect(() => {
-    updateChart(
-      chartSvg,
-      props.candleData,
-      chartRenderOption,
-      DEFAULT_CANDLE_CHART_OPTION
-    )
-  }, [props.candleData, chartRenderOption])
+    updateChart(chartSvg, props.candleData, props.option)
+  }, [props.candleData, props.option])
 
   return (
     <div id="chart">
