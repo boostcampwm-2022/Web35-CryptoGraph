@@ -25,14 +25,23 @@ export function getYAxisScale(data: CandleData[]) {
   return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 0])
 }
 export function getXAxisScale(option: ChartRenderOption, data: CandleData[]) {
+  let index = option.renderStartDataIndex + option.renderCandleCount
+  if (
+    option.renderStartDataIndex + option.renderCandleCount >
+    option.fetchCandleCount + option.fetchStartDataIndex - 1
+  ) {
+    index = option.fetchCandleCount + option.fetchStartDataIndex - 1
+  }
+  console.log(
+    index,
+    data[index],
+    option.fetchCandleCount + option.fetchStartDataIndex - 1
+  )
   return d3
     .scaleTime()
     .domain([
       //데이터는 End가 최신 데이터이기 때문에, 순서를 반대로 해야 시간순서대로 들어온다?
-      makeDate(
-        data[option.renderStartDataIndex + option.renderCandleCount].timestamp,
-        60
-      ),
+      makeDate(data[index].timestamp, 60),
       makeDate(data[option.renderStartDataIndex].timestamp, 60)
     ]) //옵션화 필요함
     .range([0, CHART_AREA_X_SIZE])
