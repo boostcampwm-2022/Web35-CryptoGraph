@@ -1,4 +1,8 @@
-import { ChartOption, ChartRenderOption } from '@/types/ChartTypes'
+import {
+  ChartOption,
+  ChartRenderOption,
+  PointerPosition
+} from '@/types/ChartTypes'
 
 export const DEFAULT_CANDLE_COUNT = 2000
 export const DEFAULT_CANDLE_CHART_OPTION: ChartOption = {
@@ -16,3 +20,8 @@ export const DEFAULT_CANDLER_CHART_RENDER_OPTION: ChartRenderOption = {
 }
 
 export const MIN_CANDLE_COUNT = 5
+
+export const DEFAULT_POINTER_POSITION: PointerPosition = {
+  positionX: -1,
+  positionY: -1
+}

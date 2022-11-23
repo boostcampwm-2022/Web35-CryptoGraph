@@ -1,10 +1,16 @@
 import * as React from 'react'
-import { CandleData, ChartOption, ChartRenderOption } from '@/types/ChartTypes'
+import {
+  CandleData,
+  ChartOption,
+  ChartRenderOption,
+  PointerPosition
+} from '@/types/ChartTypes'
 import * as d3 from 'd3'
 import {
   DEFAULT_CANDLER_CHART_RENDER_OPTION,
   DEFAULT_CANDLE_CHART_OPTION,
-  MIN_CANDLE_COUNT
+  MIN_CANDLE_COUNT,
+  DEFAULT_POINTER_POSITION
 } from '@/constants/ChartConstants'
 import { D3ZoomEvent } from 'd3'
 const CHART_CONTAINER_X_SIZE = 1000
@@ -62,7 +68,8 @@ function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
   renderOpt: ChartRenderOption,
-  options: ChartOption
+  options: ChartOption,
+  pointerInfo: PointerPosition
 ) {
   const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
   const chartContainer = d3.select(svgRef.current)
@@ -92,6 +99,7 @@ function updateChart(
         .ticks(5)
     )
   updateCurrentPrice(yAxisScale, data, renderOpt)
+  updatePointerUI(pointerInfo, yAxisScale, renderOpt)
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
     .data(data)
@@ -200,11 +208,68 @@ function updateCurrentPrice(
     .text(data[0].trade_price.toLocaleString())
 }
 
+// svg#mouse-pointer-UI자식요소에 격자구선 선 join
+function updatePointerUI(
+  pointerInfo: PointerPosition,
+  yAxisScale: d3.ScaleLinear<number, number, never>,
+  renderOpt: ChartRenderOption
+) {
+  d3.select('svg#mouse-pointer-UI')
+    .selectAll('path')
+    .data(transPointerInfoToArray(pointerInfo))
+    .join(
+      function (enter) {
+        return enter
+          .append('path')
+          .attr('d', (d, i) => pathDAttr(d, i))
+          .attr('stroke', 'black')
+      },
+      function (update) {
+        return update.attr('d', (d, i) => pathDAttr(d, i))
+      },
+      function (exit) {
+        return exit.remove()
+      }
+    )
+}
+
+// 격자를 생성할 path요소의 내용 index가 0이라면 세로선 1이라면 가로선
+function pathDAttr(d: number, i: number) {
+  return i === 0
+    ? `M${d} 0 L${d} ${CHART_AREA_Y_SIZE}`
+    : `M0 ${d} L${CHART_AREA_X_SIZE} ${d}`
+}
+
+function transPointerInfoToArray(pointerInfo: PointerPosition) {
+  return [pointerInfo.positionX, pointerInfo.positionY].filter(el => el !== -1)
+}
+
+// 마우스 이벤트 핸들러 포인터의 위치를 파악하고 pointerPosition을 갱신한다.
+function handleMouseEvent(
+  event: MouseEvent,
+  pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerPosition>>
+) {
+  if (
+    event.offsetX >= 0 &&
+    event.offsetY >= 0 &&
+    event.offsetX <= CHART_AREA_X_SIZE &&
+    event.offsetY <= CHART_AREA_Y_SIZE
+  ) {
+    pointerPositionSetter({
+      positionX: event.offsetX,
+      positionY: event.offsetY
+    })
+    return
+  }
+  pointerPositionSetter({ positionX: -1, positionY: -1 })
+}
+
 function initChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
   renderOpt: ChartRenderOption,
-  CandleMetaDataSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>
+  CandleMetaDataSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>,
+  pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerPosition>>
 ) {
   const chartContainer = d3.select(svgRef.current)
   chartContainer.attr('width', CHART_CONTAINER_X_SIZE)
@@ -266,6 +331,7 @@ function initChart(
           translateX: event.transform.x
         }
       })
+      handleMouseEvent(event.sourceEvent, pointerPositionSetter)
       d3.select('#chart-area')
         .selectAll<SVGSVGElement, CandleData>('g')
         .attr('transform', `translate(${event.transform.x})`)
@@ -283,14 +349,29 @@ function initChart(
         }
       })
     })
+  d3.select<SVGSVGElement, CandleData>('svg#chart-container').on(
+    'mousemove',
+    (event: MouseEvent) => {
+      handleMouseEvent(event, pointerPositionSetter)
+    }
+  )
 }
 
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = React.useRef<SVGSVGElement>(null)
   const [chartRenderOption, setRenderOption] =
     React.useState<ChartRenderOption>(DEFAULT_CANDLER_CHART_RENDER_OPTION)
+  const [pointerInfo, setPointerInfo] = React.useState<PointerPosition>(
+    DEFAULT_POINTER_POSITION
+  )
   React.useEffect(() => {
-    initChart(chartSvg, props.candleData, chartRenderOption, setRenderOption)
+    initChart(
+      chartSvg,
+      props.candleData,
+      chartRenderOption,
+      setRenderOption,
+      setPointerInfo
+    )
   }, [])
 
   React.useEffect(() => {
@@ -298,9 +379,10 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       chartSvg,
       props.candleData,
       chartRenderOption,
-      DEFAULT_CANDLE_CHART_OPTION
+      DEFAULT_CANDLE_CHART_OPTION,
+      pointerInfo
     )
-  }, [props.candleData, chartRenderOption])
+  }, [props.candleData, chartRenderOption, pointerInfo])
 
   return (
     <div id="chart">
@@ -314,6 +396,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
           <line />
           <text />
         </svg>
+        <svg id="mouse-pointer-UI"></svg>
       </svg>
     </div>
   )

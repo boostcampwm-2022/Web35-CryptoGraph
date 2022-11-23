@@ -31,3 +31,8 @@ export interface ChartRenderOption {
   renderCandleCount: number
   translateX: number
 }
+
+export interface PointerPosition {
+  positionX: number
+  positionY: number
+}
