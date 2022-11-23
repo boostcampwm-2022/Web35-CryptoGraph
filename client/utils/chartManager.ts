@@ -32,11 +32,6 @@ export function getXAxisScale(option: ChartRenderOption, data: CandleData[]) {
   ) {
     index = option.fetchCandleCount + option.fetchStartDataIndex - 1
   }
-  console.log(
-    index,
-    data[index],
-    option.fetchCandleCount + option.fetchStartDataIndex - 1
-  )
   return d3
     .scaleTime()
     .domain([

@@ -212,7 +212,6 @@ function initChart(
           newData = [...prevCandleData, ...newFetchedData]
           return newData
         })
-        console.log('데이터는', newData)
         debounce = false // 데이터 fetching 완료 및 디바운싱 해제
       }
 
