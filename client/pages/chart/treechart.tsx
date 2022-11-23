@@ -10,34 +10,18 @@ import { getCandleDataArray } from '@/utils/upbitManager'
 import { useRealTimeUpbitData } from 'hooks/useRealTimeUpbitData'
 import { useState, useEffect, useRef } from 'react'
 import useInterval from 'hooks/useInterval'
+import { remove } from 'lodash'
 
 const getChangeRate = () =>
   getCandleDataArray('days', DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType, 1)
 
 // set the dimensions and margins of the graph
-const margin = { top: 10, right: 10, bottom: 10, left: 10 },
-  width = 1000 - margin.left - margin.right,
+const margin = { top: 10, right: 10, bottom: 10, left: 300 },
+  width = 2400 - margin.left - margin.right,
   height = 1000 - margin.top - margin.bottom
 
 const updateChart = (svgRef, data) => {
-  const chartContainer = d3.select(svgRef.current)
-  //const chartArea = chartContainer.select('svg#chart-area')
-  // chartArea
-  //   .selectAll('g')
-  //   .data(data)
-  //   .join(enter => {
-  //     const $g = enter.append('g')
-  //     $g.append('rect')
-  //   })
-
-  const chartArea = d3
-    .select('svg#chart-area')
-    .append('svg')
-    .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom)
-    .append('g')
-    .attr('transform', `translate(${margin.left}, ${margin.top})`)
-
+  const chartArea = d3.select('svg#chart-area')
   const test = data => {
     const root = d3
       .stratify()
@@ -51,15 +35,19 @@ const updateChart = (svgRef, data) => {
       data
     )
     root.sum(function (d) {
-      return +d.value
+      return Math.abs(+d.value)
     })
     d3.treemap().size([width, height]).padding(4)(root)
+    const [min, max] = [
+      d3.min(data, d => Math.abs(d.value)),
+      d3.max(data, d => d.value)
+    ]
+    let myScale = d3.scaleLinear().domain([min, max]).range([0.5, 1])
     chartArea
       .selectAll('rect')
       .data(root.leaves())
       .join('rect')
       .attr('x', function (d) {
-        console.log(d)
         return d.x0
       })
       .attr('y', function (d) {
@@ -71,8 +59,14 @@ const updateChart = (svgRef, data) => {
       .attr('height', function (d) {
         return d.y1 - d.y0
       })
+      .attr('fill', function (d) {
+        return d.data.value > 0 ? 'red' : 'blue'
+      })
+      .transition()
+      .attr('opacity', function (d) {
+        return myScale(Math.abs(d.data.value))
+      })
       .style('stroke', 'black')
-      .style('fill', '#69b3a2')
     chartArea
       .selectAll('text')
       .data(root.leaves())
@@ -92,12 +86,10 @@ const updateChart = (svgRef, data) => {
   test(data)
 }
 
-const initChart = (svgRef, data) => {
+const initChart = svgRef => {
   const chartContainer = d3.select(svgRef.current)
   chartContainer.attr('width', width)
   chartContainer.attr('height', height)
-  chartContainer.attr('view')
-  const chartArea = chartContainer.select('svg#chart-area')
 }
 
 export default function TreeChartPage({}: any) {
@@ -108,14 +100,26 @@ export default function TreeChartPage({}: any) {
 
   const coinRate = [
     { name: 'Origin', parent: '', value: '' },
-    { name: 'BTC', parent: 'Origin', value: Number(changeRate) * 1 },
-    { name: 'ETH', parent: 'Origin', value: Number(changeRate) * 2 },
-    { name: 'DOG', parent: 'Origin', value: Number(changeRate) * 3 }
+    {
+      name: 'BTC',
+      parent: 'Origin',
+      value: Number(changeRate) * 1
+    },
+    {
+      name: 'ETH',
+      parent: 'Origin',
+      value: Number(changeRate) * -2
+    },
+    {
+      name: 'DOG',
+      parent: 'Origin',
+      value: Number(changeRate) * 3
+    }
   ]
 
   const chartSvg = useRef<SVGSVGElement>(null)
   useEffect(() => {
-    initChart(chartSvg, coinRate)
+    initChart(chartSvg)
   }, [])
 
   useEffect(() => {
