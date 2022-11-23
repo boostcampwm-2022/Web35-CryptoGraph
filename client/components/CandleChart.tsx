@@ -99,7 +99,7 @@ function updateChart(
         .ticks(5)
     )
   updateCurrentPrice(yAxisScale, data, renderOpt)
-  updatePointerUI(pointerInfo, yAxisScale, renderOpt)
+  updatePointerUI(pointerInfo, yAxisScale, renderOpt, data)
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
     .data(data)
@@ -212,20 +212,46 @@ function updateCurrentPrice(
 function updatePointerUI(
   pointerInfo: PointerPosition,
   yAxisScale: d3.ScaleLinear<number, number, never>,
-  renderOpt: ChartRenderOption
+  renderOpt: ChartRenderOption,
+  data: CandleData[]
 ) {
   d3.select('svg#mouse-pointer-UI')
-    .selectAll('path')
+    .selectAll('g')
     .data(transPointerInfoToArray(pointerInfo))
     .join(
       function (enter) {
-        return enter
-          .append('path')
-          .attr('d', (d, i) => pathDAttr(d, i))
+        const $g = enter.append('g')
+        $g.append('path')
+          .attr('d', (d, i) => getPathDAttr(d, i))
           .attr('stroke', 'black')
+        $g.append('text')
+          .attr('fill', 'black')
+          .attr('font-size', 12)
+          .attr('transform', (d, i) => getTextTransform(d, i))
+          .text((d, i) => {
+            if (i === 0) {
+              return getTimeText(d, renderOpt, data)
+            }
+            return yAxisScale.invert(d)
+          })
+          .attr('text-anchor', (d, i) => (i === 0 ? 'middle' : 'start'))
+          .attr('dominant-baseline', (d, i) => (i === 0 ? 'hanging' : 'middle'))
+        return $g
       },
       function (update) {
-        return update.attr('d', (d, i) => pathDAttr(d, i))
+        update.select('path').attr('d', (d, i) => getPathDAttr(d, i))
+        update
+          .select('text')
+          .attr('transform', (d, i) => getTextTransform(d, i))
+          .text((d, i) => {
+            if (i === 0) {
+              return getTimeText(d, renderOpt, data)
+            }
+            return Math.round(yAxisScale.invert(d))
+          })
+          .attr('text-anchor', (d, i) => (i === 0 ? 'middle' : 'start'))
+          .attr('dominant-baseline', (d, i) => (i === 0 ? 'hanging' : 'middle'))
+        return update
       },
       function (exit) {
         return exit.remove()
@@ -233,8 +259,29 @@ function updatePointerUI(
     )
 }
 
+// text위치 정보 반환
+function getTextTransform(d: number, i: number) {
+  return i === 0
+    ? `translate(${d},${CHART_AREA_Y_SIZE + 3})`
+    : `translate(${CHART_AREA_X_SIZE + 3}, ${d})`
+}
+
+// 시간정보 텍스트 반환
+// 가격은 yAxisSclae로 변환하면 되는데 xAxisScale은 적용할 수 없음
+function getTimeText(
+  positionX: number,
+  renderOpt: ChartRenderOption,
+  data: CandleData[]
+) {
+  const offSetX = renderOpt.translateX + (CHART_AREA_X_SIZE - positionX)
+  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
+  const timeString =
+    data[Math.floor(offSetX / candleWidth)].candle_date_time_kst
+  return timeString.substring(5, 10) + '\n' + timeString.substring(11, 16)
+}
+
 // 격자를 생성할 path요소의 내용 index가 0이라면 세로선 1이라면 가로선
-function pathDAttr(d: number, i: number) {
+function getPathDAttr(d: number, i: number) {
   return i === 0
     ? `M${d} 0 L${d} ${CHART_AREA_Y_SIZE}`
     : `M0 ${d} L${CHART_AREA_X_SIZE} ${d}`
