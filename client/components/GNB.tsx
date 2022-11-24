@@ -9,10 +9,10 @@ const GNBContainer = styled('div')`
   display: flex;
   height: 96px;
   background-color: ${props => props.theme.palette.primary.main};
-  ${props => props.theme.breakpoints.down('sm')} {
+  ${props => props.theme.breakpoints.down('tablet')} {
     height: 64px;
   }
-  ${props => props.theme.breakpoints.up('lg')} {
+  ${props => props.theme.breakpoints.up('tablet')} {
     background-color: ${props => props.theme.palette.primary.dark};
   }
   align-items: center;
@@ -22,10 +22,10 @@ const GNBContainer = styled('div')`
 
 export default function GNB() {
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
   return (
     <GNBContainer>
-      <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center' }}>
+      <Container maxWidth="max" sx={{ display: 'flex', alignItems: 'center' }}>
         {isMobile ? (
           <Image src="/logo-only-white.svg" alt="" width={40} height={40} />
         ) : (
