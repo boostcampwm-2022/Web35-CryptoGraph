@@ -1,5 +1,5 @@
 import { CandleData } from '@/types/ChartTypes'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, Dispatch, SetStateAction } from 'react'
 import { ChartPeriod } from '@/types/ChartTypes'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { transDate } from '@/utils/dateManager'
@@ -9,7 +9,7 @@ export const useRealTimeUpbitData = (
   period: ChartPeriod,
   market: string,
   initData: CandleData[]
-): CandleData[] => {
+): [CandleData[], Dispatch<SetStateAction<CandleData[]>>] => {
   const [realtimeCandleData, setRealtimeCandleData] =
     useState<CandleData[]>(initData)
   const isInitialMount = useRef(true)
@@ -43,7 +43,7 @@ export const useRealTimeUpbitData = (
     }
   }, [market, period])
 
-  return realtimeCandleData //socket을 state해서 같이 뺀다. 변화감지 (끊길때) -> ui표시..
+  return [realtimeCandleData, setRealtimeCandleData] //socket을 state해서 같이 뺀다. 변화감지 (끊길때) -> ui표시..
 }
 
 export function connectWS(market: string) {
