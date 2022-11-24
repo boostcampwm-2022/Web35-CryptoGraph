@@ -11,8 +11,12 @@ import {
   CHART_AREA_X_SIZE,
   CHART_AREA_Y_SIZE,
   CHART_CONTAINER_X_SIZE,
-  CHART_CONTAINER_Y_SIZE
+  CHART_CONTAINER_Y_SIZE,
+  DEFAULT_CANDLER_CHART_RENDER_OPTION,
+  DEFAULT_CANDLE_PERIOD
 } from '@/constants/ChartConstants'
+import { makeDate } from '@/utils/dateManager'
+import { getCandleDataArray } from '@/utils/upbitManager'
 
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
@@ -120,6 +124,7 @@ function updateChart(
 }
 interface CandleChartProps {
   candleData: CandleData[]
+  candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>
   option: ChartRenderOption
   optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>
 }
@@ -127,6 +132,7 @@ interface CandleChartProps {
 function initChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
+  candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>,
   option: ChartRenderOption,
   optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>
 ) {
@@ -158,6 +164,9 @@ function initChart(
     .call(d3.axisBottom(xAxisScale))
   let transalateX = 0
   let movedCandle = 0
+  let debounce = false
+  let newData: CandleData[] = data
+  let newRenderCandleCount = 0
   const zoom = d3
     .zoom<SVGSVGElement, CandleData>()
     .scaleExtent([1, 1])
@@ -171,11 +180,48 @@ function initChart(
         movedCandle = Math.floor(
           transalateX / calculateCandlewidth(prev, CHART_AREA_X_SIZE)
         )
+        newRenderCandleCount = prev.renderCandleCount
         return {
           ...prev,
           renderStartDataIndex: movedCandle
         }
       })
+
+      //1. 전체개수 200개 - movedCandle < 100개가 되는지 확인한다.
+      //2. 100개 미만으로 떨어지면 데이터를 200개만큼 추가로 가져온다. data = [...newData, ...data]
+      //3. 이때 getCandleDataArray 비동기작업이 진행되므로 디바운싱 처리를 통해 기다린다.
+      //    -> 비동기작업이 진행중일때는 fetch 추가요청 하지않게 막아줌
+      async function setNewCandleData() {
+        debounce = true // 디바운싱 시작
+        const newFetchedData: CandleData[] = await getCandleDataArray(
+          DEFAULT_CANDLE_PERIOD,
+          DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
+          200,
+          makeDate(
+            //endTime설정
+            newData[newData.length - 1].timestamp,
+            60
+          )
+            .toJSON()
+            .slice(0, -5)
+            .concat('Z')
+            .replaceAll(':', '%3A') //업비트 쿼리문 규칙
+        )
+
+        candleDataSetter((prevCandleData: CandleData[]) => {
+          newData = [...prevCandleData, ...newFetchedData]
+          return newData
+        })
+        debounce = false // 데이터 fetching 완료 및 디바운싱 해제
+      }
+
+      //디바운싱이 작동되지 않을때만 fetch시작
+      if (
+        newData.length - (movedCandle + newRenderCandleCount) < 100 &&
+        !debounce
+      ) {
+        setNewCandleData()
+      }
       d3.select('#chart-area')
         .selectAll<SVGSVGElement, CandleData>('g')
         .attr('transform', `translate(${event.transform.x})`)
@@ -195,7 +241,13 @@ function initChart(
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = React.useRef<SVGSVGElement>(null)
   React.useEffect(() => {
-    initChart(chartSvg, props.candleData, props.option, props.optionSetter)
+    initChart(
+      chartSvg,
+      props.candleData,
+      props.candleDataSetter,
+      props.option,
+      props.optionSetter
+    )
   }, [])
 
   React.useEffect(() => {

@@ -17,7 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@/pages/*": ["pages/*"],
-      "@/styles/*": ["src/*"],
+      "@/styles/*": ["style/*"],
       "@/stories/*": ["stories/*"],
       "@/constants/*": ["constants/*"],
       "@/types/*": ["types/*"],
