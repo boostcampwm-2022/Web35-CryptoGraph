@@ -31,23 +31,20 @@ export function getOffSetX(renderOpt: ChartRenderOption) {
   return renderOpt.translateX % candleWidth
 }
 // renderOpt period으로 60 대체
-export function getXAxisScale(
-  renderOpt: ChartRenderOption,
-  data: CandleData[]
-) {
-  const offSetX = getOffSetX(renderOpt)
-  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
+export function getXAxisScale(option: ChartRenderOption, data: CandleData[]) {
+  const offSetX = getOffSetX(option)
+  const candleWidth = calculateCandlewidth(option, CHART_AREA_X_SIZE)
+  const index = Math.min(
+    option.renderStartDataIndex + option.renderCandleCount,
+    option.fetchCandleCount + option.fetchStartDataIndex - 1
+  )
+
   return d3
     .scaleTime()
     .domain([
       //데이터는 End가 최신 데이터이기 때문에, 순서를 반대로 해야 시간순서대로 들어온다?
-      makeDate(
-        data[renderOpt.renderStartDataIndex + renderOpt.renderCandleCount]
-          .timestamp -
-          60 * 1000,
-        60
-      ),
-      makeDate(data[renderOpt.renderStartDataIndex].timestamp, 60)
+      makeDate(data[index].timestamp - 60 * 1000, 60),
+      makeDate(data[option.renderStartDataIndex].timestamp, 60)
     ])
     .range([-(candleWidth - offSetX), CHART_AREA_X_SIZE + offSetX])
 }
