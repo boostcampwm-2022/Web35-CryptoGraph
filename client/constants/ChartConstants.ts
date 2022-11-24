@@ -1,4 +1,8 @@
-import { ChartPeriod, ChartRenderOption } from '@/types/ChartTypes'
+import {
+  ChartPeriod,
+  ChartRenderOption,
+  PointerPosition
+} from '@/types/ChartTypes'
 
 export const CHART_CONTAINER_X_SIZE = 1000
 export const CHART_CONTAINER_Y_SIZE = 800
@@ -22,3 +26,8 @@ export const DEFAULT_CANDLER_CHART_RENDER_OPTION: ChartRenderOption = {
 }
 
 export const MIN_CANDLE_COUNT = 5
+
+export const DEFAULT_POINTER_POSITION: PointerPosition = {
+  positionX: -1,
+  positionY: -1
+}

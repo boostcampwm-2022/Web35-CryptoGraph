@@ -24,17 +24,30 @@ export function getYAxisScale(data: CandleData[]) {
   }
   return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 0])
 }
-export function getXAxisScale(option: ChartRenderOption, data: CandleData[]) {
+export function getOffSetX(renderOpt: ChartRenderOption) {
+  // CHART_AREA_X_SIZE 외부 변수사용
+  // renderOpt에 CHART관련 속성 추가 어떨지???
+  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
+  return renderOpt.translateX % candleWidth
+}
+// renderOpt period으로 60 대체
+export function getXAxisScale(
+  renderOpt: ChartRenderOption,
+  data: CandleData[]
+) {
+  const offSetX = getOffSetX(renderOpt)
+  const candleWidth = calculateCandlewidth(renderOpt, CHART_AREA_X_SIZE)
   return d3
     .scaleTime()
     .domain([
       //데이터는 End가 최신 데이터이기 때문에, 순서를 반대로 해야 시간순서대로 들어온다?
       makeDate(
-        data[option.renderStartDataIndex + option.renderCandleCount].timestamp,
+        data[renderOpt.renderStartDataIndex + renderOpt.renderCandleCount]
+          .timestamp -
+          60 * 1000,
         60
       ),
-      makeDate(data[option.renderStartDataIndex].timestamp, 60)
-    ]) //옵션화 필요함
-    .range([0, CHART_AREA_X_SIZE])
-    .nice()
+      makeDate(data[renderOpt.renderStartDataIndex].timestamp, 60)
+    ])
+    .range([-(candleWidth - offSetX), CHART_AREA_X_SIZE + offSetX])
 }

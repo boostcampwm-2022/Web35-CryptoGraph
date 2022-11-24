@@ -49,3 +49,8 @@ export interface ChartRenderOption {
   isVolumeVislble: boolean
   isMovingAverageVisible: boolean
 }
+
+export interface PointerPosition {
+  positionX: number
+  positionY: number
+}
