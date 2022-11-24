@@ -9,9 +9,31 @@ export async function getCandleDataArray(
     `https://api.upbit.com/v1/candles/${period}?market=KRW-${market}&count=${count}`,
     {
       method: 'GET',
-      headers: { accept: 'application/json' }
+      headers: { accept: 'application/json' },
     }
   )
   const data: CandleData[] = await res.json()
   return data
 }
+
+export async function getTreeMapDataArray(
+  market: string,
+): Promise<CandleData[]> {
+  const res = await fetch(
+    //market -> markets
+    `https://api.upbit.com/v1/ticker?markets=${market}&count=1`,
+    {
+      method: 'GET',
+      headers: { accept: 'application/json' },
+    }
+  )
+  const data: CandleData[] = await res.json()
+  return data
+}
+
+export async function getCoinTicker() {
+  const res = await fetch('https://api.upbit.com/v1/market/all')
+  const data = await res.json()
+  return data
+}
+

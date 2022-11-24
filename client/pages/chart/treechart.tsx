@@ -8,17 +8,14 @@ import {
 } from '@/constants/ChartConstants'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { useRealTimeUpbitData } from 'hooks/useRealTimeUpbitData'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useReducer } from 'react'
 import useInterval from 'hooks/useInterval'
-import { remove } from 'lodash'
-
-const getChangeRate = () =>
-  getCandleDataArray('days', DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType, 1)
+import { dataReducer } from 'reducers/dataReducer'
 
 // set the dimensions and margins of the graph
-const margin = { top: 10, right: 10, bottom: 10, left: 300 },
-  width = 2400 - margin.left - margin.right,
-  height = 1000 - margin.top - margin.bottom
+const margin = { top: 10, right: 10, bottom: 10, left: 300 }
+const width = 2400
+const height = 1000
 
 const updateChart = (svgRef: React.RefObject<SVGSVGElement>, data) => {
   const chartArea = d3.select('svg#chart-area')
@@ -77,7 +74,7 @@ const updateChart = (svgRef: React.RefObject<SVGSVGElement>, data) => {
       return d.y0 + Math.abs(d.y1 - d.y0) / 2
     })
     .text(function (d) {
-      return d.data.name + String(Number(d.data.value).toFixed(2)) + '%'
+      return d.data.name + '\n' + String(Number(d.data.value).toFixed(2)) + '%'
     })
     .attr('font-size', '40px')
     .attr('fill', 'white')
@@ -90,39 +87,40 @@ const initChart = (svgRef: React.RefObject<SVGSVGElement>) => {
 }
 
 export default function TreeChartPage({}: any) {
-  const [changeRate, setChangeRate] = useState(0)
-  useInterval(() => {
-    getChangeRate().then(data => setChangeRate(data[0].change_rate * 100))
-  }, 5000)
-
-  const coinRate = [
-    { name: 'Origin', parent: '', value: '' },
-    {
-      name: 'BTC',
-      parent: 'Origin',
-      value: Number(changeRate) * 1
-    },
-    {
-      name: 'ETH',
-      parent: 'Origin',
-      value: Number(changeRate) * -2
-    },
-    {
-      name: 'DOG',
-      parent: 'Origin',
-      value: Number(changeRate) * 3
-    }
-  ]
+  const [changeRate, setChangeRate] = useState([
+    { name: 'Origin', parent: '', value: 0 }
+  ])
+  const [coinRate, setcoinRate] = useState({})
+  const [data, dispatch] = useReducer(dataReducer, {})
 
   const chartSvg = useRef<SVGSVGElement>(null)
   useEffect(() => {
     initChart(chartSvg)
+    dispatch({ type: 'init', coinRate })
   }, [])
 
   useEffect(() => {
-    updateChart(chartSvg, coinRate)
+    updateChart(chartSvg, changeRate.slice(0, 20))
   }, [changeRate])
 
+  useEffect(() => {
+    console.log('coin update')
+    setcoinRate(data)
+  }, [Object.keys(data)])
+
+  useEffect(() => {
+    console.log('data binding')
+    const parent = [{ name: 'Origin', parent: '', value: 0 }]
+    setChangeRate([...parent, ...Object.values(data)])
+  }, [coinRate])
+
+  useInterval(() => {
+    console.log('coin update2')
+    dispatch({ type: 'update', coinRate })
+    setcoinRate([...Object.values(data)])
+  }, 500)
+
+  //30개 임의로 정하는 것보다 전체 다 갖다놓고 30개까지만 선택할 수 있게 하는게 나을듯
   return (
     <>
       <svg id="tree-chart" ref={chartSvg}>
