@@ -6,6 +6,7 @@ import SideBar from '../components/Sidebar'
 import { useMediaQuery, useTheme } from '@mui/material'
 const HomeContainer = styled('div')`
   width: 100%;
+  max-width: 1920px;
   height: 100%;
   display: flex;
   align-items: center;
@@ -22,13 +23,13 @@ const ResponsiveBox = styled(Box)`
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
     height: 0%;
     &.opened {
-      height: 100%;
+      height: calc(100% - 48px);
     }
   }
   ${props => props.theme.breakpoints.up('tablet')} {
     width: 0px;
     transition: width 0.6s ease-in-out;
-    height: 100%;
+    height: calc(100% - 48px);
     &.opened {
       width: 390px;
     }
@@ -62,7 +63,8 @@ export default function Home() {
       <Box
         sx={{
           width: '100%',
-          height: '100%',
+          height: `calc(100% - 48px)`,
+          margin: '24px',
           border: '1px solid black',
           borderRadius: '32px'
         }}
