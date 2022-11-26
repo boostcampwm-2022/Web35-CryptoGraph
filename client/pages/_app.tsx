@@ -44,7 +44,11 @@ export default function MyApp(props: MyAppProps) {
           }}
         >
           <GNB />
-          <Container disableGutters maxWidth="xl" sx={{ height: '100%' }}>
+          <Container
+            disableGutters
+            maxWidth="max"
+            sx={{ width: '100%', height: '100%' }}
+          >
             <Component {...pageProps} />
           </Container>
         </div>
