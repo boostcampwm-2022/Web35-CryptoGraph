@@ -3,45 +3,61 @@ import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 import Image from 'next/image'
 import SideBar from '../components/Sidebar'
-
+import { useMediaQuery, useTheme } from '@mui/material'
 const HomeContainer = styled('div')`
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
+  ${props => props.theme.breakpoints.down('tablet')} {
+    flex-direction: column-reverse;
+  }
 `
-
 const ResponsiveBox = styled(Box)`
   display: flex;
   align-items: center;
-  width: 390px; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
-  height: 100%; //(모바일에서는 50%정도)
-  transition: all 0.6s ease-in-out;
-  &.opened {
+
+  ${props => props.theme.breakpoints.down('tablet')} {
+    transition: height 0.6s ease-in-out;
+    width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
+    height: 0%;
+    &.opened {
+      height: 100%;
+    }
+  }
+  ${props => props.theme.breakpoints.up('tablet')} {
     width: 0px;
+    transition: width 0.6s ease-in-out;
+    height: 100%;
+    &.opened {
+      width: 390px;
+    }
   }
-  > .div {
-    border: 0px;
-  }
+`
+const ResponsiveImage = styled(Image)`
+  /* ${props => props.theme.breakpoints.down('tablet')} {
+    transform: rotate(270deg);
+  } */
 `
 
 export default function Home() {
   const [sideBarOpen, setSideBarOpen] = useState<boolean>(false) //사이드바가 열렸는지 컨트롤
   const [selectedMarket, setSelectedMarket] = useState<string[]>(['btc']) //선택된 market 컨트롤
-
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
   return (
     <HomeContainer>
       <ResponsiveBox className={sideBarOpen ? 'opened' : ''}>
         <SideBar isSideBarOpened={sideBarOpen} />
       </ResponsiveBox>
-      <Image
+      <ResponsiveImage
         onClick={() => {
           setSideBarOpen(!sideBarOpen)
         }}
-        src="/openBtn.svg"
+        src={isMobile ? '/openBtn-mobile.svg' : '/openBtn.svg'}
         alt=""
-        width={32}
-        height={140}
+        width={isMobile ? 140 : 32}
+        height={isMobile ? 34 : 140}
       />
       <Box
         sx={{
