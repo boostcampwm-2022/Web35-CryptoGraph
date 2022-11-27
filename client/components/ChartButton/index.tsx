@@ -9,7 +9,7 @@ const StyledTimeButton = styled('button')`
   font-weight: 500;
   font-size: 16px;
   margin: 8px 16px;
-  width: 50px;
+  width: auto;
   height: 50%;
 `
 export default function Chartbutton() {
