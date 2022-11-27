@@ -68,6 +68,7 @@ function updateChart(
     .join(
       enter => {
         const $g = enter.append('g')
+        $g.attr('transform', `translate(${option.translateX})`) //263번 줄에서 수정, 차트 움직임을 zoom이벤트 ->updateChart에서 관리
         $g.append('rect')
           .attr('width', candleWidth * 0.6)
           .attr('height', d =>
@@ -100,6 +101,7 @@ function updateChart(
       },
       update => {
         update
+          .attr('transform', `translate(${option.translateX})`) //263번 줄에서 수정, 차트 움직임을 zoom이벤트 ->updateChart에서 관리
           .select('rect')
           .attr('width', candleWidth * 0.6)
           .attr('height', d =>
@@ -197,9 +199,6 @@ function initChart(
     )
   let transalateX = 0
   let movedCandle = 0
-  let debounce = false
-  let newData: CandleData[] = data
-  let newRenderCandleCount = 0
   const zoom = d3
     .zoom<SVGSVGElement, CandleData>()
     .scaleExtent([1, 1])
@@ -213,7 +212,6 @@ function initChart(
         movedCandle = Math.floor(
           transalateX / calculateCandlewidth(prev, CHART_AREA_X_SIZE)
         )
-        newRenderCandleCount = prev.renderCandleCount
         return {
           ...prev,
           renderStartDataIndex: movedCandle,
@@ -221,57 +219,28 @@ function initChart(
         }
       })
       handleMouseEvent(event.sourceEvent, pointerPositionSetter)
-      //1. 전체개수 200개 - movedCandle < 100개가 되는지 확인한다.
-      //2. 100개 미만으로 떨어지면 데이터를 200개만큼 추가로 가져온다. data = [...newData, ...data]
-      //3. 이때 getCandleDataArray 비동기작업이 진행되므로 디바운싱 처리를 통해 기다린다.
-      //    -> 비동기작업이 진행중일때는 fetch 추가요청 하지않게 막아줌
-      async function setNewCandleData() {
-        debounce = true // 디바운싱 시작
-        const newFetchedData: CandleData[] = await getCandleDataArray(
-          DEFAULT_CANDLE_PERIOD,
-          DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
-          200,
-          makeDate(
-            //endTime설정
-            newData[newData.length - 1].timestamp,
-            60
-          )
-            .toJSON()
-            .slice(0, -5)
-            .concat('Z')
-            .replaceAll(':', '%3A') //업비트 쿼리문 규칙
-        )
-        optionSetter(prev => {
-          return { ...prev, fetchCandleCount: prev.fetchCandleCount + 200 }
-        })
-        candleDataSetter((prevCandleData: CandleData[]) => {
-          newData = [...prevCandleData, ...newFetchedData]
-          return newData
-        })
-        debounce = false // 데이터 fetching 완료 및 디바운싱 해제
-      }
-
-      //디바운싱이 작동되지 않을때만 fetch시작
-      if (
-        newData.length - (movedCandle + newRenderCandleCount) < 100 &&
-        !debounce
-      ) {
-        setNewCandleData()
-      }
-      d3.select('#chart-area')
-        .selectAll<SVGSVGElement, CandleData>('g')
-        .attr('transform', `translate(${event.transform.x})`)
     })
   d3.select<SVGSVGElement, CandleData>('#chart-container')
     .call(zoom)
     .on('wheel', (e: WheelEvent) => {
+      // 휠이벤트에 따라 확대 축소가 이루어진다.
+      // candleCount가 변함에따라 candleWidth도 변경되고 기존의 translateX와 연산하여 그래프의 시작인덱스를 재조정
       optionSetter(prev => {
+        const newRenderCandleCount = Math.max(
+          prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1), //휠이벤트 e.deltaY가 확대면 -1 축소면 +1
+          MIN_CANDLE_COUNT
+        )
+        const newRenderStartDataIndex = Math.floor(
+          prev.translateX /
+            calculateCandlewidth(
+              { ...prev, renderCandleCount: newRenderCandleCount },
+              CHART_AREA_X_SIZE
+            )
+        )
         return {
           ...prev,
-          renderCandleCount: Math.max(
-            prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1),
-            MIN_CANDLE_COUNT
-          )
+          renderCandleCount: newRenderCandleCount,
+          renderStartDataIndex: newRenderStartDataIndex
         }
       })
     })
@@ -288,6 +257,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const [pointerInfo, setPointerInfo] = React.useState<PointerPosition>(
     DEFAULT_POINTER_POSITION
   )
+  const isFetching = React.useRef(false)
   React.useEffect(() => {
     initChart(
       chartSvg,
@@ -300,6 +270,39 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   }, [])
 
   React.useEffect(() => {
+    //디바운싱 구문
+    if (
+      props.candleData.length <
+      props.option.renderStartDataIndex + props.option.renderCandleCount + 100
+    ) {
+      // 남은 candleData가 일정개수 이하로 내려가면 Fetch
+      if (!isFetching.current) {
+        //fetching중인데 한번더 요청이 일어나면 추가fetch 작동하지않음
+        isFetching.current = true
+        //추가적인 candleData Fetch
+        getCandleDataArray(
+          DEFAULT_CANDLE_PERIOD,
+          DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
+          200,
+          makeDate(
+            //endTime설정
+            props.candleData[props.candleData.length - 1].timestamp,
+            60
+          )
+            .toJSON()
+            .slice(0, -5)
+            .concat('Z')
+            .replaceAll(':', '%3A') //업비트 쿼리문 규칙
+        ).then(res => {
+          //fetch완료된 newData를 기존 data와 병합
+          isFetching.current = false
+          props.candleDataSetter(prev => {
+            return [...prev, ...res]
+          })
+        })
+      }
+      return
+    }
     updateChart(chartSvg, props.candleData, props.option, pointerInfo)
   }, [props.candleData, props.option, pointerInfo])
 

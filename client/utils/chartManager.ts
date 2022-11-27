@@ -38,11 +38,7 @@ export function getOffSetX(renderOpt: ChartRenderOption) {
 export function getXAxisScale(option: ChartRenderOption, data: CandleData[]) {
   const offSetX = getOffSetX(option)
   const candleWidth = calculateCandlewidth(option, CHART_AREA_X_SIZE)
-  const index = Math.min(
-    option.renderStartDataIndex + option.renderCandleCount,
-    option.fetchCandleCount + option.fetchStartDataIndex - 1
-  )
-
+  const index = option.renderStartDataIndex + option.renderCandleCount
   return d3
     .scaleTime()
     .domain([
