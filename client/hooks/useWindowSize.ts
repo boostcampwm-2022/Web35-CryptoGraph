@@ -5,6 +5,11 @@ interface WindowSize {
   height: number
 }
 
+/**
+ * DOM 태그의 ref의 width, height를 상태로 return하는 커스텀 훅
+ * @param ref width와 height를 얻길 원하는 html 태그의 ref
+ * @returns  width와 height의 변화하는 상태값
+ */
 export function useWindowSize(ref: React.RefObject<HTMLElement>) {
   const [windowSize, setWindowSize] = useState<WindowSize>({
     width: 0,
@@ -24,6 +29,6 @@ export function useWindowSize(ref: React.RefObject<HTMLElement>) {
     window.addEventListener('resize', handleResize)
     handleResize()
     return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  }, [ref])
   return windowSize
 }
