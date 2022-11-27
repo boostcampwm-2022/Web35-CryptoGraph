@@ -252,6 +252,13 @@ function initChart(
   )
 }
 
+function checkNeedFetch(candleData: CandleData[], option: ChartRenderOption) {
+  return (
+    candleData.length <
+    option.renderStartDataIndex + option.renderCandleCount + 100
+  )
+}
+
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = React.useRef<SVGSVGElement>(null)
   const [pointerInfo, setPointerInfo] = React.useState<PointerPosition>(
@@ -271,10 +278,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
 
   React.useEffect(() => {
     //디바운싱 구문
-    if (
-      props.candleData.length <
-      props.option.renderStartDataIndex + props.option.renderCandleCount + 100
-    ) {
+    if (checkNeedFetch(props.candleData, props.option)) {
       // 남은 candleData가 일정개수 이하로 내려가면 Fetch
       if (!isFetching.current) {
         //fetching중인데 한번더 요청이 일어나면 추가fetch 작동하지않음
