@@ -41,15 +41,16 @@ function a11yProps(index: number) {
   }
 }
 
-export default function RenderTabs({ value, setValue }: TabProps) {
+export default function RenderTabs() {
+  const [selectedTab, setSelectedTab] = React.useState<number>(0)
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue)
+    setSelectedTab(newValue)
   }
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
-          value={value}
+          value={selectedTab}
           onChange={handleChange}
           variant="fullWidth"
           aria-label="basic tabs example"
@@ -59,13 +60,13 @@ export default function RenderTabs({ value, setValue }: TabProps) {
           <Tab label="Item Three" {...a11yProps(2)} />
         </Tabs>
       </Box>
-      <TabPanel value={value} index={0}>
+      <TabPanel value={selectedTab} index={0}>
         Item One
       </TabPanel>
-      <TabPanel value={value} index={1}>
+      <TabPanel value={selectedTab} index={1}>
         Item Two
       </TabPanel>
-      <TabPanel value={value} index={2}>
+      <TabPanel value={selectedTab} index={2}>
         Item Three
       </TabPanel>
     </Box>

@@ -1,13 +1,12 @@
 import { styled } from '@mui/material/styles'
 import { Box, Button, useMediaQuery, useTheme } from '@mui/material'
-import renderMobileInfo from '@/components/Tab'
+import MobileInfo from '@/components/Tab'
 import Link from 'next/link'
 import Chartbutton from '@/components/ChartButton'
 import { useState } from 'react'
 
 export default function Detail() {
   const theme = useTheme()
-  const [selectedTab, setSelectedTab] = useState<number>(0)
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
 
   return (
@@ -20,10 +19,7 @@ export default function Detail() {
         <StyledChart>여기는 차트입니다.</StyledChart>
       </ChartContainer>
       <InfoContainer>
-        {isMobile
-          ? renderMobileInfo({ value: selectedTab, setValue: setSelectedTab })
-          : //프롭스로 컴포넌트를 받아낸다. 프롭스안에 있는 녀석들은 hook 못쓸텐데? 흠.. 일단 해보자..
-            renderDesktopInfo()}
+        {isMobile ? <MobileInfo /> : renderDesktopInfo()}
       </InfoContainer>
     </HomeContainer>
   )
