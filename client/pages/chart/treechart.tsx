@@ -11,7 +11,7 @@ import {
 
 const width = 2400
 const height = 1000
-const coinIntervalRate = 500
+const coinIntervalRate = 1000
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -19,8 +19,8 @@ const updateChart = (
 ) => {
   const chartArea = d3.select('svg#chart-area')
   const [min, max]: number[] = [
-    d3.min(data, d => Math.abs(d.value)) as number,
-    d3.max(data, d => d.value) as number
+    d3.min(data, d => Math.abs(d.value as number)) as number,
+    d3.max(data, d => d.value as number) as number
   ]
   const treeMapvalueScale = d3
     .scaleLinear()
@@ -94,30 +94,28 @@ export default function TreeChartPage() {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     { name: 'Origin', parent: '', value: 0 }
   ]) //coin의 등락률 값에 서 parentNode가 추가된 값
-  const [coinRate, setcoinRate] = useState({}) //coin의 등락률 값
+  const [coinRate, setCoinRate] = useState<CoinRateType[]>([]) //coin의 등락률 값
   const [data, dispatch] = useReducer<
     (
       data: CoinRateType | EmptyObject,
       action: ActionType
     ) => CoinRateType | undefined
   >(dataReducer, {} as never) //coin의 등락률 변화값을 받아서 coinRate에 넣어줌
-
   const chartSvg = useRef<SVGSVGElement>(null)
   useEffect(() => {
     // 1. 트리맵 초기화 (트리맵에 티커 추가)
     initChart(chartSvg)
-    dispatch({ type: 'init', coinRate })
+    dispatch({ type: 'init', coinRate: coinRate[0] })
   }, [])
-
   useEffect(() => {
     // 2. 티커를 받아오면 data init
-    setcoinRate(data)
+    setCoinRate([data])
   }, [Object.keys(data)])
 
   useInterval(() => {
     // 3. 주기적으로 코인 등락률을 업데이트
-    dispatch({ type: 'update', coinRate })
-    setcoinRate([...Object.values(data)])
+    dispatch({ type: 'update', coinRate: coinRate[0] })
+    setCoinRate([...Object.values<CoinRateType>(data)])
   }, coinIntervalRate)
 
   useEffect(() => {
