@@ -19,8 +19,8 @@ const updateChart = (
 ) => {
   const chartArea = d3.select('svg#chart-area')
   const [min, max]: number[] = [
-    d3.min(data, d => Math.abs(d.value as number)) as number,
-    d3.max(data, d => d.value as number) as number
+    d3.min(data, d => Math.abs(d.value)) as number,
+    d3.max(data, d => d.value) as number
   ]
   const treeMapvalueScale = d3
     .scaleLinear()
@@ -72,7 +72,7 @@ const updateChart = (
     )
     .join('text')
     .attr('x', function (d) {
-      return d.x0 + Math.abs(d.x1 - d.x0) / 2 - 30 //d.x0 + 30
+      return d.x0 + Math.abs(d.x1 - d.x0) / 2 - 30
     })
     .attr('y', function (d) {
       return d.y0 + Math.abs(d.y1 - d.y0) / 2
@@ -86,13 +86,8 @@ const updateChart = (
 
 const initChart = (svgRef: React.RefObject<SVGSVGElement>) => {
   const chartContainer = d3.select(svgRef.current)
-  const treeMapWidthScale = d3.scaleLinear().domain([0, width]).range([0, 100])
-  const treeMapHeightScale = d3
-    .scaleLinear()
-    .domain([0, height])
-    .range([0, 100])
-  chartContainer.attr('width', treeMapWidthScale(width) + '%')
-  chartContainer.attr('height', treeMapHeightScale(height) + '%')
+  chartContainer.attr('width', width)
+  chartContainer.attr('height', height)
 }
 
 export default function TreeChartPage() {

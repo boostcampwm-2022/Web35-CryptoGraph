@@ -96,7 +96,7 @@ export interface CoinRateContentType {
   name: string
   ticker?: string
   parent: string
-  value: string | number
+  value: number
 }
 
 export interface PointerPosition {
