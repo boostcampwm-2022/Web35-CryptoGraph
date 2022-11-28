@@ -109,7 +109,6 @@ export default function TreeChartPage() {
   }, [])
   useEffect(() => {
     // 2. 티커를 받아오면 data init
-    console.log('data init')
     setCoinRate([data])
   }, [data])
   //}, [Object.keys(data)])
