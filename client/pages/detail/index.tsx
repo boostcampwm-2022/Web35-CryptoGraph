@@ -1,33 +1,97 @@
 import { styled } from '@mui/material/styles'
-import { Button } from '@mui/material'
+import { Box, Button, useMediaQuery, useTheme } from '@mui/material'
+import MobileInfo from '@/components/Tab'
 import Link from 'next/link'
 import Chartbutton from '@/components/ChartButton'
+import { useState } from 'react'
 
-const StyledMainSection = styled('div')`
-  width: 100vw;
-  min-width: 1000px;
-  height: 80vh;
-  /* background-color: violet; */
+export default function Detail() {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
+
+  return (
+    <HomeContainer>
+      <ChartContainer>
+        차트공간
+        <ChartPeriodSelectorContainer>
+          <Chartbutton />
+        </ChartPeriodSelectorContainer>
+        <StyledChart>여기는 차트입니다.</StyledChart>
+      </ChartContainer>
+      <InfoContainer>
+        {isMobile ? <MobileInfo /> : renderDesktopInfo()}
+      </InfoContainer>
+    </HomeContainer>
+  )
+}
+
+function renderDesktopInfo() {
+  return (
+    <div style={{ width: '100%', height: '100%' }}>
+      <StyledRTV>실시간 코인시세</StyledRTV>
+      <StyledRTV>코인 상세정보</StyledRTV>
+      <Link href="/">
+        <Button
+          style={{ minWidth: '100px', width: '100%' }}
+          size="large"
+          variant="contained"
+        >
+          Go To Main
+        </Button>
+      </Link>
+    </div>
+  )
+}
+
+const HomeContainer = styled(Box)`
+  width: 100%;
+  max-width: 1920px;
+  height: 100%;
   display: flex;
+  align-items: center;
+  ${props => props.theme.breakpoints.down('tablet')} {
+    flex-direction: column;
+  }
 `
 //왼쪽 메인차트
-const StyledDetailLeft = styled('div')`
-  width: 75vw;
-  min-width: fit-content;
-  height: 75vh;
-  min-height: 750px;
+const ChartContainer = styled('div')`
+  display: flex;
+  box-sizing: content-box;
+  width: 100%;
+  height: calc(100% - 48px);
+  margin: 24px;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid black;
+  border-radius: 32px;
+  ${props => props.theme.breakpoints.down('tablet')} {
+    margin: 0;
+  }
+`
+
+//오른쪽 정보 표시 사이드바
+const InfoContainer = styled(Box)`
   margin: 24px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 32px;
+  width: 390px;
+  height: calc(100% - 48px);
+  ${props => props.theme.breakpoints.down('tablet')} {
+    transition: height 0.6s ease-in-out;
+    margin: 0;
+    width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
+    height: calc(70%);
+  }
 `
-const StyledChartButton = styled('div')`
-  width: 95%;
-  min-width: 700px;
+
+const ChartPeriodSelectorContainer = styled('div')`
+  width: 100%;
   height: 10%;
   min-height: 55px;
   background-color: #ffffff;
-  margin: 0 24px;
   border: 1px solid #cac4d0;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
@@ -36,62 +100,19 @@ const StyledChartButton = styled('div')`
   align-items: center;
 `
 const StyledChart = styled('div')`
-  width: 95%;
-  min-width: 700px;
+  width: 100%;
   height: 100%;
-  min-height: 480px;
   background-color: #ffffff;
-  margin: 24px;
   border: 1px solid #cac4d0;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
-`
-//오른쪽 사이드바
-const StyledDetailRight = styled('div')`
-  width: 18vw;
-  min-width: 250px;
-  height: 75vh;
-  min-height: 750px;
-  margin: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 `
 
 const StyledRTV = styled('div')`
   width: 100%;
   height: 43%;
-  min-height: 300px;
   background-color: #ffffff;
   border: 1px solid #cac4d0;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   padding-bottom: 24px;
 `
-
-export default function Detail() {
-  return (
-    <StyledMainSection>
-      <StyledDetailLeft>
-        <StyledChartButton>
-          <Chartbutton />
-        </StyledChartButton>
-        <StyledChart>여기는 차트입니다.</StyledChart>
-      </StyledDetailLeft>
-
-      <StyledDetailRight>
-        <StyledRTV>실시간 코인시세</StyledRTV>
-        <StyledRTV>코인 상세정보</StyledRTV>
-        <Link href="/">
-          <Button
-            style={{ minWidth: '100px', width: '100%' }}
-            size="large"
-            variant="contained"
-          >
-            Go To Main
-          </Button>
-        </Link>
-      </StyledDetailRight>
-    </StyledMainSection>
-  )
-}

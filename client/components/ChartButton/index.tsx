@@ -3,17 +3,14 @@ import Image from 'next/image'
 
 const StyledTimeButton = styled('button')`
   background: #e7e5ef;
-  border-radius: 100px;
+  border-radius: 16px;
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
   font-size: 16px;
-  line-height: 2vh;
   margin: 8px 16px;
-  width: 12vw;
-  height: 55%;
-  min-width: 108px;
-  min-height: 30px;
+  width: auto;
+  height: 50%;
 `
 export default function Chartbutton() {
   return (
