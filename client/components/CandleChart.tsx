@@ -350,7 +350,11 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
     <div
       id="chart"
       ref={chartContainerRef}
-      style={{ width: '100%', height: '100%' }}
+      style={{
+        display: 'flex',
+        width: '100%',
+        height: '100%'
+      }}
     >
       <svg id="chart-container" ref={chartSvg}>
         <g id="y-axis" />

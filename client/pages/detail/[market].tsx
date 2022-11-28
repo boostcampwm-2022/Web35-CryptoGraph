@@ -36,28 +36,15 @@ export default function Detail({
   return (
     <HomeContainer>
       <ChartContainer>
-        차트공간
         <ChartPeriodSelectorContainer>
           <Chartbutton />
         </ChartPeriodSelectorContainer>
-        <StyledChart>
-          <CandleChart
-            candleData={realtimeCandleData}
-            candleDataSetter={setRealtimeCandleData}
-            option={chartRenderOption}
-            optionSetter={setRenderOption}
-          ></CandleChart>
-          <div
-            onClick={() => {
-              setCandlePeriod(prev => {
-                return prev == 'minutes/1' ? 'minutes/60' : 'minutes/1'
-              })
-            }}
-            style={{ fontSize: '2rem' }}
-          >
-            {candlePeriod}분봉
-          </div>
-        </StyledChart>
+        <CandleChart
+          candleData={realtimeCandleData}
+          candleDataSetter={setRealtimeCandleData}
+          option={chartRenderOption}
+          optionSetter={setRenderOption}
+        ></CandleChart>
       </ChartContainer>
       <InfoContainer>
         {isMobile ? <MobileInfo /> : renderDesktopInfo()}
@@ -106,10 +93,10 @@ function renderDesktopInfo() {
 }
 
 const HomeContainer = styled(Box)`
+  display: flex;
   width: 100%;
   max-width: 1920px;
   height: 100%;
-  display: flex;
   align-items: center;
   ${props => props.theme.breakpoints.down('tablet')} {
     flex-direction: column;
@@ -119,21 +106,18 @@ const HomeContainer = styled(Box)`
 const ChartContainer = styled('div')`
   display: flex;
   box-sizing: content-box;
+  min-width: 300px;
   width: 100%;
   height: calc(100% - 48px);
-  margin: 24px;
   flex-direction: column;
-  justify-content: space-between;
-  border: 1px solid black;
   border-radius: 32px;
   ${props => props.theme.breakpoints.down('tablet')} {
-    margin: 0;
+    height: 50%;
   }
 `
 
 //오른쪽 정보 표시 사이드바
 const InfoContainer = styled(Box)`
-  margin: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -142,34 +126,25 @@ const InfoContainer = styled(Box)`
   width: 390px;
   height: calc(100% - 48px);
   ${props => props.theme.breakpoints.down('tablet')} {
-    transition: height 0.6s ease-in-out;
     margin: 0;
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
-    height: calc(70%);
   }
 `
 
 const ChartPeriodSelectorContainer = styled('div')`
+  display: flex;
   width: 100%;
-  height: 10%;
-  min-height: 55px;
+  height: auto;
   background-color: #ffffff;
   border: 1px solid #cac4d0;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
-  display: flex;
   justify-content: center;
   align-items: center;
-`
-const StyledChart = styled('div')`
-  width: 100%;
-  height: 100%;
-  background-color: #ffffff;
-  border: 1px solid #cac4d0;
-  border-radius: 20px;
+  margin-bottom: 20px;
 `
 
 const StyledRTV = styled('div')`
+  display: flex;
   width: 100%;
   height: 43%;
   background-color: #ffffff;
