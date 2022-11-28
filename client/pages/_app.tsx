@@ -4,9 +4,10 @@ import { AppProps } from 'next/app'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { Global, css, CacheProvider, EmotionCache } from '@emotion/react'
-import theme from '../src/theme'
-import createEmotionCache from '../src/createEmotionCache'
-import Gnb from '../components/Gnb'
+import theme from '../style/theme'
+import createEmotionCache from '../style/createEmotionCache'
+import GNB from '@/components/GNB'
+import { Container } from '@mui/material'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -14,7 +15,6 @@ const clientSideEmotionCache = createEmotionCache()
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
-
 const GlobalStyle = css`
   html {
     font-size: 62.5%;
@@ -36,8 +36,22 @@ export default function MyApp(props: MyAppProps) {
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
         <Global styles={GlobalStyle} />
-        <Gnb />
-        <Component {...pageProps} />
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          <GNB />
+          <Container
+            disableGutters
+            maxWidth="max"
+            sx={{ width: '100%', height: '100%' }}
+          >
+            <Component {...pageProps} />
+          </Container>
+        </div>
       </ThemeProvider>
     </CacheProvider>
   )

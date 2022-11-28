@@ -46,6 +46,7 @@ export interface ChartRenderOption {
   fetchCandleCount: number
   renderStartDataIndex: number
   renderCandleCount: number
+  translateX: number
   isVolumeVislble: boolean
   isMovingAverageVisible: boolean
 }
@@ -96,4 +97,9 @@ export interface CoinRateContentType {
   ticker?: string
   parent: string
   value: string | number
+}
+
+export interface PointerPosition {
+  positionX: number
+  positionY: number
 }
