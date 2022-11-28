@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { useState, useEffect, useRef, useReducer } from 'react'
 import useInterval from 'hooks/useInterval'
-import { dataReducer } from 'reducers/dataReducer'
+import { dataReducer } from 'hooks/reducers/dataReducer'
 import {
   ActionType,
   EmptyObject,
@@ -87,8 +87,8 @@ const initChart = (svgRef: React.RefObject<SVGSVGElement>) => {
     .scaleLinear()
     .domain([0, height])
     .range([0, 100])
-  chartContainer.attr('width', treeMapWidthScale(width))
-  chartContainer.attr('height', treeMapHeightScale(height))
+  chartContainer.attr('width', treeMapWidthScale(width) + '%')
+  chartContainer.attr('height', treeMapHeightScale(height) + '%')
 }
 
 export default function TreeChartPage() {
