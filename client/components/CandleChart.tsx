@@ -50,6 +50,7 @@ function updateChart(
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
     .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * CHART_AREA_X_SIZE))
+    .call(g => g.selectAll('.tick line').attr('stroke', '#EEEFEE'))
   chartContainer
     .select<SVGSVGElement>('g#x-axis')
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
@@ -60,6 +61,7 @@ function updateChart(
         .tickSizeOuter(0)
         .ticks(5)
     )
+    .call(g => g.selectAll('.tick line').attr('stroke', '#EEEFEE'))
   updateCurrentPrice(yAxisScale, data, option)
   updatePointerUI(pointerInfo, yAxisScale, option, data)
   chartArea
@@ -69,18 +71,6 @@ function updateChart(
       enter => {
         const $g = enter.append('g')
         $g.attr('transform', `translate(${option.translateX})`) //263번 줄에서 수정, 차트 움직임을 zoom이벤트 ->updateChart에서 관리
-        $g.append('rect')
-          .attr('width', candleWidth * 0.6)
-          .attr('height', d =>
-            Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price))
-          )
-          .attr('x', (d, i) => CHART_AREA_X_SIZE - candleWidth * (i + 0.8))
-          .attr('y', d =>
-            Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
-          )
-          .attr('fill', d =>
-            d.opening_price <= d.trade_price ? 'red' : 'blue'
-          )
         $g.append('line')
           .attr(
             'x1',
@@ -94,9 +84,20 @@ function updateChart(
           )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
-          .attr('stroke', d =>
+          .attr('stroke', 'black')
+        $g.append('rect')
+          .attr('width', candleWidth * 0.6)
+          .attr('height', d =>
+            Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price))
+          )
+          .attr('x', (d, i) => CHART_AREA_X_SIZE - candleWidth * (i + 0.8))
+          .attr('y', d =>
+            Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
+          )
+          .attr('fill', d =>
             d.opening_price <= d.trade_price ? 'red' : 'blue'
           )
+
         return $g
       },
       update => {
@@ -131,9 +132,9 @@ function updateChart(
           )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
-          .attr('stroke', d =>
-            d.opening_price < d.trade_price ? 'red' : 'blue'
-          )
+        // .attr('stroke', d =>
+        //   d.opening_price < d.trade_price ? 'red' : 'blue'
+        // )
         return update
       },
       exit => {
@@ -187,6 +188,7 @@ function initChart(
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
     .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * CHART_AREA_X_SIZE))
+    .call(g => g.selectAll('g.tick line').attr('stroke', '#EEEFEE'))
   chartContainer
     .select<SVGSVGElement>('g#x-axis')
     .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
@@ -197,6 +199,7 @@ function initChart(
         .tickSizeInner(-1 * CHART_AREA_Y_SIZE)
         .ticks(5)
     )
+    .call(g => g.selectAll('.tick line').attr('stroke', '#EEEFEE'))
   let transalateX = 0
   let movedCandle = 0
   const zoom = d3

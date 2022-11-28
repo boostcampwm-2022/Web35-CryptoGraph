@@ -100,16 +100,16 @@ export function updatePointerUI(
         const $g = enter.append('g')
         $g.append('path')
           .attr('d', (d, i) => getPathDAttr(d, i))
-          .attr('stroke', 'black')
+          .attr('stroke', '#999999')
         $g.append('text')
           .attr('fill', 'black')
-          .attr('font-size', 12)
+          .attr('font-size', 15)
           .attr('transform', (d, i) => getTextTransform(d, i))
           .text((d, i) => {
             if (i === 0) {
               return getTimeText(d, renderOpt, data)
             }
-            return yAxisScale.invert(d)
+            return Math.round(yAxisScale.invert(d)).toLocaleString()
           })
           .attr('text-anchor', (d, i) => (i === 0 ? 'middle' : 'start'))
           .attr('dominant-baseline', (d, i) => (i === 0 ? 'hanging' : 'middle'))
@@ -124,10 +124,8 @@ export function updatePointerUI(
             if (i === 0) {
               return getTimeText(d, renderOpt, data)
             }
-            return Math.round(yAxisScale.invert(d))
+            return Math.round(yAxisScale.invert(d)).toLocaleString()
           })
-          .attr('text-anchor', (d, i) => (i === 0 ? 'middle' : 'start'))
-          .attr('dominant-baseline', (d, i) => (i === 0 ? 'hanging' : 'middle'))
         return update
       },
       function (exit) {
