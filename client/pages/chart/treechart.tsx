@@ -19,15 +19,15 @@ const updateChart = (
 ) => {
   const chartArea = d3.select('svg#chart-area')
   const [min, max]: number[] = [
-    d3.min(data, d => Math.abs(d.value)),
-    d3.max(data, d => d.value)
+    d3.min(data, d => Math.abs(d.value as number)) as number,
+    d3.max(data, d => d.value as number) as number
   ]
   const treeMapvalueScale = d3
     .scaleLinear()
     .domain([min, max])
     .range([0.5, 1.5])
-  const root = d3
-    .stratify()
+  const root: d3.HierarchyNode<CoinRateContentType> = d3
+    .stratify<CoinRateContentType>()
     .id(function (d): string {
       return d.name
     })
@@ -41,7 +41,9 @@ const updateChart = (
 
   chartArea
     .selectAll<SVGSVGElement, CoinRateContentType>('rect')
-    .data(root.leaves())
+    .data<d3.HierarchyRectangularNode<CoinRateContentType>>(
+      root.leaves() as Array<d3.HierarchyRectangularNode<CoinRateContentType>>
+    )
     .join('rect')
     .attr('x', function (d) {
       return d.x0
@@ -60,12 +62,14 @@ const updateChart = (
     })
     .transition()
     .attr('opacity', function (d) {
-      return treeMapvalueScale(Math.abs(d.data.value))
+      return treeMapvalueScale(Math.abs(d.data.value as number))
     })
     .style('stroke', 'black')
   chartArea
     .selectAll('text')
-    .data(root.leaves())
+    .data(
+      root.leaves() as Array<d3.HierarchyRectangularNode<CoinRateContentType>>
+    )
     .join('text')
     .attr('x', function (d) {
       return d.x0 + Math.abs(d.x1 - d.x0) / 2 - 30 //d.x0 + 30
@@ -94,7 +98,7 @@ const initChart = (svgRef: React.RefObject<SVGSVGElement>) => {
 export default function TreeChartPage() {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     { name: 'Origin', parent: '', value: 0 }
-  ]) //coin의 등락률 값에서 parentNode가 추가된 값
+  ]) //coin의 등락률 값에 서 parentNode가 추가된 값
   const [coinRate, setcoinRate] = useState({}) //coin의 등락률 값
   const [data, dispatch] = useReducer<
     (
