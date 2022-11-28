@@ -26,12 +26,14 @@ import {
 } from '@/constants/ChartConstants'
 import { makeDate } from '@/utils/dateManager'
 import { getCandleDataArray } from '@/utils/upbitManager'
+import { useWindowSize, WindowSize } from 'hooks/useWindowSize'
 
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
   option: ChartRenderOption,
-  pointerInfo: PointerPosition
+  pointerInfo: PointerPosition,
+  windowSize: WindowSize
 ) {
   const candleWidth = calculateCandlewidth(option, CHART_AREA_X_SIZE)
   const chartContainer = d3.select(svgRef.current)
@@ -261,6 +263,8 @@ function checkNeedFetch(candleData: CandleData[], option: ChartRenderOption) {
 
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = React.useRef<SVGSVGElement>(null)
+  const chartContainerRef = React.useRef<HTMLDivElement>(null)
+  const windowSize = useWindowSize(chartContainerRef)
   const [pointerInfo, setPointerInfo] = React.useState<PointerPosition>(
     DEFAULT_POINTER_POSITION
   )
@@ -307,11 +311,21 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       }
       return
     }
-    updateChart(chartSvg, props.candleData, props.option, pointerInfo)
-  }, [props.candleData, props.option, pointerInfo])
+    updateChart(
+      chartSvg,
+      props.candleData,
+      props.option,
+      pointerInfo,
+      windowSize
+    )
+  }, [props.candleData, props.option, pointerInfo, windowSize])
 
   return (
-    <div id="chart">
+    <div
+      id="chart"
+      ref={chartContainerRef}
+      style={{ width: '100%', height: '100%' }}
+    >
       <svg id="chart-container" ref={chartSvg}>
         <g id="y-axis" />
         <svg id="x-axis-container">
