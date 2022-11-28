@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import { useState, useEffect, useRef, useReducer } from 'react'
+import { useState, useEffect, useRef, useReducer, SetStateAction } from 'react'
 import useInterval from 'hooks/useInterval'
 import { dataReducer } from 'hooks/reducers/dataReducer'
 import {
