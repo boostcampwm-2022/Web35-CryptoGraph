@@ -7,8 +7,9 @@ export async function getCandleDataArray(
   count = DEFAULT_CANDLE_COUNT,
   endTime: string | void
 ): Promise<CandleData[]> {
+  let res;
   if (!endTime) {
-    const res = await fetch(
+    res = await fetch(
       `https://api.upbit.com/v1/candles/${period}?market=KRW-${market}&count=${count}`,
       {
         method: 'GET',
@@ -16,7 +17,7 @@ export async function getCandleDataArray(
       }
     )
   } else {
-    const res = await fetch(
+    res = await fetch(
       `https://api.upbit.com/v1/candles/${period}?market=KRW-${market}&to=${endTime}&count=${count}`,
       {
         method: 'GET',
