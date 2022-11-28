@@ -3,12 +3,36 @@ import { Box, Button, useMediaQuery, useTheme } from '@mui/material'
 import MobileInfo from '@/components/Tab'
 import Link from 'next/link'
 import Chartbutton from '@/components/ChartButton'
+import { useRouter } from 'next/router'
+import {
+  DEFAULT_CANDLE_PERIOD,
+  DEFAULT_CANDLER_CHART_RENDER_OPTION
+} from '@/constants/ChartConstants'
+import { CandleData, ChartPeriod, ChartRenderOption } from '@/types/ChartTypes'
+import { getCandleDataArray } from '@/utils/upbitManager'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import { CandleChart } from '@/components/CandleChart'
+import { useRealTimeUpbitData } from 'hooks/useRealTimeUpbitData'
 import { useState } from 'react'
 
-export default function Detail() {
+export default function Detail({
+  candleData
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
-
+  const router = useRouter()
+  const { id } = router.query
+  const [candlePeriod, setCandlePeriod] = useState<ChartPeriod>(
+    DEFAULT_CANDLE_PERIOD
+  )
+  const [chartRenderOption, setRenderOption] = useState<ChartRenderOption>(
+    DEFAULT_CANDLER_CHART_RENDER_OPTION
+  )
+  const [realtimeCandleData, setRealtimeCandleData] = useRealTimeUpbitData(
+    candlePeriod,
+    chartRenderOption.marketType, //파싱
+    candleData
+  )
   return (
     <HomeContainer>
       <ChartContainer>
@@ -16,13 +40,51 @@ export default function Detail() {
         <ChartPeriodSelectorContainer>
           <Chartbutton />
         </ChartPeriodSelectorContainer>
-        <StyledChart>여기는 차트입니다.</StyledChart>
+        <StyledChart>
+          <CandleChart
+            candleData={realtimeCandleData}
+            candleDataSetter={setRealtimeCandleData}
+            option={chartRenderOption}
+            optionSetter={setRenderOption}
+          ></CandleChart>
+          <div
+            onClick={() => {
+              setCandlePeriod(prev => {
+                return prev == 'minutes/1' ? 'minutes/60' : 'minutes/1'
+              })
+            }}
+            style={{ fontSize: '2rem' }}
+          >
+            {candlePeriod}분봉
+          </div>
+        </StyledChart>
       </ChartContainer>
       <InfoContainer>
         {isMobile ? <MobileInfo /> : renderDesktopInfo()}
       </InfoContainer>
     </HomeContainer>
   )
+}
+
+interface CandleChartPageProps {
+  candleData: CandleData[]
+} //페이지 자체의 props interface
+export const getServerSideProps: GetServerSideProps<
+  CandleChartPageProps
+> = async context => {
+  const fetched: CandleData[] = await getCandleDataArray(
+    DEFAULT_CANDLE_PERIOD,
+    DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
+    200
+  )
+  console.log(context.query)
+  //여기서 커팅
+  const toret: CandleChartPageProps = {
+    candleData: fetched
+  } //이것도 함수로 뽑아내는게 나을듯?
+  return {
+    props: toret // will be passed to the page component as props
+  }
 }
 
 function renderDesktopInfo() {
