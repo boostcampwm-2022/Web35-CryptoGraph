@@ -1,4 +1,10 @@
 import {
+  CANDLE_COLOR_RED,
+  CANDLE_COLOR_BLUE,
+  CANDLE_CHART_POINTER_LINE_COLOR,
+  CHART_FONT_SIZE
+} from '@/constants/ChartConstants'
+import {
   ChartRenderOption,
   CandleData,
   PointerPosition
@@ -61,7 +67,9 @@ export function updateCurrentPrice(
   const $currentPrice = d3.select('svg#current-price')
   const yCoord = yAxisScale(data[0].trade_price)
   const strokeColor =
-    data[0].opening_price < data[0].trade_price ? 'red' : 'blue'
+    data[0].opening_price < data[0].trade_price
+      ? CANDLE_COLOR_RED
+      : CANDLE_COLOR_BLUE
   $currentPrice
     .select('line')
     .attr('x1', CHART_AREA_X_SIZE)
@@ -74,7 +82,7 @@ export function updateCurrentPrice(
   $currentPrice
     .select('text')
     .attr('fill', strokeColor)
-    .attr('font-size', 15)
+    .attr('font-size', CHART_FONT_SIZE)
     .attr('transform', `translate(${CHART_AREA_X_SIZE + 3}, ${yCoord})`)
     .attr('dominant-baseline', 'middle')
     .text(data[0].trade_price.toLocaleString())
@@ -97,7 +105,7 @@ export function updatePointerUI(
   )
   d3.select('text#price-info')
     .attr('fill', color ? color : 'black')
-    .attr('font-size', 15)
+    .attr('font-size', CHART_FONT_SIZE)
     .text(priceText)
   d3.select('svg#mouse-pointer-UI')
     .selectAll('g')
@@ -109,10 +117,10 @@ export function updatePointerUI(
           .attr('d', (d, i) =>
             getPathDAttr(d, i, CHART_AREA_X_SIZE, CHART_AREA_Y_SIZE)
           )
-          .attr('stroke', 'black')
+          .attr('stroke', CANDLE_CHART_POINTER_LINE_COLOR)
         $g.append('text')
           .attr('fill', 'black')
-          .attr('font-size', 12)
+          .attr('font-size', CHART_FONT_SIZE)
           .attr('transform', (d, i) =>
             getTextTransform(d, i, CHART_AREA_X_SIZE, CHART_AREA_Y_SIZE)
           )
@@ -120,7 +128,7 @@ export function updatePointerUI(
             if (i === 0) {
               return getTimeText(d, renderOpt, data, CHART_AREA_X_SIZE)
             }
-            return yAxisScale.invert(d)
+            return Math.round(yAxisScale.invert(d)).toLocaleString()
           })
           .attr('text-anchor', (d, i) => (i === 0 ? 'middle' : 'start'))
           .attr('dominant-baseline', (d, i) => (i === 0 ? 'hanging' : 'middle'))
@@ -141,10 +149,8 @@ export function updatePointerUI(
             if (i === 0) {
               return getTimeText(d, renderOpt, data, CHART_AREA_X_SIZE)
             }
-            return Math.round(yAxisScale.invert(d))
+            return Math.round(yAxisScale.invert(d)).toLocaleString()
           })
-          .attr('text-anchor', (d, i) => (i === 0 ? 'middle' : 'start'))
-          .attr('dominant-baseline', (d, i) => (i === 0 ? 'hanging' : 'middle'))
         return update
       },
       function (exit) {
@@ -205,6 +211,10 @@ function getPriceInfo(
   }
 
   const index = getDataIndexFromPosX(positionX, renderOpt, CHART_AREA_X_SIZE)
+  if (index < 0) {
+    console.error('예외상황')
+    return { priceText: '' }
+  }
   const candleUnitData = data[index]
   return {
     priceText: [
@@ -214,7 +224,9 @@ function getPriceInfo(
       `종가: ${candleUnitData.trade_price}`
     ].join('  '),
     color:
-      candleUnitData.opening_price < candleUnitData.trade_price ? 'red' : 'blue'
+      candleUnitData.opening_price < candleUnitData.trade_price
+        ? CANDLE_COLOR_RED
+        : CANDLE_COLOR_BLUE
   }
 }
 

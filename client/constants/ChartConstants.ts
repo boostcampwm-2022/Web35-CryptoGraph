@@ -31,3 +31,9 @@ export const DEFAULT_POINTER_POSITION: PointerPosition = {
   positionX: -1,
   positionY: -1
 }
+
+export const CANDLE_COLOR_RED = '#D24F45'
+export const CANDLE_COLOR_BLUE = '#1D61C4'
+export const CANDLE_CHART_GRID_COLOR = '#EEEFEE'
+export const CANDLE_CHART_POINTER_LINE_COLOR = '#999999'
+export const CHART_FONT_SIZE = 15
