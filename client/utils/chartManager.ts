@@ -205,6 +205,10 @@ function getPriceInfo(
   }
 
   const index = getDataIndexFromPosX(positionX, renderOpt, CHART_AREA_X_SIZE)
+  if (index < 0) {
+    console.error('예외상황')
+    return { priceText: '' }
+  }
   const candleUnitData = data[index]
   return {
     priceText: [
