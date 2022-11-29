@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-interface WindowSize {
+export interface WindowSize {
   width: number
   height: number
 }
@@ -10,10 +10,10 @@ interface WindowSize {
  * @param ref width와 height를 얻길 원하는 html 태그의 ref
  * @returns  width와 height의 변화하는 상태값
  */
-export function useWindowSize(ref: React.RefObject<HTMLElement>) {
+export function useWindowSize(ref: React.RefObject<Element>) {
   const [windowSize, setWindowSize] = useState<WindowSize>({
-    width: 0,
-    height: 0
+    width: 1000,
+    height: 900
   })
   useEffect(() => {
     function handleResize() {
