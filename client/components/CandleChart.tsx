@@ -15,7 +15,6 @@ import {
   updatePointerUI
 } from '@/utils/chartManager'
 import {
-  DEFAULT_CANDLER_CHART_RENDER_OPTION,
   DEFAULT_CANDLE_PERIOD,
   DEFAULT_POINTER_POSITION,
   MIN_CANDLE_COUNT
@@ -316,7 +315,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
         //추가적인 candleData Fetch
         getCandleDataArray(
           DEFAULT_CANDLE_PERIOD,
-          DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
+          props.option.marketType,
           200,
           makeDate(
             //endTime설정

@@ -3,7 +3,6 @@ import { Box, Button, useMediaQuery, useTheme } from '@mui/material'
 import MobileInfo from '@/components/Tab'
 import Link from 'next/link'
 import Chartbutton from '@/components/ChartButton'
-import { useRouter } from 'next/router'
 import {
   DEFAULT_CANDLE_PERIOD,
   DEFAULT_CANDLER_CHART_RENDER_OPTION
@@ -16,21 +15,21 @@ import { useRealTimeUpbitData } from 'hooks/useRealTimeUpbitData'
 import { useState } from 'react'
 
 export default function Detail({
+  market,
   candleData
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
-  const router = useRouter()
-  const { id } = router.query
+  const [chartRenderOption, setRenderOption] = useState<ChartRenderOption>({
+    ...DEFAULT_CANDLER_CHART_RENDER_OPTION,
+    marketType: market
+  })
   const [candlePeriod, setCandlePeriod] = useState<ChartPeriod>(
     DEFAULT_CANDLE_PERIOD
   )
-  const [chartRenderOption, setRenderOption] = useState<ChartRenderOption>(
-    DEFAULT_CANDLER_CHART_RENDER_OPTION
-  )
   const [realtimeCandleData, setRealtimeCandleData] = useRealTimeUpbitData(
     candlePeriod,
-    chartRenderOption.marketType, //파싱
+    chartRenderOption.marketType,
     candleData
   )
   return (
@@ -54,23 +53,44 @@ export default function Detail({
 }
 
 interface CandleChartPageProps {
+  market: string
   candleData: CandleData[]
 } //페이지 자체의 props interface
 export const getServerSideProps: GetServerSideProps<
   CandleChartPageProps
 > = async context => {
-  const fetched: CandleData[] = await getCandleDataArray(
+  if (context.params === undefined) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/'
+      }
+    }
+  }
+
+  const market = Array.isArray(context.params.market)
+    ? context.params.market[0]
+    : context.params.market
+
+  if (!market) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/'
+      }
+    }
+  }
+
+  const fetchedCandleData: CandleData[] = await getCandleDataArray(
     DEFAULT_CANDLE_PERIOD,
-    DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
+    market,
     200
   )
-  console.log(context.query)
-  //여기서 커팅
-  const toret: CandleChartPageProps = {
-    candleData: fetched
-  } //이것도 함수로 뽑아내는게 나을듯?
   return {
-    props: toret // will be passed to the page component as props
+    props: {
+      market: market,
+      candleData: fetchedCandleData
+    } // will be passed to the page component as props
   }
 }
 
