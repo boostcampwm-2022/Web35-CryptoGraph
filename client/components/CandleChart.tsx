@@ -15,10 +15,6 @@ import {
   updatePointerUI
 } from '@/utils/chartManager'
 import {
-  CHART_AREA_X_SIZE,
-  CHART_AREA_Y_SIZE,
-  CHART_CONTAINER_X_SIZE,
-  CHART_CONTAINER_Y_SIZE,
   DEFAULT_CANDLER_CHART_RENDER_OPTION,
   DEFAULT_CANDLE_PERIOD,
   DEFAULT_POINTER_POSITION,
@@ -26,13 +22,19 @@ import {
 } from '@/constants/ChartConstants'
 import { makeDate } from '@/utils/dateManager'
 import { getCandleDataArray } from '@/utils/upbitManager'
+import { useWindowSize, WindowSize } from 'hooks/useWindowSize'
 
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
   option: ChartRenderOption,
-  pointerInfo: PointerPosition
+  pointerInfo: PointerPosition,
+  windowSize: WindowSize
 ) {
+  const CHART_CONTAINER_X_SIZE = windowSize.width
+  const CHART_CONTAINER_Y_SIZE = windowSize.height
+  const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - 100
+  const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - 100
   const candleWidth = calculateCandlewidth(option, CHART_AREA_X_SIZE)
   const chartContainer = d3.select(svgRef.current)
   const chartArea = chartContainer.select('svg#chart-area')
@@ -40,12 +42,13 @@ function updateChart(
     data.slice(
       option.renderStartDataIndex,
       option.renderStartDataIndex + option.renderCandleCount
-    )
+    ),
+    CHART_AREA_Y_SIZE
   )
   if (!yAxisScale) {
     return undefined
   }
-  const xAxisScale = getXAxisScale(option, data)
+  const xAxisScale = getXAxisScale(option, data, CHART_AREA_X_SIZE)
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
@@ -60,8 +63,15 @@ function updateChart(
         .tickSizeOuter(0)
         .ticks(5)
     )
-  updateCurrentPrice(yAxisScale, data, option)
-  updatePointerUI(pointerInfo, yAxisScale, option, data)
+  updateCurrentPrice(yAxisScale, data, option, CHART_AREA_X_SIZE)
+  updatePointerUI(
+    pointerInfo,
+    yAxisScale,
+    option,
+    data,
+    CHART_AREA_X_SIZE,
+    CHART_AREA_Y_SIZE
+  )
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
     .data(data)
@@ -154,8 +164,14 @@ function initChart(
   candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>,
   option: ChartRenderOption,
   optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>,
-  pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerPosition>>
+  pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerPosition>>,
+  windowSize: WindowSize
 ) {
+  const CHART_CONTAINER_X_SIZE = windowSize.width
+  const CHART_CONTAINER_Y_SIZE = windowSize.height
+  const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - 100
+  const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - 100
+  //margin값도 크기에 맞춰 변수화 시켜야함.
   const chartContainer = d3.select(svgRef.current)
   chartContainer.attr('width', CHART_CONTAINER_X_SIZE)
   chartContainer.attr('height', CHART_CONTAINER_Y_SIZE)
@@ -176,13 +192,14 @@ function initChart(
     data.slice(
       option.renderStartDataIndex,
       option.renderStartDataIndex + option.renderCandleCount
-    )
+    ),
+    CHART_AREA_Y_SIZE
   )
   if (!yAxisScale) {
     console.error('받아온 API 데이터 에러')
     return undefined
   }
-  const xAxisScale = getXAxisScale(option, data)
+  const xAxisScale = getXAxisScale(option, data, CHART_AREA_X_SIZE)
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
     .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
@@ -218,7 +235,12 @@ function initChart(
           translateX: event.transform.x
         }
       })
-      handleMouseEvent(event.sourceEvent, pointerPositionSetter)
+      handleMouseEvent(
+        event.sourceEvent,
+        pointerPositionSetter,
+        CHART_AREA_X_SIZE,
+        CHART_AREA_Y_SIZE
+      )
     })
   d3.select<SVGSVGElement, CandleData>('#chart-container')
     .call(zoom)
@@ -247,7 +269,12 @@ function initChart(
   d3.select<SVGSVGElement, CandleData>('svg#chart-container').on(
     'mousemove',
     (event: MouseEvent) => {
-      handleMouseEvent(event, pointerPositionSetter)
+      handleMouseEvent(
+        event,
+        pointerPositionSetter,
+        CHART_AREA_X_SIZE,
+        CHART_AREA_Y_SIZE
+      )
     }
   )
 }
@@ -261,6 +288,8 @@ function checkNeedFetch(candleData: CandleData[], option: ChartRenderOption) {
 
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = React.useRef<SVGSVGElement>(null)
+  const chartContainerRef = React.useRef<HTMLDivElement>(null)
+  const windowSize = useWindowSize(chartContainerRef)
   const [pointerInfo, setPointerInfo] = React.useState<PointerPosition>(
     DEFAULT_POINTER_POSITION
   )
@@ -272,9 +301,10 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       props.candleDataSetter,
       props.option,
       props.optionSetter,
-      setPointerInfo
+      setPointerInfo,
+      windowSize
     )
-  }, [])
+  }, [props, windowSize])
 
   React.useEffect(() => {
     //디바운싱 구문
@@ -307,11 +337,25 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       }
       return
     }
-    updateChart(chartSvg, props.candleData, props.option, pointerInfo)
-  }, [props.candleData, props.option, pointerInfo])
+    updateChart(
+      chartSvg,
+      props.candleData,
+      props.option,
+      pointerInfo,
+      windowSize
+    )
+  }, [props, pointerInfo, windowSize])
 
   return (
-    <div id="chart">
+    <div
+      id="chart"
+      ref={chartContainerRef}
+      style={{
+        display: 'flex',
+        width: '100%',
+        height: '100%'
+      }}
+    >
       <svg id="chart-container" ref={chartSvg}>
         <g id="y-axis" />
         <svg id="x-axis-container">
