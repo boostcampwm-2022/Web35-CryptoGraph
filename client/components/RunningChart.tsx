@@ -1,21 +1,20 @@
 import * as d3 from 'd3'
 import * as React from 'react'
 import { CoinRateContentType, CoinRateType } from '@/types/ChartTypes'
+//------------------------------interface------------------------------
 interface RunningChartProps {
-  // candleData: CandleData[]
-  // candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>
-  // option: ChartRenderOption
-  // optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>
   coinRate: CoinRateType
 }
 const WIDTH = 1024
 const HEIGHT = 768
-
+//------------------------------initChart------------------------------
 const initChart = (svgRef: React.RefObject<SVGSVGElement>) => {
   const chartContainer = d3.select(svgRef.current)
   chartContainer.attr('width', WIDTH)
   chartContainer.attr('height', HEIGHT)
 }
+
+//------------------------------updateChart------------------------------
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
   data: CoinRateType
@@ -29,19 +28,30 @@ const updateChart = (
   ]
   const chartContainer = d3.select(svgRef.current)
   const chartArea = d3.select('svg#running-chart')
-  
-  const [min, max]: number[] = [
-    d3.min(ArrayDataValue, d => Math.abs(d.value as number)) as number,
-    d3.max(ArrayDataValue, d => d.value as number) as number
-  ]
-  const xScale = d3.scaleLinear().domain([min, max]).range([0, 800])
 
+  const [min, max] = [
+    d3.min(ArrayDataValue, d => Math.abs(d.value)),
+    d3.max(ArrayDataValue, d => d.value)
+  ]
+  if (!min || !max) {
+    return
+  }
+  const xScale = d3.scaleLinear().domain([min, max]).range([0, 800])
+  const y = d3
+    .scaleBand()
+    .range([0, 400])
+    .domain(
+      ArrayDataValue.map(function (d) {
+        return d.value
+      })
+    )
+    .padding(0.1)
   chartArea
     .append('g')
     .attr('transform', `translate(0,400)`)
     .call(d3.axisBottom(xScale))
 }
-
+//------------------------------Component------------------------------
 export const RunningChart: React.FunctionComponent<
   RunningChartProps
 > = props => {

@@ -1,4 +1,3 @@
-import { useReducer } from 'react'
 import { getCoinTicker } from '@/utils/upbitManager'
 import { getTreeMapDataArray } from '@/utils/upbitManager'
 import { ActionType } from '@/types/ChartTypes'
@@ -44,8 +43,10 @@ export const dataReducer = (data: CoinRateType, action: ActionType) => {
         // 업비트에 선택된 티커에 대한 코인등락률을 받아와서 기존 데이터 업데이트
         for (const coin of data) {
           if (action.coinRate[coin.market]) {
-            action.coinRate[coin.market].value = (coin.signed_change_rate * 100) //실시간 등락rate를 퍼센테이지로 변경
-              .toFixed(2) //소수점 두자리로 fix
+            action.coinRate[coin.market].value = Number(
+              (coin.signed_change_rate * 100) //실시간 등락rate를 퍼센테이지로 변경
+                .toFixed(2)
+            ) //소수점 두자리로 fix
           }
         }
       })
