@@ -9,8 +9,8 @@ import {
   CoinRateContentType
 } from '@/types/ChartTypes'
 
-const width = 2400
-const height = 1000
+const width = 1920
+const height = 800
 const coinIntervalRate = 1000
 
 const updateChart = (
@@ -34,9 +34,17 @@ const updateChart = (
     .parentId(function (d): string {
       return d.parent
     })(data)
-  root.sum(function (d): number {
-    return Math.abs(+d.value)
-  })
+  const sort = (
+    a: d3.HierarchyNode<CoinRateContentType>,
+    b: d3.HierarchyNode<CoinRateContentType>
+  ) => d3.descending(a.value, b.value)
+  //const sort = (a, b) => d3.ascending(a.id, b.id)
+  root
+    .sum(function (d): number {
+      return Math.abs(+d.value)
+    })
+    .sort(sort)
+
   d3.treemap<CoinRateContentType>().size([width, height]).padding(4)(root)
 
   chartArea
@@ -60,7 +68,6 @@ const updateChart = (
     .attr('fill', function (d) {
       return d.data.value > 0 ? 'red' : 'blue'
     })
-    .transition()
     .attr('opacity', function (d) {
       return treeMapvalueScale(Math.abs(d.data.value as number))
     })
@@ -82,6 +89,11 @@ const updateChart = (
     })
     .attr('font-size', '10px')
     .attr('fill', 'white')
+  // const treeChartArea = d3
+  //   .select('svg#tree-chart')
+  //   .style('border-style', 'solid')
+  //   .style('border-width', '10px')
+  //   .style('border-radius', '10%')
 }
 
 const initChart = (svgRef: React.RefObject<SVGSVGElement>) => {
@@ -130,7 +142,9 @@ export default function TreeChartPage() {
 
   useEffect(() => {
     // 5. 트리맵에 데이터 바인딩
-    updateChart(chartSvg, changeRate)
+    if (changeRate.length > 1 && changeRate[1].value !== 1) {
+      updateChart(chartSvg, changeRate)
+    }
   }, [changeRate])
 
   return (

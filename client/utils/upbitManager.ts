@@ -30,14 +30,14 @@ export async function getCandleDataArray(
 }
 
 export async function getTreeMapDataArray(
-  market: string,
+  market: string
 ): Promise<TreeMapData[]> {
   const res = await fetch(
     //market -> markets
     `https://api.upbit.com/v1/ticker?markets=${market}&count=1`,
     {
       method: 'GET',
-      headers: { accept: 'application/json' },
+      headers: { accept: 'application/json' }
     }
   )
   const data: TreeMapData[] = await res.json()
@@ -49,4 +49,3 @@ export async function getCoinTicker() {
   const data = await res.json()
   return data
 }
-
