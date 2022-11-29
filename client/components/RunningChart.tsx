@@ -20,15 +20,16 @@ const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
   data: CoinRateType
 ) => {
-  if (!data) {
+  if (!data || !svgRef) {
     return
   }
   //ArrayDataValue : 기존 Object<object>이던 data를 value만 추출해서 Array<object>로 변경
   const ArrayDataValue: CoinRateContentType[] = [
     ...(Object.values(data) as CoinRateContentType[])
   ]
-
-  const chartArea = d3.select('svg#chart-area')
+  const chartContainer = d3.select(svgRef.current)
+  const chartArea = d3.select('svg#running-chart')
+  
   const [min, max]: number[] = [
     d3.min(ArrayDataValue, d => Math.abs(d.value as number)) as number,
     d3.max(ArrayDataValue, d => d.value as number) as number
