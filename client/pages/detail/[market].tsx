@@ -1,7 +1,7 @@
 import { styled } from '@mui/material/styles'
 import { Box, Button, useMediaQuery, useTheme } from '@mui/material'
-import MobileInfo from '@/components/Tab'
-import Link from 'next/link'
+import InfoContainerMobile from '@/components/InfoContainerMobile'
+import InfoContainerDesktop from '@/components/InfoContainerDesktop'
 import Chartbutton from '@/components/ChartButton'
 import {
   DEFAULT_CANDLE_PERIOD,
@@ -13,7 +13,6 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { CandleChart } from '@/components/CandleChart'
 import { useRealTimeUpbitData } from 'hooks/useRealTimeUpbitData'
 import { useState } from 'react'
-
 export default function Detail({
   market,
   candleData
@@ -46,7 +45,8 @@ export default function Detail({
         ></CandleChart>
       </ChartContainer>
       <InfoContainer>
-        {isMobile ? <MobileInfo /> : renderDesktopInfo()}
+        {/* 모바일일 경우 모바일 화면을, 데스크탑일 경우 데스크탑 화면을 */}
+        {isMobile ? <InfoContainerMobile /> : <InfoContainerDesktop />}
       </InfoContainer>
     </HomeContainer>
   )
@@ -102,24 +102,6 @@ export const getServerSideProps: GetServerSideProps<
   }
 }
 
-function renderDesktopInfo() {
-  return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <StyledRTV>실시간 코인시세</StyledRTV>
-      <StyledRTV>코인 상세정보</StyledRTV>
-      <Link href="/">
-        <Button
-          style={{ minWidth: '100px', width: '100%' }}
-          size="large"
-          variant="contained"
-        >
-          Go To Main
-        </Button>
-      </Link>
-    </div>
-  )
-}
-
 const HomeContainer = styled(Box)`
   display: flex;
   width: 100%;
@@ -169,15 +151,4 @@ const ChartPeriodSelectorContainer = styled('div')`
   justify-content: center;
   align-items: center;
   margin-bottom: 20px;
-`
-
-const StyledRTV = styled('div')`
-  display: flex;
-  width: 100%;
-  height: 43%;
-  background-color: #ffffff;
-  border: 1px solid #cac4d0;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 20px;
-  padding-bottom: 24px;
 `

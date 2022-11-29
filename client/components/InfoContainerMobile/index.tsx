@@ -4,10 +4,6 @@ import Tab from '@mui/material/Tab'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 
-interface TabProps {
-  value: number
-  setValue: React.Dispatch<React.SetStateAction<number>>
-}
 interface TabPanelProps {
   children?: React.ReactNode
   index: number
@@ -41,7 +37,7 @@ function a11yProps(index: number) {
   }
 }
 
-export default function RenderTabs() {
+export default function InfoContainerMobile() {
   const [selectedTab, setSelectedTab] = React.useState<number>(0)
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue)
