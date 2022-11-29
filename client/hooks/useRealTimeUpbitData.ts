@@ -14,7 +14,15 @@ export const useRealTimeUpbitData = (
     useState<CandleData[]>(initData)
   const isInitialMount = useRef(true)
   const fetchData = async () => {
-    const fetched: CandleData[] = await getCandleDataArray(period, market, 200)
+    const fetched: CandleData[] | null = await getCandleDataArray(
+      period,
+      market,
+      200
+    )
+    if (fetched === null) {
+      console.error('코인 쿼리 실패, 404에러')
+      return
+    }
     setRealtimeCandleData(fetched)
   }
 
