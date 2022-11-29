@@ -23,6 +23,7 @@ import {
 import { makeDate } from '@/utils/dateManager'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { useWindowSize, WindowSize } from 'hooks/useWindowSize'
+import { ChartPeriod } from '@/types/ChartTypes'
 
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
@@ -152,6 +153,7 @@ function updateChart(
     )
 }
 interface CandleChartProps {
+  candlePeriod: ChartPeriod
   candleData: CandleData[]
   candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>
   option: ChartRenderOption
@@ -315,7 +317,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
         isFetching.current = true
         //추가적인 candleData Fetch
         getCandleDataArray(
-          DEFAULT_CANDLE_PERIOD,
+          props.candlePeriod,
           DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
           200,
           makeDate(
