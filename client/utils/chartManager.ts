@@ -1,6 +1,10 @@
 import {
   CHART_AREA_Y_SIZE,
-  CHART_AREA_X_SIZE
+  CHART_AREA_X_SIZE,
+  CANDLE_COLOR_RED,
+  CANDLE_COLOR_BLUE,
+  CANDLE_CHART_POINTER_LINE_COLOR,
+  CHART_FONT_SIZE
 } from '@/constants/ChartConstants'
 import {
   ChartRenderOption,
@@ -57,7 +61,9 @@ export function updateCurrentPrice(
   const $currentPrice = d3.select('svg#current-price')
   const yCoord = yAxisScale(data[0].trade_price)
   const strokeColor =
-    data[0].opening_price < data[0].trade_price ? 'red' : 'blue'
+    data[0].opening_price < data[0].trade_price
+      ? CANDLE_COLOR_RED
+      : CANDLE_COLOR_BLUE
   $currentPrice
     .select('line')
     .attr('x1', CHART_AREA_X_SIZE)
@@ -70,7 +76,7 @@ export function updateCurrentPrice(
   $currentPrice
     .select('text')
     .attr('fill', strokeColor)
-    .attr('font-size', 15)
+    .attr('font-size', CHART_FONT_SIZE)
     .attr('transform', `translate(${CHART_AREA_X_SIZE + 3}, ${yCoord})`)
     .attr('dominant-baseline', 'middle')
     .text(data[0].trade_price.toLocaleString())
@@ -90,7 +96,7 @@ export function updatePointerUI(
   )
   d3.select('text#price-info')
     .attr('fill', color ? color : 'black')
-    .attr('font-size', 15)
+    .attr('font-size', CHART_FONT_SIZE)
     .text(priceText)
   d3.select('svg#mouse-pointer-UI')
     .selectAll('g')
@@ -100,10 +106,10 @@ export function updatePointerUI(
         const $g = enter.append('g')
         $g.append('path')
           .attr('d', (d, i) => getPathDAttr(d, i))
-          .attr('stroke', '#999999')
+          .attr('stroke', CANDLE_CHART_POINTER_LINE_COLOR)
         $g.append('text')
           .attr('fill', 'black')
-          .attr('font-size', 15)
+          .attr('font-size', CHART_FONT_SIZE)
           .attr('transform', (d, i) => getTextTransform(d, i))
           .text((d, i) => {
             if (i === 0) {
@@ -179,7 +185,9 @@ function getPriceInfo(
       `종가: ${candleUnitData.trade_price}`
     ].join('  '),
     color:
-      candleUnitData.opening_price < candleUnitData.trade_price ? 'red' : 'blue'
+      candleUnitData.opening_price < candleUnitData.trade_price
+        ? CANDLE_COLOR_RED
+        : CANDLE_COLOR_BLUE
   }
 }
 
