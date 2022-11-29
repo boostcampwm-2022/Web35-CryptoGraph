@@ -6,7 +6,7 @@ export async function getCandleDataArray(
   market: string,
   count = DEFAULT_CANDLE_COUNT,
   endTime: string | void
-): Promise<CandleData[]> {
+): Promise<CandleData[] | null> {
   let res
   if (!endTime) {
     res = await fetch(
@@ -25,19 +25,22 @@ export async function getCandleDataArray(
       }
     )
   }
+  if (res.status === 404) {
+    return null
+  }
   const data: CandleData[] = await res.json()
   return data
 }
 
 export async function getTreeMapDataArray(
-  market: string,
+  market: string
 ): Promise<TreeMapData[]> {
   const res = await fetch(
     //market -> markets
     `https://api.upbit.com/v1/ticker?markets=${market}&count=1`,
     {
       method: 'GET',
-      headers: { accept: 'application/json' },
+      headers: { accept: 'application/json' }
     }
   )
   const data: TreeMapData[] = await res.json()
@@ -49,4 +52,3 @@ export async function getCoinTicker() {
   const data = await res.json()
   return data
 }
-

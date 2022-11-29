@@ -81,11 +81,19 @@ export const getServerSideProps: GetServerSideProps<
     }
   }
 
-  const fetchedCandleData: CandleData[] = await getCandleDataArray(
+  const fetchedCandleData: CandleData[] | null = await getCandleDataArray(
     DEFAULT_CANDLE_PERIOD,
     market,
     200
   )
+  if (fetchedCandleData === null) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/'
+      }
+    }
+  }
   return {
     props: {
       market: market,

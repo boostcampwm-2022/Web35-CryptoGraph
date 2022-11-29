@@ -50,11 +50,20 @@ interface CandleChartPageProps {
 export const getServerSideProps: GetServerSideProps<
   CandleChartPageProps
 > = async context => {
-  const fetched: CandleData[] = await getCandleDataArray(
+  const fetched: CandleData[] | null = await getCandleDataArray(
     DEFAULT_CANDLE_PERIOD,
     DEFAULT_CANDLER_CHART_RENDER_OPTION.marketType,
     200
   )
+
+  if (fetched === null)
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/'
+      }
+    }
+
   const toret: CandleChartPageProps = {
     candleData: fetched
   } //이것도 함수로 뽑아내는게 나을듯?

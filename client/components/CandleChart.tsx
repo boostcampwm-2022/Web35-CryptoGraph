@@ -328,6 +328,10 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
             .replaceAll(':', '%3A') //업비트 쿼리문 규칙
         ).then(res => {
           //fetch완료된 newData를 기존 data와 병합
+          if (res === null) {
+            console.error('코인 쿼리 실패, 404에러')
+            return
+          }
           isFetching.current = false
           props.candleDataSetter(prev => {
             return [...prev, ...res]
