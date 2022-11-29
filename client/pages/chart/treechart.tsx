@@ -110,14 +110,13 @@ export default function TreeChartPage() {
   useEffect(() => {
     // 2. 티커를 받아오면 data init
     setCoinRate([data])
-  }, [Object.keys(data)])
-
+  }, [data])
+  //}, [Object.keys(data)])
   useInterval(() => {
     // 3. 주기적으로 코인 등락률을 업데이트
     dispatch({ type: 'update', coinRate: coinRate[0] })
-    setCoinRate([...Object.values<CoinRateType>(data)])
+    setCoinRate([data])
   }, coinIntervalRate)
-
   useEffect(() => {
     // 4. CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
     const parentNode: CoinRateContentType[] = [
