@@ -2,8 +2,7 @@ import { styled } from '@mui/material/styles'
 import { Box, Button, useMediaQuery, useTheme } from '@mui/material'
 import MobileInfo from '@/components/Tab'
 import Link from 'next/link'
-import Chartbutton from '@/components/ChartButton'
-import { useRouter } from 'next/router'
+import ChartPeriodSelector from '@/components/ChartPeriodSelector'
 import {
   DEFAULT_CANDLE_PERIOD,
   DEFAULT_CANDLER_CHART_RENDER_OPTION
@@ -20,8 +19,6 @@ export default function Detail({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
-  const router = useRouter()
-  const { id } = router.query
   const [candlePeriod, setCandlePeriod] = useState<ChartPeriod>(
     DEFAULT_CANDLE_PERIOD
   )
@@ -36,10 +33,12 @@ export default function Detail({
   return (
     <HomeContainer>
       <ChartContainer>
-        <ChartPeriodSelectorContainer>
-          <Chartbutton />
-        </ChartPeriodSelectorContainer>
+        <ChartPeriodSelector
+          selected={candlePeriod}
+          selectedSetter={setCandlePeriod}
+        />
         <CandleChart
+          candlePeriod={candlePeriod}
           candleData={realtimeCandleData}
           candleDataSetter={setRealtimeCandleData}
           option={chartRenderOption}
@@ -129,18 +128,6 @@ const InfoContainer = styled(Box)`
     margin: 0;
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
   }
-`
-
-const ChartPeriodSelectorContainer = styled('div')`
-  display: flex;
-  width: 100%;
-  height: auto;
-  background-color: #ffffff;
-  border: 1px solid #cac4d0;
-  border-radius: 20px;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
 `
 
 const StyledRTV = styled('div')`
