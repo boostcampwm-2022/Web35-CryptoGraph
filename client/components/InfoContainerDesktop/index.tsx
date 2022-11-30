@@ -25,7 +25,6 @@ const StyledRTV = styled('div')`
   height: auto;
   background-color: #ffffff;
   border: 1px solid #cac4d0;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   padding-bottom: 24px;
 `
