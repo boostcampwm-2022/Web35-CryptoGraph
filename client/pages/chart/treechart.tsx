@@ -11,7 +11,7 @@ import {
 
 const width = 1920
 const height = 800
-const coinIntervalRate = 200
+const coinIntervalRate = 300
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -39,6 +39,7 @@ const updateChart = (
     b: d3.HierarchyNode<CoinRateContentType>
   ) => d3.descending(a.value, b.value)
   //const sort = (a, b) => d3.ascending(a.id, b.id)
+
   root
     .sum(function (d): number {
       return Math.abs(+d.value)
@@ -97,7 +98,19 @@ const updateChart = (
 }
 
 const initChart = (svgRef: React.RefObject<SVGSVGElement>) => {
-  const chartContainer = d3.select(svgRef.current)
+  let zoom = d3
+    .zoom()
+    .on('zoom', handleZoom)
+    .scaleExtent([1, 5]) //scale 제한
+    .translateExtent([
+      [0, 0], // top-left-corner 좌표
+      [width, height] //bottom-right-corner 좌표
+    ])
+  function handleZoom(e) {
+    d3.selectAll('rect').attr('transform', e.transform)
+    d3.selectAll('text').attr('transform', e.transform)
+  }
+  const chartContainer = d3.select(svgRef.current).call(zoom)
   chartContainer.attr('width', width)
   chartContainer.attr('height', height)
 }
