@@ -39,7 +39,7 @@ export const DatePeriod: ChartPeriodItered<number> = {
   days: 86400,
   weeks: 604800
 }
-
+export const ChartPeriodList = Object.keys(DatePeriod)
 export interface ChartRenderOption {
   marketType: string
   fetchStartDataIndex: number

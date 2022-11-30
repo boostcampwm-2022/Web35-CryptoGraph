@@ -1,8 +1,8 @@
 import { styled } from '@mui/material/styles'
-import { Box, Button, useMediaQuery, useTheme } from '@mui/material'
+import { Box, useMediaQuery, useTheme } from '@mui/material'
 import InfoContainerMobile from '@/components/InfoContainerMobile'
 import InfoContainerDesktop from '@/components/InfoContainerDesktop'
-import Chartbutton from '@/components/ChartButton'
+import ChartPeriodSelector from '@/components/ChartPeriodSelector'
 import {
   DEFAULT_CANDLE_PERIOD,
   DEFAULT_CANDLER_CHART_RENDER_OPTION
@@ -37,10 +37,12 @@ export default function Detail({
   return (
     <HomeContainer>
       <ChartContainer>
-        <ChartPeriodSelectorContainer>
-          <Chartbutton />
-        </ChartPeriodSelectorContainer>
+        <ChartPeriodSelector
+          selected={candlePeriod}
+          selectedSetter={setCandlePeriod}
+        />
         <CandleChart
+          candlePeriod={candlePeriod}
           candleData={realtimeCandleData}
           candleDataSetter={setRealtimeCandleData}
           option={chartRenderOption}
@@ -161,16 +163,4 @@ const InfoContainer = styled(Box)`
     margin: 0;
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
   }
-`
-
-const ChartPeriodSelectorContainer = styled('div')`
-  display: flex;
-  width: 100%;
-  height: auto;
-  background-color: #ffffff;
-  border: 1px solid #cac4d0;
-  border-radius: 20px;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
 `
