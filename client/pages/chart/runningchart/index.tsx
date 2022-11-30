@@ -25,10 +25,14 @@ export default function TreeChartPage() {
       setCoinRate([data])
     }
   }, COIN_INTERVAL_RATE)
-
   return (
     <>
-      <RunningChart coinRate={coinRate[0]}></RunningChart>
+      <RunningChart
+        coinRate={coinRate}
+        WIDTH={1000}
+        HEIGHT={800}
+        CANDLECOUNT={15}
+      ></RunningChart>
     </>
   )
 }
