@@ -103,3 +103,9 @@ export interface PointerPosition {
   positionX: number
   positionY: number
 }
+
+export interface tickerData {
+  market: string
+  korean_name: string
+  english_name: string
+}

@@ -11,7 +11,7 @@ import {
 
 const width = 1920
 const height = 800
-const coinIntervalRate = 1000
+const coinIntervalRate = 200
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
