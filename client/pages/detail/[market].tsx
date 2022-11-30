@@ -60,15 +60,15 @@ export default function Detail({
             }}
           >
             <InfoContainerMobile>
+              <CoinDetailedInfo market={market} tabLabelInfo={'코인 디테일'} />
               <RealTimeCoinPrice tabLabelInfo={'실시간 코인 정보'} />
-              <CoinDetailedInfo tabLabelInfo={'코인 디테일'} />
             </InfoContainerMobile>
             <LinkButton goto="/" content="Go to Main" />
           </Box>
         ) : (
           <InfoContainerDesktop>
+            <CoinDetailedInfo market={market} />
             <RealTimeCoinPrice />
-            <CoinDetailedInfo />
           </InfoContainerDesktop>
         )}
       </InfoContainer>
@@ -155,8 +155,6 @@ const InfoContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid black;
-  border-radius: 32px;
   width: 390px;
   height: calc(100% - 48px);
   ${props => props.theme.breakpoints.down('tablet')} {
