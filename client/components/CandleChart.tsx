@@ -26,6 +26,7 @@ import {
 import { makeDate } from '@/utils/dateManager'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { useWindowSize, WindowSize } from 'hooks/useWindowSize'
+import { ChartPeriod } from '@/types/ChartTypes'
 
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
@@ -169,6 +170,7 @@ function updateChart(
     )
 }
 interface CandleChartProps {
+  candlePeriod: ChartPeriod
   candleData: CandleData[]
   candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>
   option: ChartRenderOption
