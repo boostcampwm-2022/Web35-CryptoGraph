@@ -98,19 +98,28 @@ const updateChart = (
 }
 
 const initChart = (svgRef: React.RefObject<SVGSVGElement>) => {
-  let zoom = d3
-    .zoom()
+  const zoom = d3
+    .zoom<SVGSVGElement, CoinRateContentType>()
     .on('zoom', handleZoom)
     .scaleExtent([1, 5]) //scale 제한
     .translateExtent([
       [0, 0], // top-left-corner 좌표
       [width, height] //bottom-right-corner 좌표
     ])
-  function handleZoom(e) {
-    d3.selectAll('rect').attr('transform', e.transform)
-    d3.selectAll('text').attr('transform', e.transform)
+  function handleZoom(e: d3.D3ZoomEvent<SVGSVGElement, CoinRateContentType>) {
+    d3.selectAll('rect').attr(
+      'transform',
+      `translate(${e.transform.x}, ${e.transform.y}) scale(${e.transform.k}, ${e.transform.k})`
+    )
+    d3.selectAll('text').attr(
+      'transform',
+      `translate(${e.transform.x}, ${e.transform.y}) scale(${e.transform.k}, ${e.transform.k})`
+    )
   }
-  const chartContainer = d3.select(svgRef.current).call(zoom)
+  if (!svgRef.current) return
+  const chartContainer = d3
+    .select<SVGSVGElement, CoinRateContentType>(svgRef.current)
+    .call(zoom)
   chartContainer.attr('width', width)
   chartContainer.attr('height', height)
 }
