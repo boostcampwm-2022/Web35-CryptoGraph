@@ -13,6 +13,9 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { CandleChart } from '@/components/CandleChart'
 import { useRealTimeUpbitData } from 'hooks/useRealTimeUpbitData'
 import { useState } from 'react'
+import CoinDetailedInfo from '@/components/CoinDetailedInfo'
+import RealTimeCoinPrice from '@/components/RealTimeCoinPrice'
+import LinkButton from '@/components/LinkButton'
 export default function Detail({
   market,
   candleData
@@ -45,8 +48,27 @@ export default function Detail({
         ></CandleChart>
       </ChartContainer>
       <InfoContainer>
-        {/* 모바일일 경우 모바일 화면을, 데스크탑일 경우 데스크탑 화면을 */}
-        {isMobile ? <InfoContainerMobile /> : <InfoContainerDesktop />}
+        {isMobile ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              height: '100%'
+            }}
+          >
+            <InfoContainerMobile>
+              <RealTimeCoinPrice tabLabelInfo={'실시간 코인 정보'} />
+              <CoinDetailedInfo tabLabelInfo={'코인 디테일'} />
+            </InfoContainerMobile>
+            <LinkButton goto="/" content="Go to Main" />
+          </Box>
+        ) : (
+          <InfoContainerDesktop>
+            <RealTimeCoinPrice />
+            <CoinDetailedInfo />
+          </InfoContainerDesktop>
+        )}
       </InfoContainer>
     </HomeContainer>
   )

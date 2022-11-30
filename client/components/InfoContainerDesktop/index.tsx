@@ -1,18 +1,19 @@
 import * as React from 'react'
 import styled from '@emotion/styled'
-import CoinDetailedInfo from '@/components/CoinDetailedInfo'
 import LinkButton from '@/components/LinkButton'
-import RealTimeCoinPrice from '@/components/RealTimeCoinPrice'
+import { ReactNode } from 'react'
 
-export default function InfoContainerDesktop() {
+interface InfoContainerDesktopProps {
+  children: ReactNode
+}
+export default function InfoContainerDesktop({
+  children
+}: InfoContainerDesktopProps) {
   return (
     <div style={{ width: '100%', height: '100%' }}>
-      <StyledRTV>
-        <RealTimeCoinPrice value={1} />
-      </StyledRTV>
-      <StyledRTV>
-        <CoinDetailedInfo value={1} />
-      </StyledRTV>
+      {React.Children.map(children, child => {
+        return <StyledRTV>{child}</StyledRTV>
+      })}
       <LinkButton goto="/" content="Go to Main" />
     </div>
   )
@@ -21,7 +22,7 @@ export default function InfoContainerDesktop() {
 const StyledRTV = styled('div')`
   display: flex;
   width: 100%;
-  height: 43%;
+  height: auto;
   background-color: #ffffff;
   border: 1px solid #cac4d0;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);

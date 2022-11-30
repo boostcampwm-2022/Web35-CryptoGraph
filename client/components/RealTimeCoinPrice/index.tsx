@@ -1,10 +1,7 @@
 import * as React from 'react'
+import { TabProps } from '../InfoContainerMobile'
 
-interface RealTimeCoinPriceProps {
-  value: number
-}
-
-//코인 상세정보
-export default function RealTimeCoinPrice(props: RealTimeCoinPriceProps) {
-  return <div />
+//코인 실시간 정보
+export default function RealTimeCoinPrice(props: TabProps) {
+  return <div>코인 실시간 정보</div>
 }

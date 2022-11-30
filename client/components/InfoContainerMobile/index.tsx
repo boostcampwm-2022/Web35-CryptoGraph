@@ -1,18 +1,22 @@
 import * as React from 'react'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
-import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
+import { ReactNode } from 'react'
 
+export interface TabProps {
+  tabLabelInfo?: string
+}
+interface InfoContainerMobileProps {
+  children: ReactNode
+}
 interface TabPanelProps {
   children?: React.ReactNode
   index: number
   value: number
 }
 
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props
-
+function TabPanel({ children, value, index, ...other }: TabPanelProps) {
   return (
     <div
       role="tabpanel"
@@ -21,11 +25,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   )
 }
@@ -37,7 +37,9 @@ function a11yProps(index: number) {
   }
 }
 
-export default function InfoContainerMobile() {
+export default function InfoContainerMobile({
+  children
+}: InfoContainerMobileProps) {
   const [selectedTab, setSelectedTab] = React.useState<number>(0)
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue)
@@ -51,20 +53,31 @@ export default function InfoContainerMobile() {
           variant="fullWidth"
           aria-label="basic tabs example"
         >
-          <Tab label="Item One" {...a11yProps(0)} />
-          <Tab label="Item Two" {...a11yProps(1)} />
-          <Tab label="Item Three" {...a11yProps(2)} />
+          {React.Children.map(children, (child, index) => {
+            if (!React.isValidElement(child)) {
+              console.error('올바른 리액트 노드가 아님')
+              return false
+            }
+            return (
+              <Tab
+                label={child.props.tabLabelInfo || 'default'}
+                {...a11yProps(index)}
+              />
+            )
+          })}
         </Tabs>
       </Box>
-      <TabPanel value={selectedTab} index={0}>
-        Item One
-      </TabPanel>
-      <TabPanel value={selectedTab} index={1}>
-        Item Two
-      </TabPanel>
-      <TabPanel value={selectedTab} index={2}>
-        Item Three
-      </TabPanel>
+      {React.Children.map(children, (child, index) => {
+        if (!React.isValidElement(child)) {
+          console.error('올바른 리액트 노드가 아님')
+          return false
+        }
+        return (
+          <TabPanel value={selectedTab} index={index}>
+            {child}
+          </TabPanel>
+        )
+      })}
     </Box>
   )
 }
