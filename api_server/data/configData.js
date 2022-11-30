@@ -7,18 +7,19 @@ async function getCoinInfo() {
   const coinIds = [];
   // listing/latest에서 얻는 정보들 정리 result에 1차로 저장
   const coinDatas = await getCoinData();
-  for (const code of upbitMarketCodes) {
+  for (const { code, name } of upbitMarketCodes) {
     const coinInfo = {};
     // coinData를 순회하며 알맞은 info를 찾아 저장한다.
     for (const data of coinDatas) {
       // FCT2 예외처리
-      if (data.symbol.includes(code) || data.name === code || data.slug === code) {
+      if (data.symbol === code || data.name === name) {
         coinInfo.id = data.id;
-        coinInfo.symbol = data.symbol;
+        coinInfo.symbol = code;
         coinInfo.name = data.name;
         coinInfo.slug = data.slug;
         coinInfo.market_cap_dominance = data.quote.KRW.market_cap_dominance;
-        coinInfo.market_cap = transPrice(data.quote.KRW.market_cap);
+        coinInfo.market_cap = data.quote.KRW.market_cap;
+        coinInfo.market_cap_kr = transPrice(data.quote.KRW.market_cap);
         coinInfo.max_supply = data.max_supply;
         coinInfo.circulating_supply = data.circulating_supply;
         coinInfo.total_supply = data.total_supply;
@@ -32,7 +33,7 @@ async function getCoinInfo() {
   }
   // info에서 얻는 메타데이터 추가 result에 2차로 저장
   const coinMetaDatas = await getCoinMetaData(coinIds.join(","));
-  for (const code of upbitMarketCodes) {
+  for (const { code, name } of upbitMarketCodes) {
     const coinInfo = result[code];
     const id = coinInfo.id;
     const metaData = coinMetaDatas[id];
@@ -42,8 +43,6 @@ async function getCoinInfo() {
   }
   return result;
 }
-
-module.exports = { getCoinInfo };
 
 // 업데이트 당시 시간 구하는 함수
 function getTime() {
@@ -74,13 +73,29 @@ function transPrice(price) {
   return price;
 }
 
+// 최종적으로 사용할 데이터 변환함수
+async function getData() {
+  return getCoinInfo().then((result) => {
+    coinInfos = result;
+    marketCapInfos = Object.values(result)
+      .map((coinInfo) => {
+        return { symbol: coinInfo.symbol, market_cap: coinInfo.market_cap };
+      })
+      .sort((a, b) => -a.market_cap + b.market_cap);
+    return { coinInfos, marketCapInfos };
+  });
+}
+
+module.exports = { getCoinInfo, getData };
+
 // 업비트 api의 coin 심볼을 키로하며 객체형식의 코인정보를 값으로 같는 객체 반환
 // BTC: {
 // 	symbol  코인이름1
 // 	name  코인이름2
 // 	slug  코인이름3
 // 	market_cap_dominance 시장 점유율?
-// 	market_cap 시가총액
+// 	market_cap 시가총액 number
+// 	market_cap_kr 시가총액 한글로 변환 string
 // 	cmc_rank 시가총액 순위
 // 	max_supply 최대공급량 -> 발행가능한 최대 코인수인듯? null값이 존재하는 유일한 속성
 // 	circulating_supply -> 현재 거래되는 공급량

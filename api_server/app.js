@@ -1,30 +1,42 @@
-const createError = require("http-errors");
 const express = require("express");
-const path = require("path");
+const { getData } = require("./data/configData");
 
-const indexRouter = require("./routes/index");
+const PORT = 8080;
+let coinInfos = null;
+let marketCapInfos = null;
+
+getData().then((result) => {
+  coinInfos = result.coinInfos;
+  marketCapInfos = result.marketCapInfos;
+});
+
+setInterval(() => {
+  getData().then((result) => {
+    coinInfos = result.coinInfos;
+    marketCapInfos = result.marketCapInfos;
+  });
+}, 60 * 60 * 1000);
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
-app.use("/", indexRouter);
-
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
+app.get("/coin-info/:code", (req, res) => {
+  const code = req.params.code;
+  if (coinInfos === null) {
+    res.status(503).end();
+  }
+  if (!code || !coinInfos[code]) {
+    res.status(404).end();
+  }
+  res.status(200).send(coinInfos[code]);
 });
 
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
+app.get("/market-cap-info", (req, res) => {
+  if (marketCapInfos === null) {
+    res.status(503).end();
+  }
+  res.status(200).send(marketCapInfos);
 });
 
-module.exports = app;
+app.listen(PORT, () => {
+  console.log(`server listening port ${PORT}`);
+});
