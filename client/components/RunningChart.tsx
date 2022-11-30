@@ -31,13 +31,14 @@ const updateChart = (
   if (!data || !svgRef) {
     return
   }
+  // console.log('data : ', data)
   //ArrayDataValue : 기존 Object<object>이던 data를 data.value, 즉 실시간변동 퍼센테이지 값만 추출해서 Array<object>로 변경
   const ArrayDataValue: CoinRateContentType[] = [
     ...(Object.values(data) as CoinRateContentType[])
   ]
     .sort((a, b) => b.value - a.value) // 변동 퍼센트 오름차순 정렬
     .slice(0, CANDLECOUNT)
-
+  console.log('ArrayDATAVALUE : ', ArrayDataValue)
   const chartContainer = d3.select(svgRef.current)
   const chartArea = d3.select('svg#running-chart')
 
@@ -133,6 +134,9 @@ const updateChart = (
           .attr('x', d => scale(d.value) + 20)
           .text(d => d.name)
         return update
+      },
+      exit => {
+        exit.remove()
       }
     )
 }
@@ -153,7 +157,7 @@ export const RunningChart: React.FunctionComponent<
       props.HEIGHT,
       props.CANDLECOUNT
     )
-  }, [props.coinRate])
+  }, [props])
 
   return (
     <svg id="chart-container" ref={chartSvg}>

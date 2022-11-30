@@ -5,7 +5,7 @@ import { ActionType, EmptyObject, CoinRateType } from '@/types/ChartTypes'
 import { RunningChart } from '@/components/RunningChart'
 
 const COIN_INTERVAL_RATE = 1000
-export default function TreeChartPage() {
+export default function RunningChartPage() {
   const [coinRate, setCoinRate] = useState<CoinRateType[]>([]) //coin의 등락률 값
   const [data, dispatch] = useReducer<
     (
@@ -31,7 +31,7 @@ export default function TreeChartPage() {
         coinRate={coinRate}
         WIDTH={1000}
         HEIGHT={800}
-        CANDLECOUNT={15}
+        CANDLECOUNT={100}
       ></RunningChart>
     </>
   )
