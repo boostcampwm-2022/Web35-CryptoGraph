@@ -19,8 +19,8 @@ const updateChart = (
 ) => {
   const chartArea = d3.select('svg#chart-area')
   const [min, max]: number[] = [
-    d3.min(data, d => Math.abs(d.value as number)) as number,
-    d3.max(data, d => d.value as number) as number
+    d3.min(data, d => Math.abs(d.value)) as number,
+    d3.max(data, d => d.value) as number
   ]
   const treeMapvalueScale = d3
     .scaleLinear()
