@@ -7,7 +7,7 @@ async function getCoinInfo() {
   const coinIds = [];
   // listing/latest에서 얻는 정보들 정리 result에 1차로 저장
   const coinDatas = await getCoinData();
-  for (const { code, name } of upbitMarketCodes) {
+  for (const { code, name, name_kr } of upbitMarketCodes) {
     const coinInfo = {};
     // coinData를 순회하며 알맞은 info를 찾아 저장한다.
     for (const data of coinDatas) {
@@ -16,6 +16,7 @@ async function getCoinInfo() {
         coinInfo.id = data.id;
         coinInfo.symbol = code;
         coinInfo.name = data.name;
+        coinInfo.name_kr = name_kr;
         coinInfo.slug = data.slug;
         coinInfo.market_cap_dominance = data.quote.KRW.market_cap_dominance;
         coinInfo.market_cap = data.quote.KRW.market_cap;
@@ -79,7 +80,11 @@ async function getData() {
     coinInfos = result;
     marketCapInfos = Object.values(result)
       .map((coinInfo) => {
-        return { symbol: coinInfo.symbol, market_cap: coinInfo.market_cap };
+        return {
+          name: coinInfo.symbol,
+          market_cap: coinInfo.market_cap,
+          name_kr: coinInfo.name_kr,
+        };
       })
       .sort((a, b) => -a.market_cap + b.market_cap);
     return { coinInfos, marketCapInfos };
@@ -88,7 +93,7 @@ async function getData() {
 
 module.exports = { getCoinInfo, getData };
 
-// 업비트 api의 coin 심볼을 키로하며 객체형식의 코인정보를 값으로 같는 객체 반환
+// 업비트 api의 coin 심볼을 키로하며 객체형식의 코인정보를 값으로 갖는 객체 반환
 // BTC: {
 // 	symbol  코인이름1
 // 	name  코인이름2

@@ -10,7 +10,7 @@ async function getUpbitMarketCode() {
   return marketCodes.reduce((acc, curr) => {
     const [moneyType, coinCode] = curr.market.split("-");
     if (moneyType === "KRW") {
-      acc.push({ code: coinCode, name: curr.english_name });
+      acc.push({ code: coinCode, name: curr.english_name, name_kr: curr.korean_name });
     }
     return acc;
   }, []);

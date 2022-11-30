@@ -33,6 +33,9 @@ function typeCheck(key, coin) {
   if (typeof coin.name !== "string") {
     console.log(key, "name", coin.name);
   }
+  if (typeof coin.name_kr !== "string") {
+    console.log(key, "name_kr", coin.name_kr);
+  }
   if (typeof coin.slug !== "string") {
     console.log(key, "slug", coin.slug);
   }
