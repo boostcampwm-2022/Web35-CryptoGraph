@@ -49,27 +49,29 @@ export default function CoinDetailedInfo({ market }: CoinDetailedInfoProps) {
         </BodyHeader>
         <BodyContentContainer>
           <BodyContent key="market_cap_kr">
-            시가총액: {coinMetaData.market_cap_kr}
+            시가총액: {coinMetaData.market_cap_kr}원
+          </BodyContent>
+          <BodyContent key="market_cap_kr">
+            시가총액 순위: {coinMetaData.cmc_rank}위
+          </BodyContent>
+          <BodyContent key="market_cap_kr">
+            24시간 거래량: {coinMetaData.volume_24h}원
           </BodyContent>
           <BodyContent key="max_supply">
             최대 공급량:{' '}
             {coinMetaData.max_supply === null
               ? '미정'
-              : Math.floor(coinMetaData.max_supply).toLocaleString()}
+              : Math.floor(coinMetaData.max_supply).toLocaleString() +
+                coinMetaData.symbol}
           </BodyContent>
           <BodyContent key="total_supply">
-            총 공급량: {Math.floor(coinMetaData.total_supply).toLocaleString()}
+            총 공급량:{' '}
+            {Math.floor(coinMetaData.total_supply).toLocaleString() +
+              coinMetaData.symbol}
           </BodyContent>
           <BodyContent key="description">
             {coinMetaData.description}
           </BodyContent>
-          {/* {Object.keys(mocking).map((key, index: number) => {
-            return (
-              <BodyContent key={key + index}>
-                {key + ':' + mocking[key]}
-              </BodyContent>
-            )
-          })} */}
         </BodyContentContainer>
       </Body>
     </Container>

@@ -15,4 +15,5 @@ export interface CoinMetaData {
   website: string
   logo: string
   description: number
+  volume_24h: string
 }
