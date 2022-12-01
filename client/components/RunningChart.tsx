@@ -1,32 +1,31 @@
 import * as d3 from 'd3'
 import * as React from 'react'
 import { CoinRateContentType, CoinRateType } from '@/types/ChartTypes'
+import { useWindowSize } from 'hooks/useWindowSize'
 //------------------------------interface------------------------------
 interface RunningChartProps {
   coinRate: CoinRateType[]
-  WIDTH: number
-  HEIGHT: number
-  CANDLECOUNT: number
+  candleCount: number
 }
 
 //------------------------------initChart------------------------------
 const initChart = (
   svgRef: React.RefObject<SVGSVGElement>,
-  WIDTH: number,
-  HEIGHT: number
+  width: number,
+  height: number
 ) => {
   const chartContainer = d3.select(svgRef.current)
-  chartContainer.attr('width', WIDTH)
-  chartContainer.attr('height', HEIGHT)
+  chartContainer.attr('width', width)
+  chartContainer.attr('height', height)
 }
 
 //------------------------------updateChart------------------------------
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
   data: CoinRateType,
-  WIDTH: number,
-  HEIGHT: number,
-  CANDLECOUNT: number
+  width: number,
+  height: number,
+  candleCount: number
 ) => {
   if (!data || !svgRef) {
     return
@@ -37,8 +36,7 @@ const updateChart = (
     ...(Object.values(data) as CoinRateContentType[])
   ]
     .sort((a, b) => b.value - a.value) // 변동 퍼센트 오름차순 정렬
-    .slice(0, CANDLECOUNT)
-  console.log('ArrayDATAVALUE : ', ArrayDataValue)
+    .slice(0, candleCount)
   const chartContainer = d3.select(svgRef.current)
   const chartArea = d3.select('svg#running-chart')
 
@@ -51,17 +49,17 @@ const updateChart = (
   }
 
   const BARMARGIN = 3 //바 사이사이 마진값
-  const barHeight = HEIGHT / CANDLECOUNT - BARMARGIN //각각의 수평 바 y 높이
+  const barHeight = height / candleCount - BARMARGIN //각각의 수평 바 y 높이
 
   const scale = d3
     .scaleLinear()
     .domain([min, max])
-    .range([100, WIDTH - 100])
+    .range([100, width - 100])
 
   const svgChart = d3
     .select('#running-chart')
-    .attr('width', WIDTH)
-    .attr('height', HEIGHT)
+    .attr('width', width)
+    .attr('height', height)
 
   svgChart
     .selectAll<SVGSVGElement, CoinRateContentType>('g')
@@ -144,26 +142,32 @@ const updateChart = (
 export const RunningChart: React.FunctionComponent<
   RunningChartProps
 > = props => {
+  const chartContainerRef = React.useRef<HTMLDivElement>(null)
+  const { width, height } = useWindowSize(chartContainerRef)
   const chartSvg = React.useRef(null)
   React.useEffect(() => {
-    initChart(chartSvg, props.WIDTH, props.HEIGHT)
-  }, [])
+    initChart(chartSvg, width, height)
+  }, [width, height])
 
   React.useEffect(() => {
-    updateChart(
-      chartSvg,
-      props.coinRate[0],
-      props.WIDTH,
-      props.HEIGHT,
-      props.CANDLECOUNT
-    )
-  }, [props])
+    updateChart(chartSvg, props.coinRate[0], width, height, props.candleCount)
+  }, [props, width, height])
 
   return (
-    <svg id="chart-container" ref={chartSvg}>
-      <g id="y-axis" />
-      <g id="x-axis" />
-      <svg id="running-chart" />
-    </svg>
+    <div
+      id="chart"
+      ref={chartContainerRef}
+      style={{
+        display: 'flex',
+        width: '100%',
+        height: '100%'
+      }}
+    >
+      <svg id="chart-container" ref={chartSvg}>
+        <g id="y-axis" />
+        <g id="x-axis" />
+        <svg id="running-chart" />
+      </svg>
+    </div>
   )
 }
