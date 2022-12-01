@@ -1,8 +1,8 @@
 import * as d3 from 'd3'
 import { useState, useEffect, useRef, useReducer } from 'react'
-import useInterval from 'hooks/useInterval'
-import { dataReducer } from 'hooks/reducers/dataReducer'
-import { useWindowSize } from '../../hooks/useWindowSize'
+import useInterval from '@/hooks/useInterval'
+import { dataReducer } from '@/hooks/reducers/dataReducer'
+import { useWindowSize } from '@/hooks/useWindowSize'
 import {
   ActionType,
   EmptyObject,
@@ -85,17 +85,20 @@ const updateChart = (
           .style('stroke', 'black')
         $g.append('text')
           .attr('x', function (d) {
-            return d.x0 + Math.abs(d.x1 - d.x0) / 2 - 30
+            return d.x0 + Math.abs(d.x1 - d.x0) / 2
           })
           .attr('y', function (d) {
             return d.y0 + Math.abs(d.y1 - d.y0) / 2
           })
+          .attr('text-anchor', 'middle')
           .text(function (d) {
             return (
               d.data.name + '\n' + String(Number(d.data.value).toFixed(2)) + '%'
             )
           })
-          .attr('font-size', '10px')
+          .style('font-size', function (d) {
+            return `${(d.x1 - d.x0) / 9}px`
+          })
           .attr('fill', 'white')
         return $g
       },
@@ -120,20 +123,27 @@ const updateChart = (
           .attr('opacity', function (d) {
             return treeMapvalueScale(Math.abs(d.data.value as number))
           })
+          .transition()
+          .duration(500)
           .style('stroke', 'black')
         update
           .select('text')
           .attr('x', function (d) {
-            return d.x0 + Math.abs(d.x1 - d.x0) / 2 - 30
+            return d.x0 + Math.abs(d.x1 - d.x0) / 2
           })
           .attr('y', function (d) {
             return d.y0 + Math.abs(d.y1 - d.y0) / 2
           })
+          .attr('text-anchor', 'middle')
           .text(function (d) {
             return (
               d.data.name + '\n' + String(Number(d.data.value).toFixed(2)) + '%'
             )
           })
+          .style('font-size', function (d) {
+            return `${(d.x1 - d.x0) / 9}px`
+          })
+          .attr('fill', 'white')
         return update
       },
       exit => {
