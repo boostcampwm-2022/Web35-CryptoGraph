@@ -2,6 +2,8 @@ import * as React from 'react'
 import { TabProps } from '@/components/InfoContainerMobile/index'
 import { styled } from '@mui/material'
 import Image from 'next/image'
+import { CoinMetaData } from '@/types/CoinDataTypes'
+import { useCoinMetaData } from 'hooks/useCoinMetaData'
 
 type mockingType = {
   [key: string]: string
@@ -24,30 +26,52 @@ interface CoinDetailedInfoProps extends TabProps {
   market: string
 }
 export default function CoinDetailedInfo({ market }: CoinDetailedInfoProps) {
-  return (
+  const coinMetaData: CoinMetaData | null = useCoinMetaData(market)
+  return coinMetaData === null ? (
+    <Container></Container>
+  ) : (
     <Container>
       <Header>
         <HeaderLogo
-          src="https://s2.coinmarketcap.com/static/img/coins/64x64/1.png"
+          src={coinMetaData.logo}
           alt="/logo-only-white.svg"
           width={60}
           height={60}
         />
         <HeaderContent>
-          <div> {'비트코인.. 처럼 한국말이름'}</div>
-          <div> {market}</div>
+          <div> {coinMetaData.name_kr}</div>
+          <div> {coinMetaData.symbol}</div>
         </HeaderContent>
       </Header>
       <Body>
-        <BodyHeader>코인 정보(xx.xx.xx 기준, coinmarketcap 제공)</BodyHeader>
+        <BodyHeader>
+          코인 정보({coinMetaData.time} 기준, coinmarketcap 제공)
+        </BodyHeader>
         <BodyContentContainer>
-          {Object.keys(mocking).map((key, index: number) => {
-            return (
-              <BodyContent key={key + index}>
-                {key + ':' + mocking[key]}
-              </BodyContent>
-            )
-          })}
+          <BodyContent key="market_cap_kr">
+            시가총액: {coinMetaData.market_cap_kr}원
+          </BodyContent>
+          <BodyContent key="market_cap_kr">
+            시가총액 순위: {coinMetaData.cmc_rank}위
+          </BodyContent>
+          <BodyContent key="market_cap_kr">
+            24시간 거래량: {coinMetaData.volume_24h}원
+          </BodyContent>
+          <BodyContent key="max_supply">
+            최대 공급량:{' '}
+            {coinMetaData.max_supply === null
+              ? '미정'
+              : Math.floor(coinMetaData.max_supply).toLocaleString() +
+                coinMetaData.symbol}
+          </BodyContent>
+          <BodyContent key="total_supply">
+            총 공급량:{' '}
+            {Math.floor(coinMetaData.total_supply).toLocaleString() +
+              coinMetaData.symbol}
+          </BodyContent>
+          <BodyContent key="description">
+            {coinMetaData.description}
+          </BodyContent>
         </BodyContentContainer>
       </Body>
     </Container>
