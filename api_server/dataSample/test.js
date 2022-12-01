@@ -72,6 +72,9 @@ function typeCheck(key, coin) {
   if (typeof coin.time !== "string") {
     console.log(key, "time", coin.time);
   }
+  if (typeof coin.volume_24h !== "string") {
+    console.log(key, "volume_24h", coin.volume_24h);
+  }
 }
 
 main();
