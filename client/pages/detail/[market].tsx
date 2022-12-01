@@ -1,7 +1,7 @@
 import { styled } from '@mui/material/styles'
-import { Box, Button, useMediaQuery, useTheme } from '@mui/material'
-import MobileInfo from '@/components/Tab'
-import Link from 'next/link'
+import { Box, useMediaQuery, useTheme } from '@mui/material'
+import InfoContainerMobile from '@/components/InfoContainerMobile'
+import InfoContainerDesktop from '@/components/InfoContainerDesktop'
 import ChartPeriodSelector from '@/components/ChartPeriodSelector'
 import {
   DEFAULT_CANDLE_PERIOD,
@@ -13,7 +13,9 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { CandleChart } from '@/components/CandleChart'
 import { useRealTimeUpbitData } from 'hooks/useRealTimeUpbitData'
 import { useState } from 'react'
-
+import CoinDetailedInfo from '@/components/CoinDetailedInfo'
+import RealTimeCoinPrice from '@/components/RealTimeCoinPrice'
+import LinkButton from '@/components/LinkButton'
 export default function Detail({
   market,
   candleData
@@ -48,7 +50,27 @@ export default function Detail({
         ></CandleChart>
       </ChartContainer>
       <InfoContainer>
-        {isMobile ? <MobileInfo /> : renderDesktopInfo()}
+        {isMobile ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              height: '100%'
+            }}
+          >
+            <InfoContainerMobile>
+              <CoinDetailedInfo market={market} tabLabelInfo={'코인 디테일'} />
+              <RealTimeCoinPrice tabLabelInfo={'실시간 코인 정보'} />
+            </InfoContainerMobile>
+            <LinkButton goto="/" content="Go to Main" />
+          </Box>
+        ) : (
+          <InfoContainerDesktop>
+            <CoinDetailedInfo market={market} />
+            <RealTimeCoinPrice />
+          </InfoContainerDesktop>
+        )}
       </InfoContainer>
     </HomeContainer>
   )
@@ -104,24 +126,6 @@ export const getServerSideProps: GetServerSideProps<
   }
 }
 
-function renderDesktopInfo() {
-  return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <StyledRTV>실시간 코인시세</StyledRTV>
-      <StyledRTV>코인 상세정보</StyledRTV>
-      <Link href="/">
-        <Button
-          style={{ minWidth: '100px', width: '100%' }}
-          size="large"
-          variant="contained"
-        >
-          Go To Main
-        </Button>
-      </Link>
-    </div>
-  )
-}
-
 const HomeContainer = styled(Box)`
   display: flex;
   width: 100%;
@@ -151,23 +155,10 @@ const InfoContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid black;
-  border-radius: 32px;
   width: 390px;
   height: calc(100% - 48px);
   ${props => props.theme.breakpoints.down('tablet')} {
     margin: 0;
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
   }
-`
-
-const StyledRTV = styled('div')`
-  display: flex;
-  width: 100%;
-  height: 43%;
-  background-color: #ffffff;
-  border: 1px solid #cac4d0;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 20px;
-  padding-bottom: 24px;
 `
