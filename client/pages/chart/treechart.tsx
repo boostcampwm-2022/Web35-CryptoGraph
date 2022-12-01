@@ -1,7 +1,8 @@
 import * as d3 from 'd3'
-import { useState, useEffect, useRef, useReducer, SetStateAction } from 'react'
+import { useState, useEffect, useRef, useReducer } from 'react'
 import useInterval from 'hooks/useInterval'
 import { dataReducer } from 'hooks/reducers/dataReducer'
+import { useWindowSize } from '../../hooks/useWindowSize'
 import {
   ActionType,
   EmptyObject,
@@ -9,14 +10,20 @@ import {
   CoinRateContentType
 } from '@/types/ChartTypes'
 
-const width = 1920
-const height = 800
 const coinIntervalRate = 300
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
-  data: CoinRateContentType[]
+  data: CoinRateContentType[],
+  width: number,
+  height: number
 ) => {
+  if (!svgRef.current) return
+  const chartContainer = d3.select<SVGSVGElement, CoinRateContentType>(
+    svgRef.current
+  )
+  chartContainer.attr('width', width)
+  chartContainer.attr('height', height)
   const chartArea = d3.select('svg#chart-area')
   const [min, max]: number[] = [
     d3.min(data, d => Math.abs(d.value)) as number,
@@ -90,14 +97,13 @@ const updateChart = (
     })
     .attr('font-size', '10px')
     .attr('fill', 'white')
-  // const treeChartArea = d3
-  //   .select('svg#tree-chart')
-  //   .style('border-style', 'solid')
-  //   .style('border-width', '10px')
-  //   .style('border-radius', '10%')
 }
 
-const initChart = (svgRef: React.RefObject<SVGSVGElement>) => {
+const initChart = (
+  svgRef: React.RefObject<SVGSVGElement>,
+  width: number,
+  height: number
+) => {
   const zoom = d3
     .zoom<SVGSVGElement, CoinRateContentType>()
     .on('zoom', handleZoom)
@@ -124,7 +130,7 @@ const initChart = (svgRef: React.RefObject<SVGSVGElement>) => {
   chartContainer.attr('height', height)
 }
 
-export default function TreeChartPage() {
+export default function TreeChart() {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     { name: 'Origin', parent: '', value: 0 }
   ]) //coin의 등락률 값에 서 parentNode가 추가된 값
@@ -136,11 +142,15 @@ export default function TreeChartPage() {
     ) => CoinRateType | undefined
   >(dataReducer, {} as never) //coin의 등락률 변화값을 받아서 coinRate에 넣어줌
   const chartSvg = useRef<SVGSVGElement>(null)
+  const chartContainerSvg = useRef<HTMLDivElement>(null)
+  const { width, height } = useWindowSize(chartContainerSvg)
   useEffect(() => {
     // 1. 트리맵 초기화 (트리맵에 티커 추가)
-    initChart(chartSvg)
     dispatch({ type: 'init', coinRate: coinRate[0] })
   }, [])
+  useEffect(() => {
+    initChart(chartSvg, width, height)
+  }, [width, height])
   useEffect(() => {
     // 2. 티커를 받아오면 data init
     setCoinRate([data])
@@ -160,20 +170,23 @@ export default function TreeChartPage() {
       ...parentNode,
       ...Object.values(data)
     ] as CoinRateContentType[])
-  }, [coinRate])
+  }, [coinRate, data])
 
   useEffect(() => {
     // 5. 트리맵에 데이터 바인딩
     if (changeRate.length > 1 && changeRate[1].value !== 1) {
-      updateChart(chartSvg, changeRate)
+      updateChart(chartSvg, changeRate, width, height)
     }
-  }, [changeRate])
+  }, [changeRate, width, height])
 
   return (
-    <>
+    <div
+      style={{ display: 'flex', width: '100%', height: '100%' }}
+      ref={chartContainerSvg}
+    >
       <svg id="tree-chart" ref={chartSvg}>
         <svg id="chart-area"></svg>
       </svg>
-    </>
+    </div>
   )
 }
