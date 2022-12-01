@@ -10,7 +10,7 @@ import {
   CoinRateContentType
 } from '@/types/ChartTypes'
 
-const coinIntervalRate = 300
+const coinIntervalRate = 1000
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -105,6 +105,8 @@ const updateChart = (
       update => {
         update
           .select('rect')
+          .transition()
+          .duration(500)
           .attr('x', function (d) {
             return d.x0
           })
@@ -128,6 +130,8 @@ const updateChart = (
           .style('stroke', 'black')
         update
           .select('text')
+          .transition()
+          .duration(500)
           .attr('x', function (d) {
             return d.x0 + Math.abs(d.x1 - d.x0) / 2
           })
@@ -186,7 +190,7 @@ const initChart = (
 export default function TreeChart() {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     { name: 'Origin', parent: '', value: 0 }
-  ]) //coin의 등락률 값에 서 parentNode가 추가된 값
+  ]) //coin의 등락률 값에 parentNode가 추가된 값
   const [coinRate, setCoinRate] = useState<CoinRateType[]>([]) //coin의 등락률 값
   const [data, dispatch] = useReducer<
     (
