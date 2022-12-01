@@ -27,7 +27,7 @@ interface CoinInfo {
 export default function RealTimeCoinPrice(props: TabProps) {
   return (
     <Container>
-      <Header>코인 실시간 정보</Header>
+      <CoinPriceHeader></CoinPriceHeader>
       <CoinPriceContainer>
         <CoinPriceTab />
         <CoinPriceTab />
@@ -72,6 +72,21 @@ const CoinPriceTab: React.FunctionComponent = () => {
   )
 }
 
+const CoinPriceHeader: React.FunctionComponent = () => {
+  return (
+    <Header>
+      <p>코인 실시간 가격</p>
+      <div className="header">
+        <div className="empty"></div>
+        <div className="name">코인명</div>
+        <div className="price">현재가</div>
+        <div className="yesterday">전일대비</div>
+        <div className="amount">거래대금</div>
+      </div>
+    </Header>
+  )
+}
+
 const Container = styled('div')`
   display: flex;
   flex-direction: column;
@@ -89,6 +104,16 @@ const Header = styled('div')`
   font-size: 20px;
   font-weight: bold;
   text-align: center;
+  gap: 4px;
+  & > div.header {
+    display: flex;
+    & > div.empty {
+      width: 40px;
+    }
+    & > div:nth-child(n + 2) {
+      flex: 1;
+    }
+  }
 `
 
 const CoinPriceContainer = styled('div')`
@@ -115,6 +140,7 @@ const CoinPrice = styled('div')`
     p {
       margin: 0;
       line-height: 100%;
+      padding-left: 10px;
     }
   }
   & > div.price {

@@ -63,7 +63,7 @@ export function connectWS(market: string) {
 
   socket.onopen = function () {
     filterRequest(
-      `[{"ticket":"test"},{"type":"ticker","codes":["KRW-${market}"]}]`
+      `[{"ticket":"test"},{"type":"ticker","codes":["KRW-${market.toUpperCase()}"]}]`
     )
   }
   socket.onclose = function () {
