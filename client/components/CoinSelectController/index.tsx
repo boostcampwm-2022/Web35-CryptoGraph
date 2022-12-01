@@ -16,6 +16,10 @@ interface CoinInfo {
   logo: string
 }
 
+interface CoinChecked {
+  [key: string]: boolean
+}
+
 const SelectCoinTitle = styled('div')`
   display: flex;
   justify-content: space-between;
@@ -62,14 +66,6 @@ const getCoinInfo = async () => {
     }
   )
   return res.json()
-}
-
-const getData = () => {
-  return 'hello'
-}
-
-interface CoinChecked {
-  [key: string]: boolean
 }
 
 export default function CoinSelectController(props: CoinSelectControllerProps) {
