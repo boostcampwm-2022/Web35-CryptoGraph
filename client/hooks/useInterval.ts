@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 export default function useInterval(
-  callback: Function,
+  callback: () => unknown,
   delay: number | undefined
 ) {
   const savedCallback = useRef(callback) // 최근에 들어온 callback을 저장할 ref를 하나 만든다.
