@@ -1,6 +1,10 @@
 import * as d3 from 'd3'
 import * as React from 'react'
-import { CoinRateContentType, CoinRateType } from '@/types/ChartTypes'
+import {
+  CoinRateContentType,
+  CoinRateType,
+  EmptyObject
+} from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
 //------------------------------interface------------------------------
 interface RunningChartProps {
@@ -32,13 +36,11 @@ const updateChart = (
   }
   // console.log('data : ', data)
   //ArrayDataValue : 기존 Object<object>이던 data를 data.value, 즉 실시간변동 퍼센테이지 값만 추출해서 Array<object>로 변경
-  const ArrayDataValue: CoinRateContentType[] = [
-    ...(Object.values(data) as CoinRateContentType[])
+  const ArrayDataValue: (EmptyObject | CoinRateContentType)[] = [
+    ...Object.values<EmptyObject | CoinRateContentType>(data)
   ]
     .sort((a, b) => b.value - a.value) // 변동 퍼센트 오름차순 정렬
     .slice(0, candleCount)
-  const chartContainer = d3.select(svgRef.current)
-  const chartArea = d3.select('svg#running-chart')
 
   const [min, max] = [
     d3.min(ArrayDataValue, d => d.value),
@@ -48,7 +50,7 @@ const updateChart = (
     return
   }
 
-  const BARMARGIN = 3 //바 사이사이 마진값
+  const BARMARGIN = height / candleCount / 10 //바 사이사이 마진값
   const barHeight = height / candleCount - BARMARGIN //각각의 수평 바 y 높이
 
   const scale = d3
@@ -116,6 +118,7 @@ const updateChart = (
           .transition()
           .duration(1000)
           .attr('width', d => scale(d.value))
+          .attr('height', barHeight - BARMARGIN)
 
         update
           .select('text')
