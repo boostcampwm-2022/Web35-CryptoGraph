@@ -1,9 +1,9 @@
 import Image from 'next/image'
 import TextField from '@mui/material/TextField'
-import SearchIcon from '@mui/icons-material/Search'
-import HighlightOffIcon from '@mui/icons-material/HighlightOff'
+
 import { styled } from '@mui/material/styles'
 import { Container, useMediaQuery, useTheme } from '@mui/material'
+import SearchInput from './searchInput'
 
 const GNBContainer = styled('div')`
   display: flex;
@@ -31,21 +31,7 @@ export default function GNB() {
         ) : (
           <Image src="/logo-white.svg" alt="" width={200} height={48} />
         )}
-        <TextField
-          sx={{ marginLeft: 'auto' }}
-          InputProps={{
-            sx: {
-              backgroundColor: 'white',
-              height: '48px',
-              width: { mobile: '100%', tablet: 400, desktop: 600 },
-              p: 2,
-              gap: 2
-            },
-            placeholder: '검색어를 입력하세요',
-            startAdornment: <SearchIcon sx={{ opacity: 0.2 }} />,
-            endAdornment: <HighlightOffIcon sx={{ opacity: 0.2 }} />
-          }}
-        />
+        <SearchInput />
       </Container>
     </GNBContainer>
   )
