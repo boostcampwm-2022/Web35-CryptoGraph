@@ -34,7 +34,6 @@ const updateChart = (
   if (!data || !svgRef) {
     return
   }
-  // console.log('data : ', data)
   //ArrayDataValue : 기존 Object<object>이던 data를 data.value, 즉 실시간변동 퍼센테이지 값만 추출해서 Array<object>로 변경
   const ArrayDataValue: (EmptyObject | CoinRateContentType)[] = [
     ...Object.values<EmptyObject | CoinRateContentType>(data)
@@ -94,17 +93,20 @@ const updateChart = (
             return scale(d.value) / 2
           })
           .attr('y', barHeight / 2)
-          .attr('dy', '0.35em')
-          .attr('font-size', '20px')
+          .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'middle')
+          .style('font-size', `${barHeight * 0.6}px`)
           .text('0.00%')
+
         $g.append('text')
           .attr('id', 'CoinName')
           .attr('x', function (d) {
             return scale(d.value)
           })
           .attr('y', barHeight / 2)
-          .attr('dy', '0.35em')
-          .attr('font-size', '20px')
+          .style('font-size', `${barHeight * 0.6}px`)
+          .attr('text-anchor', 'start')
+          .attr('dominant-baseline', 'middle')
           .text('loading...')
         return $g
       },
@@ -125,14 +127,23 @@ const updateChart = (
           .transition()
           .duration(1000)
           .attr('x', function (d) {
-            return scale(d.value) / 2 - 20
+            return scale(d.value) / 2
           })
+          .attr('y', barHeight / 2)
+          .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'middle')
+          .style('font-size', `${barHeight * 0.6}px`)
           .text(d => `${d.value}%`)
+
         update
           .select('#CoinName')
           .transition()
           .duration(1000)
-          .attr('x', d => scale(d.value) + 20)
+          .attr('x', d => scale(d.value))
+          .attr('y', barHeight / 2)
+          .attr('text-anchor', 'start')
+          .attr('dominant-baseline', 'middle')
+          .style('font-size', `${barHeight * 0.6}px`)
           .text(d => d.name)
         return update
       },
