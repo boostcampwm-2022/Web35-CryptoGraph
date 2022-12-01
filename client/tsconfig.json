@@ -22,6 +22,7 @@
       "@/constants/*": ["constants/*"],
       "@/types/*": ["types/*"],
       "@/utils/*": ["utils/*"],
+      "@/hooks/*": ["hooks/*"],
       "@/components/*": ["components/*"]
     }
   },

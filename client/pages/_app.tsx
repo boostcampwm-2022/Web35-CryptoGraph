@@ -47,7 +47,7 @@ export default function MyApp(props: MyAppProps) {
           <Container
             disableGutters
             maxWidth="max"
-            sx={{ width: '100%', height: '100%' }}
+            sx={{ display: 'flex', width: '100%', height: '100%' }}
           >
             <Component {...pageProps} />
           </Container>
