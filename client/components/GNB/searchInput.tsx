@@ -6,11 +6,14 @@ import SearchIcon from '@mui/icons-material/Search'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
+import { useRouter } from 'next/router'
+import { matchNameKRwithENG, validateInputName } from '@/utils/inputBarManager'
 export default function SearchInput() {
   /* -------------주의------------- */
   // CoinNames의 fetch는 api_server를 이용했습니다.
   // express서버를 키고 작동해야 제대로 받아올 수 있습니다.
   const [CoinNames, setCoinNames] = React.useState<MarketCapInfo[]>([])
+  const router = useRouter()
   React.useEffect(() => {
     async function asyncGetCoinName() {
       const data: MarketCapInfo[] | null = await getMarketCapInfo()
@@ -56,6 +59,17 @@ export default function SearchInput() {
             }}
           />
         )}
+        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+          const inputCoinName = (e.target as HTMLInputElement).value
+          if (e.key === 'Enter') {
+            //1.입력값이 db에 있는지 검증하는 로직
+            //2.로직을 통과하면 해당 값으로 리다이렉트
+            if (validateInputName(CoinNames, inputCoinName)) {
+              const engCoinName = matchNameKRwithENG(CoinNames, inputCoinName)
+              router.push(`/detail/${engCoinName}`)
+            }
+          }
+        }}
       />
     </Stack>
   )
