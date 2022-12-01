@@ -1,12 +1,13 @@
 import Box from '@mui/material/Box'
 import { useState } from 'react'
+import CoinSelectController from '../CoinSelectController/index'
 
 interface SideBarProps {
   isSideBarOpened: boolean
 }
 
 export default function SideBar({ isSideBarOpened }: SideBarProps) {
-  const [buttonSelect, setButtonSelect] = useState('treeMap')
+  const [buttonSelect, setButtonSelect] = useState(false)
 
   return (
     <Box
@@ -16,6 +17,8 @@ export default function SideBar({ isSideBarOpened }: SideBarProps) {
         border: '1px solid black',
         borderRadius: '16px'
       }}
-    ></Box>
+    >
+      <CoinSelectController isSideBarOpened={isSideBarOpened} />
+    </Box>
   )
 }
