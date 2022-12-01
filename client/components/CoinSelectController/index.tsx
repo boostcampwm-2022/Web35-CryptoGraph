@@ -3,10 +3,19 @@ import { styled } from '@mui/material/styles'
 import Checkbox from '@mui/material/Checkbox'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { domainToASCII } from 'url'
 
 interface CoinSelectControllerProps {
   isSideBarOpened: boolean
 }
+
+interface CoinInfo {
+  name: string
+  cmc_rank: number
+  name_kr: string
+  logo: string
+}
+
 const SelectCoinTitle = styled('div')`
   display: flex;
   justify-content: space-between;
@@ -59,21 +68,46 @@ const getData = () => {
   return 'hello'
 }
 
-//코인 상세정보
+interface CoinChecked {
+  [key: string]: boolean
+}
+
 export default function CoinSelectController(props: CoinSelectControllerProps) {
-  const [coinList, setCoinList] = useState([])
-  // {
-  //   name: 영문이름,
-  //   name_kr: 한글이름,
-  //   logo: 이미지 url,
-  //   cmc_rank: 시가총액 순위
-  //   }[ ]
+  const [coinList, setCoinList] = useState<CoinInfo[]>([])
+  const [checked, setChecked] = useState<CoinChecked>({
+    all: true
+  })
 
   useEffect(() => {
     getCoinInfo().then(data => {
       setCoinList(data)
     })
   }, [])
+
+  useEffect(() => {
+    for (const coin of coinList) {
+      checked[coin.name] = false
+    }
+
+    setChecked({
+      ...checked
+    })
+  }, [coinList])
+  const coinCheckAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    for (const coin in checked) {
+      checked[coin] = event.target.checked
+    }
+    setChecked({
+      ...checked
+    })
+  }
+
+  const coinCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked({
+      ...checked,
+      [event.target.name]: event.target.checked
+    })
+  }
 
   return (
     <>
@@ -84,15 +118,23 @@ export default function CoinSelectController(props: CoinSelectControllerProps) {
           <SelectCoinTitleFont>코인선택</SelectCoinTitleFont>
           <SelectCoinTitleBox>
             <SelectCoinTitleBoxFont>전부 [선택/해제]</SelectCoinTitleBoxFont>
-            <Checkbox />
+            <Checkbox
+              checked={checked.all}
+              onChange={coinCheckAll}
+              name="all"
+            />
           </SelectCoinTitleBox>
         </SelectCoinTitle>
-        {coinList.map((coin, index) => {
+        {coinList.map((coin: CoinInfo, index) => {
           return (
             <SelectCoinInnerLayer key={index}>
               <Image src={coin.logo} alt="" width={44} height={44} />
               <SelectCoinInnerFont>{coin.name_kr}</SelectCoinInnerFont>
-              <Checkbox onClick={getData} />
+              <Checkbox
+                checked={checked[coin.name]}
+                onChange={coinCheck}
+                name={coin.name}
+              />
             </SelectCoinInnerLayer>
           )
         })}
