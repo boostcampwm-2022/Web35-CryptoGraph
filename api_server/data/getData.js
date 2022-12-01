@@ -16,6 +16,15 @@ async function getUpbitMarketCode() {
   }, []);
 }
 
+async function getCoinPriceFromUpbit(coinCodes) {
+  const priceInfo = await axios({
+    method: "get",
+    baseURL: "https://api.upbit.com",
+    url: `/v1/ticker?markets=${coinCodes}`,
+  }).then((response) => response.data);
+  return priceInfo;
+}
+
 async function getCoinData() {
   const responseBody = await axios({
     method: "get",
@@ -47,4 +56,4 @@ async function getCoinMetaData(coinIds) {
   return responseBody.data;
 }
 
-module.exports = { getUpbitMarketCode, getCoinData, getCoinMetaData };
+module.exports = { getUpbitMarketCode, getCoinData, getCoinMetaData, getCoinPriceFromUpbit };

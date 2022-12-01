@@ -1,4 +1,9 @@
-const { getCoinData, getCoinMetaData, getUpbitMarketCode } = require("./getData");
+const {
+  getCoinData,
+  getCoinMetaData,
+  getUpbitMarketCode,
+  getCoinPriceFromUpbit,
+} = require("./getData");
 
 async function getCoinInfo() {
   const time = getTime();
@@ -91,7 +96,30 @@ async function getData() {
   });
 }
 
-module.exports = { getCoinInfo, getData };
+async function getPriceData(coinInfos) {
+  if (coinInfos === null) {
+    return null;
+  }
+  const marketCodes = Object.keys(coinInfos);
+  const marketCodesString = marketCodes.map((code) => "KRW-" + code).join(",");
+  const priceData = await getCoinPriceFromUpbit(marketCodesString);
+  console.log(priceData);
+  const result = {};
+  marketCodes.forEach((code, index) => {
+    const info = {};
+    info.logo = coinInfos[code].logo;
+    info.name_kr = coinInfos[code].name_kr;
+    info.name = coinInfos[code].symbol;
+    info.price = priceData[index].trade_price;
+    info.signed_change_price = priceData[index].signed_change_price;
+    info.signed_change_rate = priceData[index].signed_change_rate;
+    info.acc_trade_price_24h = priceData[index].acc_trade_price_24h;
+    result[code] = info;
+  });
+  console.log(result);
+  return result;
+}
+module.exports = { getCoinInfo, getData, getPriceData };
 
 // 업비트 api의 coin 심볼을 키로하며 객체형식의 코인정보를 값으로 갖는 객체 반환
 // BTC: {
