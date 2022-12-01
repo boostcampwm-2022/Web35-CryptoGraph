@@ -54,8 +54,7 @@ export default function SearchInput() {
                 gap: 2
               },
               placeholder: '검색어를 입력하세요',
-              startAdornment: <SearchIcon sx={{ opacity: 0.2 }} />,
-              endAdornment: <HighlightOffIcon sx={{ opacity: 0.2 }} />
+              endAdornment: <SearchIcon sx={{ opacity: 0.2 }} />,
             }}
           />
         )}
@@ -66,7 +65,8 @@ export default function SearchInput() {
             //2.로직을 통과하면 해당 값으로 리다이렉트
             if (validateInputName(CoinNames, inputCoinName)) {
               const engCoinName = matchNameKRwithENG(CoinNames, inputCoinName)
-              router.push(`/detail/${engCoinName}`)
+              //생각해볼점   router.push(`/detail/${engCoinName}`) 
+              window.location.href = `/detail/${engCoinName}`
             }
           }
         }}
