@@ -276,6 +276,7 @@ function initChart(
   d3.select<SVGSVGElement, CandleData>('#chart-container')
     .call(zoom)
     .on('wheel', (e: WheelEvent) => {
+      e.preventDefault()
       // 휠이벤트에 따라 확대 축소가 이루어진다.
       // candleCount가 변함에따라 candleWidth도 변경되고 기존의 translateX와 연산하여 그래프의 시작인덱스를 재조정
       optionSetter(prev => {
