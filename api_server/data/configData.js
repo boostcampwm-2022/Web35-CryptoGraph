@@ -77,15 +77,14 @@ function transPrice(price) {
 async function getData() {
   return getCoinInfo().then((result) => {
     coinInfos = result;
-    marketCapInfos = Object.values(result)
-      .map((coinInfo) => {
-        return {
-          name: coinInfo.symbol,
-          market_cap: coinInfo.market_cap,
-          name_kr: coinInfo.name_kr,
-        };
-      })
-      .sort((a, b) => -a.market_cap + b.market_cap);
+    marketCapInfos = Object.values(result).map((coinInfo) => {
+      return {
+        name: coinInfo.symbol,
+        cmc_rank: coinInfo.cmc_rank,
+        name_kr: coinInfo.name_kr,
+        logo: coinInfo.logo,
+      };
+    });
     return { coinInfos, marketCapInfos };
   });
 }
