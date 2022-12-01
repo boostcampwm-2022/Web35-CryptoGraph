@@ -56,47 +56,90 @@ const updateChart = (
   d3.treemap<CoinRateContentType>().size([width, height]).padding(4)(root)
 
   chartArea
-    .selectAll<SVGSVGElement, CoinRateContentType>('rect')
+    .selectAll<SVGSVGElement, CoinRateContentType>('g')
     .data<d3.HierarchyRectangularNode<CoinRateContentType>>(
       root.leaves() as Array<d3.HierarchyRectangularNode<CoinRateContentType>>
     )
-    .join('rect')
-    .attr('x', function (d) {
-      return d.x0
-    })
-    .attr('y', function (d) {
-      return d.y0
-    })
-    .attr('width', function (d) {
-      return d.x1 - d.x0
-    })
-    .attr('height', function (d) {
-      return d.y1 - d.y0
-    })
-    .attr('fill', function (d) {
-      return d.data.value > 0 ? 'red' : 'blue'
-    })
-    .attr('opacity', function (d) {
-      return treeMapvalueScale(Math.abs(d.data.value as number))
-    })
-    .style('stroke', 'black')
-  chartArea
-    .selectAll('text')
-    .data(
-      root.leaves() as Array<d3.HierarchyRectangularNode<CoinRateContentType>>
+    .join(
+      enter => {
+        const $g = enter.append('g')
+        $g.append('rect')
+          .attr('x', function (d) {
+            return d.x0
+          })
+          .attr('y', function (d) {
+            return d.y0
+          })
+          .attr('width', function (d) {
+            return d.x1 - d.x0
+          })
+          .attr('height', function (d) {
+            return d.y1 - d.y0
+          })
+          .attr('fill', function (d) {
+            return d.data.value > 0 ? 'red' : 'blue'
+          })
+          .attr('opacity', function (d) {
+            return treeMapvalueScale(Math.abs(d.data.value as number))
+          })
+          .style('stroke', 'black')
+        $g.append('text')
+          .attr('x', function (d) {
+            return d.x0 + Math.abs(d.x1 - d.x0) / 2 - 30
+          })
+          .attr('y', function (d) {
+            return d.y0 + Math.abs(d.y1 - d.y0) / 2
+          })
+          .text(function (d) {
+            return (
+              d.data.name + '\n' + String(Number(d.data.value).toFixed(2)) + '%'
+            )
+          })
+          .attr('font-size', '10px')
+          .attr('fill', 'white')
+        return $g
+      },
+      update => {
+        update
+          .select('rect')
+          .attr('x', function (d) {
+            return d.x0
+          })
+          .attr('y', function (d) {
+            return d.y0
+          })
+          .attr('width', function (d) {
+            return d.x1 - d.x0
+          })
+          .attr('height', function (d) {
+            return d.y1 - d.y0
+          })
+          .attr('fill', function (d) {
+            return d.data.value > 0 ? 'red' : 'blue'
+          })
+          .attr('opacity', function (d) {
+            return treeMapvalueScale(Math.abs(d.data.value as number))
+          })
+          .style('stroke', 'black')
+        update
+          .select('text')
+          .attr('x', function (d) {
+            return d.x0 + Math.abs(d.x1 - d.x0) / 2 - 30
+          })
+          .attr('y', function (d) {
+            return d.y0 + Math.abs(d.y1 - d.y0) / 2
+          })
+          .text(function (d) {
+            return (
+              d.data.name + '\n' + String(Number(d.data.value).toFixed(2)) + '%'
+            )
+          })
+        return update
+      },
+      exit => {
+        exit.remove()
+      }
     )
-    .join('text')
-    .attr('x', function (d) {
-      return d.x0 + Math.abs(d.x1 - d.x0) / 2 - 30
-    })
-    .attr('y', function (d) {
-      return d.y0 + Math.abs(d.y1 - d.y0) / 2
-    })
-    .text(function (d) {
-      return d.data.name + '\n' + String(Number(d.data.value).toFixed(2)) + '%'
-    })
-    .attr('font-size', '10px')
-    .attr('fill', 'white')
 }
 
 const initChart = (
