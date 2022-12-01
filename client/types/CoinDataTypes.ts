@@ -17,3 +17,10 @@ export interface CoinMetaData {
   description: number
   volume_24h: string
 }
+
+export interface MarketCapInfo {
+  name: string
+  cmc_rank: string
+  name_kr: string
+  logo: string
+}

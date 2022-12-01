@@ -31,7 +31,7 @@ export default function RunningChartPage() {
         coinRate={coinRate}
         WIDTH={1000}
         HEIGHT={800}
-        CANDLECOUNT={100}
+        CANDLECOUNT={15}
       ></RunningChart>
     </>
   )
