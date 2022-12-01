@@ -10,17 +10,6 @@ interface CoinChecked {
   [key: string]: boolean
 }
 
-const getCoinInfo = async () => {
-  const res = await fetch(
-    process.env.NEXT_PUBLIC_SERVER_URL + '/market-cap-info',
-    {
-      method: 'GET',
-      headers: { accept: 'application/json' }
-    }
-  )
-  return res.json()
-}
-
 export default function CoinSelectController() {
   const [coinList, setCoinList] = useState<MarketCapInfo[] | null>([])
   const [checked, setChecked] = useState<CoinChecked>({
@@ -90,14 +79,28 @@ export default function CoinSelectController() {
   )
 }
 
+const Container = styled('div')`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+`
 const Header = styled('div')`
   display: flex;
   justify-content: space-between;
-  margin: 8% 12%;
+  padding: 1rem;
   align-items: center;
 `
+const Body = styled('div')`
+  overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+`
+
 const HeaderTitle = styled('div')`
-  font-size: 24px;
+  font-size: 1.5rem;
 `
 
 const HeaderSelectBox = styled('div')`
@@ -106,28 +109,18 @@ const HeaderSelectBox = styled('div')`
 `
 
 const HeaderSelectBoxContent = styled('div')`
-  font-size: 12px;
+  font-size: 0.8rem;
 `
 
 const SelectCoinInnerLayer = styled('div')`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 8% 12%;
+  padding: 1rem;
+  width: 100%;
 `
 
 const SelectCoinInnerFont = styled('div')`
   align-items: center;
-  margin: 8% 12%;
-  font-size: 24px;
-`
-
-const Container = styled('div')`
-  overflow: scroll;
-  height: 100%;
-`
-
-const Body = styled('div')`
-  overflow: scroll;
-  height: 100%;
+  font-size: 1rem;
 `
