@@ -27,12 +27,7 @@ export default function RunningChartPage() {
   }, COIN_INTERVAL_RATE)
   return (
     <>
-      <RunningChart
-        coinRate={coinRate}
-        WIDTH={1000}
-        HEIGHT={800}
-        CANDLECOUNT={15}
-      ></RunningChart>
+      <RunningChart coinRate={coinRate} candleCount={20}></RunningChart>
     </>
   )
 }
