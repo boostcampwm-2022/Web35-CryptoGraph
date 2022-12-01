@@ -155,7 +155,7 @@ const InfoContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 390px;
+  min-width: 500px;
   height: calc(100% - 48px);
   ${props => props.theme.breakpoints.down('tablet')} {
     margin: 0;
