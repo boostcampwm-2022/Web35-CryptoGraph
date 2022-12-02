@@ -41,13 +41,18 @@ export default function Detail({
           selected={candlePeriod}
           selectedSetter={setCandlePeriod}
         />
-        <CandleChart
-          candlePeriod={candlePeriod}
-          candleData={realtimeCandleData}
-          candleDataSetter={setRealtimeCandleData}
-          option={chartRenderOption}
-          optionSetter={setRenderOption}
-        ></CandleChart>
+        <Box
+          sx={{ display: 'flex', width: '100%', height: `calc(100% - 60px)` }}
+          //60px은 ChartPeriodSelector이다. 매직넘버임.. 이거 css 해결 못하겠다.. 반응형으로 모바일일때도 줘야한다.
+        >
+          <CandleChart
+            candlePeriod={candlePeriod}
+            candleData={realtimeCandleData}
+            candleDataSetter={setRealtimeCandleData}
+            option={chartRenderOption}
+            optionSetter={setRenderOption}
+          ></CandleChart>
+        </Box>
       </ChartContainer>
       <InfoContainer>
         {isMobile ? (
@@ -146,7 +151,8 @@ const ChartContainer = styled('div')`
   flex-direction: column;
   border-radius: 32px;
   ${props => props.theme.breakpoints.down('tablet')} {
-    height: 50%;
+    height: calc(100% - 48px);
+    min-height: 400px;
   }
 `
 
