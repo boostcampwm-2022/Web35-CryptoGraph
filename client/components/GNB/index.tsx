@@ -1,12 +1,14 @@
 import Image from 'next/image'
-import TextField from '@mui/material/TextField'
-
 import { styled } from '@mui/material/styles'
 import { Container, useMediaQuery, useTheme } from '@mui/material'
 import SearchInput from './searchInput'
 
 const GNBContainer = styled('div')`
-  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   height: 96px;
   background-color: ${props => props.theme.palette.primary.main};
   ${props => props.theme.breakpoints.down('tablet')} {
@@ -25,7 +27,14 @@ export default function GNB() {
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
   return (
     <GNBContainer>
-      <Container maxWidth="max" sx={{ display: 'flex', alignItems: 'center' }}>
+      <Container
+        maxWidth="max"
+        id="GNBcontainer"
+        sx={{
+          display: 'flex',
+          alignItems: 'center'
+        }}
+      >
         {isMobile ? (
           <Image src="/logo-only-white.svg" alt="" width={40} height={40} />
         ) : (

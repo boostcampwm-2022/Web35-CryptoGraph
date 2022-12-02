@@ -33,7 +33,6 @@ export default function MyApp(props: MyAppProps) {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <ThemeProvider theme={theme}>
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
         <Global styles={GlobalStyle} />
         <GNB />
@@ -54,11 +53,12 @@ export default function MyApp(props: MyAppProps) {
 const ContainerHeightLimiter = styled('div')`
   display: flex;
   width: 100%;
+  height: 100%;
   ${props => props.theme.breakpoints.down('tablet')} {
-    height: calc(100% - 64px); //64px -> 모바일 GNB 높이
+    padding-top: calc(64px + 16px);
   }
   ${props => props.theme.breakpoints.up('tablet')} {
-    height: calc(100% - 96px); //96px -> 데탑 GNB 높이
+    padding-top: calc(96px + 16px);
     //매직 넘버 상수화 필요
   }
 `
