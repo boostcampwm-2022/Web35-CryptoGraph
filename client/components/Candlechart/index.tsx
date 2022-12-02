@@ -21,7 +21,9 @@ import {
   CANDLE_COLOR_RED,
   CANDLE_COLOR_BLUE,
   CANDLE_CHART_GRID_COLOR,
-  CHART_FONT_SIZE
+  CHART_FONT_SIZE,
+  CHART_Y_AXIS_MARGIN,
+  CHART_X_AXIS_MARGIN
 } from '@/constants/ChartConstants'
 import { makeDate } from '@/utils/dateManager'
 import { getCandleDataArray } from '@/utils/upbitManager'
@@ -35,11 +37,11 @@ function updateChart(
   pointerInfo: PointerPosition,
   windowSize: WindowSize
 ) {
-  const CHART_CONTAINER_X_SIZE = windowSize.width
-  const CHART_CONTAINER_Y_SIZE = windowSize.height
-  const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - 100
-  const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - 100
-  const candleWidth = calculateCandlewidth(option, CHART_AREA_X_SIZE)
+  const chartContainerXsize = windowSize.width
+  const chartContainerYsize = windowSize.height
+  const chartAreaXsize = chartContainerXsize - CHART_Y_AXIS_MARGIN
+  const chartAreaYsize = chartContainerYsize - CHART_X_AXIS_MARGIN
+  const candleWidth = calculateCandlewidth(option, chartAreaXsize)
   const chartContainer = d3.select(svgRef.current)
   const chartArea = chartContainer.select('svg#chart-area')
   const yAxisScale = getYAxisScale(
@@ -47,16 +49,16 @@ function updateChart(
       option.renderStartDataIndex,
       option.renderStartDataIndex + option.renderCandleCount
     ),
-    CHART_AREA_Y_SIZE
+    chartAreaYsize
   )
   if (!yAxisScale) {
     return undefined
   }
-  const xAxisScale = getXAxisScale(option, data, CHART_AREA_X_SIZE)
+  const xAxisScale = getXAxisScale(option, data, chartAreaXsize)
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
-    .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
-    .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * CHART_AREA_X_SIZE))
+    .attr('transform', `translate(${chartAreaXsize},0)`)
+    .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * chartAreaXsize))
     .call(g => {
       g.selectAll('.tick line').attr('stroke', CANDLE_CHART_GRID_COLOR)
       g.selectAll('.tick text')
@@ -65,11 +67,11 @@ function updateChart(
     })
   chartContainer
     .select<SVGSVGElement>('g#x-axis')
-    .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
+    .attr('transform', `translate(0,${chartAreaYsize})`)
     .call(
       d3
         .axisBottom(xAxisScale)
-        .tickSizeInner(-1 * CHART_AREA_Y_SIZE)
+        .tickSizeInner(-1 * chartAreaYsize)
         .tickSizeOuter(0)
         .ticks(5)
     )
@@ -79,14 +81,14 @@ function updateChart(
         .attr('stroke', 'black')
         .attr('font-size', CHART_FONT_SIZE)
     })
-  updateCurrentPrice(yAxisScale, data, option, CHART_AREA_X_SIZE)
+  updateCurrentPrice(yAxisScale, data, option, chartAreaXsize)
   updatePointerUI(
     pointerInfo,
     yAxisScale,
     option,
     data,
-    CHART_AREA_X_SIZE,
-    CHART_AREA_Y_SIZE
+    chartAreaXsize,
+    chartAreaYsize
   )
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
@@ -98,13 +100,11 @@ function updateChart(
         $g.append('line')
           .attr(
             'x1',
-            (d, i) =>
-              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+            (d, i) => chartAreaXsize + candleWidth / 2 - candleWidth * (i + 1)
           )
           .attr(
             'x2',
-            (d, i) =>
-              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+            (d, i) => chartAreaXsize + candleWidth / 2 - candleWidth * (i + 1)
           )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
@@ -114,7 +114,7 @@ function updateChart(
           .attr('height', d =>
             Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price))
           )
-          .attr('x', (d, i) => CHART_AREA_X_SIZE - candleWidth * (i + 0.8))
+          .attr('x', (d, i) => chartAreaXsize - candleWidth * (i + 0.8))
           .attr('y', d =>
             Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
@@ -139,7 +139,7 @@ function updateChart(
                   yAxisScale(d.trade_price) - yAxisScale(d.opening_price)
                 )
           )
-          .attr('x', (d, i) => CHART_AREA_X_SIZE - candleWidth * (i + 0.8))
+          .attr('x', (d, i) => chartAreaXsize - candleWidth * (i + 0.8))
           .attr('y', d =>
             Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
@@ -152,13 +152,11 @@ function updateChart(
           .select('line')
           .attr(
             'x1',
-            (d, i) =>
-              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+            (d, i) => chartAreaXsize + candleWidth / 2 - candleWidth * (i + 1)
           )
           .attr(
             'x2',
-            (d, i) =>
-              CHART_AREA_X_SIZE + candleWidth / 2 - candleWidth * (i + 1)
+            (d, i) => chartAreaXsize + candleWidth / 2 - candleWidth * (i + 1)
           )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
@@ -180,31 +178,30 @@ interface CandleChartProps {
 function initChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
-  candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>,
   option: ChartRenderOption,
   optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>,
   pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerPosition>>,
   windowSize: WindowSize
 ) {
-  const CHART_CONTAINER_X_SIZE = windowSize.width
-  const CHART_CONTAINER_Y_SIZE = windowSize.height
-  const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - 100
-  const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - 100
+  const chartContainerXsize = windowSize.width
+  const chartContainerYsize = windowSize.height
+  const chartAreaXsize = chartContainerXsize - CHART_Y_AXIS_MARGIN
+  const chartAreaYsize = chartContainerYsize - CHART_X_AXIS_MARGIN
   //margin값도 크기에 맞춰 변수화 시켜야함.
   const chartContainer = d3.select(svgRef.current)
-  chartContainer.attr('width', CHART_CONTAINER_X_SIZE)
-  chartContainer.attr('height', CHART_CONTAINER_Y_SIZE)
+  chartContainer.attr('width', chartContainerXsize)
+  chartContainer.attr('height', chartContainerYsize)
   const chartArea = chartContainer.select('svg#chart-area')
-  chartArea.attr('width', CHART_AREA_X_SIZE)
-  chartArea.attr('height', CHART_AREA_Y_SIZE)
+  chartArea.attr('width', chartAreaXsize)
+  chartArea.attr('height', chartAreaYsize)
   chartArea.attr('view')
   // xAxis초기값 설정
   chartContainer
     .select('svg#x-axis-container')
-    .attr('width', CHART_AREA_X_SIZE)
-    .attr('height', CHART_AREA_Y_SIZE + 20)
+    .attr('width', chartAreaXsize)
+    .attr('height', chartAreaYsize + 20)
   // currentPrice초기값 설정
-  chartContainer.select('svg#current-price').attr('height', CHART_AREA_Y_SIZE)
+  chartContainer.select('svg#current-price').attr('height', chartAreaYsize)
   // text 위치설정 매직넘버? 반응형 고려하면 변수화도 고려되어야할듯
   chartContainer.select('text#price-info').attr('x', 20).attr('y', 20)
   const yAxisScale = getYAxisScale(
@@ -212,38 +209,38 @@ function initChart(
       option.renderStartDataIndex,
       option.renderStartDataIndex + option.renderCandleCount
     ),
-    CHART_AREA_Y_SIZE
+    chartAreaYsize
   )
   if (!yAxisScale) {
     console.error('받아온 API 데이터 에러')
     return undefined
   }
-  const xAxisScale = getXAxisScale(option, data, CHART_AREA_X_SIZE)
+  const xAxisScale = getXAxisScale(option, data, chartAreaXsize)
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
-    .attr('transform', `translate(${CHART_AREA_X_SIZE},0)`)
-    .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * CHART_AREA_X_SIZE))
+    .attr('transform', `translate(${chartAreaXsize},0)`)
+    .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * chartAreaXsize))
     .call(g => {
       g.selectAll('.tick line').attr('stroke', CANDLE_CHART_GRID_COLOR)
       g.selectAll('.tick text')
         .attr('stroke', 'black')
-        .attr('font-size', CHART_FONT_SIZE)
+        .style('font-size', CHART_FONT_SIZE)
     })
   chartContainer
     .select<SVGSVGElement>('g#x-axis')
-    .attr('transform', `translate(0,${CHART_AREA_Y_SIZE})`)
-    .attr('width', CHART_AREA_X_SIZE)
+    .attr('transform', `translate(0,${chartAreaYsize})`)
+    .attr('width', chartAreaXsize)
     .call(
       d3
         .axisBottom(xAxisScale)
-        .tickSizeInner(-1 * CHART_AREA_Y_SIZE)
+        .tickSizeInner(-1 * chartAreaYsize)
         .ticks(5)
     )
     .call(g => {
       g.selectAll('.tick line').attr('stroke', CANDLE_CHART_GRID_COLOR)
       g.selectAll('.tick text')
         .attr('stroke', 'black')
-        .attr('font-size', CHART_FONT_SIZE)
+        .style('font-size', CHART_FONT_SIZE)
     })
   let transalateX = 0
   let movedCandle = 0
@@ -252,13 +249,13 @@ function initChart(
     .scaleExtent([1, 1])
     .translateExtent([
       [-Infinity, 0],
-      [CHART_CONTAINER_X_SIZE, CHART_CONTAINER_Y_SIZE]
+      [chartContainerXsize, chartContainerYsize]
     ])
     .on('zoom', function (event: D3ZoomEvent<SVGSVGElement, CandleData>) {
       transalateX = event.transform.x
       optionSetter((prev: ChartRenderOption) => {
         movedCandle = Math.floor(
-          transalateX / calculateCandlewidth(prev, CHART_AREA_X_SIZE)
+          transalateX / calculateCandlewidth(prev, chartAreaXsize)
         )
         return {
           ...prev,
@@ -269,8 +266,8 @@ function initChart(
       handleMouseEvent(
         event.sourceEvent,
         pointerPositionSetter,
-        CHART_AREA_X_SIZE,
-        CHART_AREA_Y_SIZE
+        chartAreaXsize,
+        chartAreaYsize
       )
     })
   d3.select<SVGSVGElement, CandleData>('#chart-container')
@@ -288,7 +285,7 @@ function initChart(
           prev.translateX /
             calculateCandlewidth(
               { ...prev, renderCandleCount: newRenderCandleCount },
-              CHART_AREA_X_SIZE
+              chartAreaXsize
             )
         )
         return {
@@ -304,8 +301,8 @@ function initChart(
       handleMouseEvent(
         event,
         pointerPositionSetter,
-        CHART_AREA_X_SIZE,
-        CHART_AREA_Y_SIZE
+        chartAreaXsize,
+        chartAreaYsize
       )
     }
   )
@@ -330,13 +327,12 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
     initChart(
       chartSvg,
       props.candleData,
-      props.candleDataSetter,
       props.option,
       props.optionSetter,
       setPointerInfo,
       windowSize
     )
-  }, [props, windowSize])
+  }, [props.candleData, props.option, props.optionSetter, windowSize])
 
   React.useEffect(() => {
     //디바운싱 구문
