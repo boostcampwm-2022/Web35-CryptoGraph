@@ -10,8 +10,10 @@ const GNBContainer = styled('div')`
   right: 0;
   z-index: 100;
   height: 96px;
+  padding-top: 24px;
   background-color: ${props => props.theme.palette.primary.main};
   ${props => props.theme.breakpoints.down('tablet')} {
+    padding-top: 8px;
     height: 64px;
   }
   ${props => props.theme.breakpoints.up('tablet')} {

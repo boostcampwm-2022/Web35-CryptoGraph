@@ -36,32 +36,26 @@ export default function Detail({
   )
   return (
     <HomeContainer>
-      <ChartContainer>
+      <ChartAreaContainer>
         <ChartPeriodSelector
           selected={candlePeriod}
           selectedSetter={setCandlePeriod}
         />
-        <Box
-          sx={{ display: 'flex', width: '100%', height: `calc(100% - 60px)` }}
-          //60px은 ChartPeriodSelector이다. 매직넘버임.. 이거 css 해결 못하겠다.. 반응형으로 모바일일때도 줘야한다.
-        >
-          <CandleChart
-            candlePeriod={candlePeriod}
-            candleData={realtimeCandleData}
-            candleDataSetter={setRealtimeCandleData}
-            option={chartRenderOption}
-            optionSetter={setRenderOption}
-          ></CandleChart>
-        </Box>
-      </ChartContainer>
+        <CandleChart
+          candlePeriod={candlePeriod}
+          candleData={realtimeCandleData}
+          candleDataSetter={setRealtimeCandleData}
+          option={chartRenderOption}
+          optionSetter={setRenderOption}
+        ></CandleChart>
+      </ChartAreaContainer>
       <InfoContainer>
         {isMobile ? (
           <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              width: '100%',
-              height: '100%'
+              width: '100%'
             }}
           >
             <InfoContainerMobile>
@@ -135,24 +129,21 @@ const HomeContainer = styled(Box)`
   display: flex;
   width: 100%;
   max-width: 1920px;
-  height: 100%;
-  align-items: center;
   ${props => props.theme.breakpoints.down('tablet')} {
+    align-items: center;
     flex-direction: column;
   }
 `
 //왼쪽 메인차트
-const ChartContainer = styled('div')`
+const ChartAreaContainer = styled('div')`
   display: flex;
   box-sizing: content-box;
   min-width: 300px;
   width: 100%;
-  height: calc(100% - 48px);
   flex-direction: column;
-  border-radius: 32px;
-  ${props => props.theme.breakpoints.down('tablet')} {
-    height: calc(100% - 48px);
-    min-height: 400px;
+  ${props => props.theme.breakpoints.up('tablet')} {
+    height: 90%; //분봉선택바가 10%이다.
+    max-height: 1080px;
   }
 `
 
@@ -164,6 +155,7 @@ const InfoContainer = styled(Box)`
   width: 390px;
   height: calc(100% - 48px);
   ${props => props.theme.breakpoints.down('tablet')} {
+    height: auto;
     margin: 0;
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
   }

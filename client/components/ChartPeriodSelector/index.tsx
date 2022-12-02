@@ -10,24 +10,14 @@ import { ChartPeriodList } from '@/types/ChartTypes'
 const ChartPeriodSelectorContainer = styled('div')`
   display: flex;
   width: 100%;
-  height: auto;
+  height: 10%;
   background-color: #ffffff;
+  box-sizing: border-box;
   border: 1px solid #cac4d0;
   border-radius: 20px;
   justify-content: center;
   align-items: center;
   margin-bottom: 20px;
-`
-const StyledTimeButton = styled('button')`
-  background: #e7e5ef;
-  border-radius: 16px;
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 16px;
-  margin: 8px 16px;
-  width: auto;
-  height: 50%;
 `
 interface ChartPeriodSelectorProps {
   selected: ChartPeriod

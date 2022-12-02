@@ -29,6 +29,7 @@ import { makeDate } from '@/utils/dateManager'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { useWindowSize, WindowSize } from 'hooks/useWindowSize'
 import { ChartPeriod } from '@/types/ChartTypes'
+import { styled } from '@mui/material'
 
 function updateChart(
   svgRef: React.RefObject<SVGSVGElement>,
@@ -379,28 +380,38 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   }, [props, pointerInfo, windowSize])
 
   return (
-    <div
-      id="chart"
-      ref={chartContainerRef}
-      style={{
-        display: 'flex',
-        width: '100%',
-        height: '100%'
-      }}
-    >
-      <svg id="chart-container" ref={chartSvg}>
-        <g id="y-axis" />
-        <svg id="x-axis-container">
-          <g id="x-axis" />
+    <ChartContainer>
+      <div
+        id="chart"
+        ref={chartContainerRef}
+        style={{
+          display: 'flex',
+          width: '100%',
+          height: '100%'
+        }}
+      >
+        <svg id="chart-container" ref={chartSvg}>
+          <g id="y-axis" />
+          <svg id="x-axis-container">
+            <g id="x-axis" />
+          </svg>
+          <svg id="chart-area" />
+          <svg id="current-price">
+            <line />
+            <text />
+          </svg>
+          <svg id="mouse-pointer-UI"></svg>
+          <text id="price-info"></text>
         </svg>
-        <svg id="chart-area" />
-        <svg id="current-price">
-          <line />
-          <text />
-        </svg>
-        <svg id="mouse-pointer-UI"></svg>
-        <text id="price-info"></text>
-      </svg>
-    </div>
+      </div>
+    </ChartContainer>
   )
 }
+
+const ChartContainer = styled('div')`
+  display: flex;
+  height: 100%;
+  ${props => props.theme.breakpoints.down('tablet')} {
+    height: 400px;
+  }
+`
