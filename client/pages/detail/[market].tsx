@@ -10,7 +10,7 @@ import {
 import { CandleData, ChartPeriod, ChartRenderOption } from '@/types/ChartTypes'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import { CandleChart } from '@/components/CandleChart'
+import { CandleChart } from '@/components/Candlechart'
 import { useRealTimeUpbitData } from 'hooks/useRealTimeUpbitData'
 import { useState } from 'react'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
