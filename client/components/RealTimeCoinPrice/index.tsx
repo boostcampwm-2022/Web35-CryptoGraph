@@ -2,73 +2,56 @@ import { styled } from '@mui/material'
 import * as React from 'react'
 import { TabProps } from '../InfoContainerMobile'
 import Image from 'next/image'
-
-const mockingData: CoinInfo = {
-  logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
-  name: 'BTC',
-  name_kr: '비트코인',
-  price: 23144000,
-  signed_change_price: -48000.0,
-  signed_change_rate: -0.0020696792,
-  acc_trade_price_24h: 86114284886.73242
-}
-
-interface CoinInfo {
-  logo: string
-  name: string
-  name_kr: string
-  price: number
-  signed_change_price: number
-  signed_change_rate: number
-  acc_trade_price_24h: number
-}
-
+import { CoinPrice } from '@/types/CoinPriceTypes'
 //코인 실시간 정보
 export default function RealTimeCoinPrice(props: TabProps) {
   return (
     <Container>
       <CoinPriceHeader></CoinPriceHeader>
       <CoinPriceContainer>
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        {/* <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab />
-        <CoinPriceTab /> */}
+        {props.priceInfo &&
+          Object.values(props.priceInfo).map(coinPrice => (
+            <CoinPriceTab
+              key={coinPrice.name}
+              coinPrice={coinPrice}
+            ></CoinPriceTab>
+          ))}
       </CoinPriceContainer>
     </Container>
   )
 }
 
-const CoinPriceTab: React.FunctionComponent = () => {
+interface CoinPriceTabProps {
+  coinPrice: CoinPrice
+}
+
+const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
+  coinPrice
+}) => {
+  const isMinus = coinPrice.signed_change_price < 0
   return (
-    <CoinPrice>
-      <Image src={mockingData.logo} alt="" width={40} height={40} />
+    <CoinPriceDiv>
+      <Image src={coinPrice.logo} alt="" width={40} height={40} />
       <div className="name">
-        <p>{mockingData.name_kr}</p>
-        <p>{mockingData.name}</p>
+        <p>{coinPrice.name_kr}</p>
+        <p>{coinPrice.name}</p>
       </div>
-      <div className="price">{mockingData.price.toLocaleString()}</div>
-      <div className="yesterday">
-        <p>{mockingData.signed_change_price.toLocaleString()}</p>
-        <p>{Math.floor(mockingData.signed_change_rate * 100) / 100}%</p>
+      <div className={isMinus ? 'price red' : 'price'}>
+        {coinPrice.price.toLocaleString()}
       </div>
-      <div className="amount">
-        {transPrice(mockingData.acc_trade_price_24h)}
+      <div className={isMinus ? 'yesterday red' : 'yesterday'}>
+        <p>
+          {(isMinus ? '' : '+') +
+            coinPrice.signed_change_price.toLocaleString()}
+        </p>
+        <p>
+          {(isMinus ? '' : '+') +
+            Math.floor(coinPrice.signed_change_rate * 100) / 100}
+          %
+        </p>
       </div>
-    </CoinPrice>
+      <div className="amount">{transPrice(coinPrice.acc_trade_price_24h)}</div>
+    </CoinPriceDiv>
   )
 }
 
@@ -125,17 +108,16 @@ const CoinPriceContainer = styled('div')`
   gap: 5px;
 `
 
-const CoinPrice = styled('div')`
+const CoinPriceDiv = styled('div')`
   display: flex;
   width: 100%;
   height: 50px;
-  font-size: 20px;
+  font-size: 15px;
   gap: 4px;
   align-items: center;
   text-align: right;
   & > div.name {
     flex: 1;
-    font-size: 18px;
     text-align: left;
     p {
       margin: 0;
@@ -154,6 +136,7 @@ const CoinPrice = styled('div')`
     }
   }
   & > div.amount {
+    color: black;
     flex: 1;
   }
 `

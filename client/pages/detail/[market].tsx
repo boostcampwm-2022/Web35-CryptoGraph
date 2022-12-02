@@ -16,9 +16,12 @@ import { useState } from 'react'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
 import RealTimeCoinPrice from '@/components/RealTimeCoinPrice'
 import LinkButton from '@/components/LinkButton'
+import { getPriceInfo } from '@/utils/apiManager'
+import { CoinPriceObj } from '@/types/CoinPriceTypes'
 export default function Detail({
   market,
-  candleData
+  candleData,
+  priceInfo
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
@@ -68,7 +71,7 @@ export default function Detail({
         ) : (
           <InfoContainerDesktop>
             <CoinDetailedInfo market={market} />
-            <RealTimeCoinPrice />
+            <RealTimeCoinPrice priceInfo={priceInfo} />
           </InfoContainerDesktop>
         )}
       </InfoContainer>
@@ -79,6 +82,7 @@ export default function Detail({
 interface CandleChartPageProps {
   market: string
   candleData: CandleData[]
+  priceInfo: CoinPriceObj
 } //페이지 자체의 props interface
 export const getServerSideProps: GetServerSideProps<
   CandleChartPageProps
@@ -118,10 +122,21 @@ export const getServerSideProps: GetServerSideProps<
       }
     }
   }
+
+  const priceInfo: CoinPriceObj = await getPriceInfo()
+  if (priceInfo === null) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/'
+      }
+    }
+  }
   return {
     props: {
       market: market,
-      candleData: fetchedCandleData
+      candleData: fetchedCandleData,
+      priceInfo: priceInfo
     } // will be passed to the page component as props
   }
 }
