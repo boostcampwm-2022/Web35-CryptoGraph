@@ -1,14 +1,17 @@
 import * as d3 from 'd3'
 import * as React from 'react'
 import {
+  ActionType,
   CoinRateContentType,
   CoinRateType,
   EmptyObject
 } from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
+import { dataReducer } from '@/hooks/reducers/dataReducer'
+import useInterval from '@/hooks/useInterval'
 //------------------------------interface------------------------------
 interface RunningChartProps {
-  coinRate: CoinRateType[]
+  coinRate: CoinRateType
   candleCount: number
 }
 
@@ -40,7 +43,6 @@ const updateChart = (
   ]
     .sort((a, b) => b.value - a.value) // 변동 퍼센트 오름차순 정렬
     .slice(0, candleCount)
-
   const [min, max] = [
     d3.min(ArrayDataValue, d => d.value),
     d3.max(ArrayDataValue, d => d.value)
@@ -156,16 +158,35 @@ const updateChart = (
 export const RunningChart: React.FunctionComponent<
   RunningChartProps
 > = props => {
+  const COIN_INTERVAL_RATE = 1000
+
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerRef)
   const chartSvg = React.useRef(null)
-  React.useEffect(() => {
-    initChart(chartSvg, width, height)
-  }, [width, height])
+  const [coinRate, setCoinRate] = React.useState<CoinRateType>(props.coinRate) //coin의 등락률 값
 
   React.useEffect(() => {
-    updateChart(chartSvg, props.coinRate[0], width, height, props.candleCount)
-  }, [props, width, height])
+    setCoinRate(props.coinRate)
+  }, [props.coinRate])
+  const [data, dispatch] = React.useReducer<
+    (
+      data: CoinRateType | EmptyObject,
+      action: ActionType
+    ) => CoinRateType | undefined
+  >(dataReducer, props.coinRate as never) //coin의 등락률 변화값을 받아서 coinRate에 넣어줌
+
+  React.useEffect(() => {
+    initChart(chartSvg, width, height)
+  }, [width, height]) // 창크기에 따른 차트크기 조절
+
+  useInterval(() => {
+    // 주기적으로 코인 등락률을 업데이트
+    if (Object.keys(coinRate).length) {
+      dispatch({ type: 'update', coinRate: coinRate }) //coinRate업데이트
+    }
+    setCoinRate(data)
+    updateChart(chartSvg, coinRate, width, height, props.candleCount)
+  }, COIN_INTERVAL_RATE)
 
   return (
     <div
