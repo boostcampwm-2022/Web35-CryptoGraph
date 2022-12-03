@@ -23,4 +23,5 @@ export interface MarketCapInfo {
   cmc_rank: string
   name_kr: string
   logo: string
+  percent_change_24h: number
 }

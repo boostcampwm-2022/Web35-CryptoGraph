@@ -20,6 +20,7 @@ async function getCoinInfo() {
         coinInfo.slug = data.slug;
         coinInfo.market_cap_dominance = data.quote.KRW.market_cap_dominance;
         coinInfo.market_cap = data.quote.KRW.market_cap;
+        coinInfo.percent_change_24h = data.quote.KRW.percent_change_24h;
         coinInfo.market_cap_kr = transPrice(data.quote.KRW.market_cap);
         coinInfo.max_supply = data.max_supply;
         coinInfo.circulating_supply = data.circulating_supply;
@@ -83,6 +84,7 @@ async function getData() {
         cmc_rank: coinInfo.cmc_rank,
         name_kr: coinInfo.name_kr,
         logo: coinInfo.logo,
+        percent_change_24h: coinInfo.percent_change_24h,
       };
     });
     return { coinInfos, marketCapInfos };

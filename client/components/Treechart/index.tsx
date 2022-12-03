@@ -11,7 +11,7 @@ import {
 } from '@/types/ChartTypes'
 import { getTreeData, updateTreeData } from './getCoinData'
 
-const coinIntervalRate = 50000
+const coinIntervalRate = 5000
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
