@@ -178,8 +178,6 @@ interface CandleChartProps {
 
 function initChart(
   svgRef: React.RefObject<SVGSVGElement>,
-  data: CandleData[],
-  option: ChartRenderOption,
   optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>,
   pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerPosition>>,
   windowSize: WindowSize
@@ -205,44 +203,6 @@ function initChart(
   chartContainer.select('svg#current-price').attr('height', chartAreaYsize)
   // text 위치설정 매직넘버? 반응형 고려하면 변수화도 고려되어야할듯
   chartContainer.select('text#price-info').attr('x', 20).attr('y', 20)
-  const yAxisScale = getYAxisScale(
-    data.slice(
-      option.renderStartDataIndex,
-      option.renderStartDataIndex + option.renderCandleCount
-    ),
-    chartAreaYsize
-  )
-  if (!yAxisScale) {
-    console.error('받아온 API 데이터 에러')
-    return undefined
-  }
-  const xAxisScale = getXAxisScale(option, data, chartAreaXsize)
-  chartContainer
-    .select<SVGSVGElement>('g#y-axis')
-    .attr('transform', `translate(${chartAreaXsize},0)`)
-    .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * chartAreaXsize))
-    .call(g => {
-      g.selectAll('.tick line').attr('stroke', CANDLE_CHART_GRID_COLOR)
-      g.selectAll('.tick text')
-        .attr('stroke', 'black')
-        .style('font-size', CHART_FONT_SIZE)
-    })
-  chartContainer
-    .select<SVGSVGElement>('g#x-axis')
-    .attr('transform', `translate(0,${chartAreaYsize})`)
-    .attr('width', chartAreaXsize)
-    .call(
-      d3
-        .axisBottom(xAxisScale)
-        .tickSizeInner(-1 * chartAreaYsize)
-        .ticks(5)
-    )
-    .call(g => {
-      g.selectAll('.tick line').attr('stroke', CANDLE_CHART_GRID_COLOR)
-      g.selectAll('.tick text')
-        .attr('stroke', 'black')
-        .style('font-size', CHART_FONT_SIZE)
-    })
   let transalateX = 0
   let movedCandle = 0
   const zoom = d3
@@ -325,15 +285,8 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   )
   const isFetching = React.useRef(false)
   React.useEffect(() => {
-    initChart(
-      chartSvg,
-      props.candleData,
-      props.option,
-      props.optionSetter,
-      setPointerInfo,
-      windowSize
-    )
-  }, [props.candleData, props.option, props.optionSetter, windowSize])
+    initChart(chartSvg, props.optionSetter, setPointerInfo, windowSize)
+  }, [windowSize, props.optionSetter])
 
   React.useEffect(() => {
     //디바운싱 구문
