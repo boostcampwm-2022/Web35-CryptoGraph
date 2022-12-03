@@ -16,9 +16,12 @@ import { useState } from 'react'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
 import RealTimeCoinPrice from '@/components/RealTimeCoinPrice'
 import LinkButton from '@/components/LinkButton'
+import { getPriceInfo } from '@/utils/apiManager'
+import { CoinPriceObj } from '@/types/CoinPriceTypes'
 export default function Detail({
   market,
-  candleData
+  candleData,
+  priceInfo
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
@@ -29,11 +32,13 @@ export default function Detail({
   const [candlePeriod, setCandlePeriod] = useState<ChartPeriod>(
     DEFAULT_CANDLE_PERIOD
   )
-  const [realtimeCandleData, setRealtimeCandleData] = useRealTimeUpbitData(
-    candlePeriod,
-    chartRenderOption.marketType,
-    candleData
-  )
+  const [realtimeCandleData, setRealtimeCandleData, realtimePriceInfo] =
+    useRealTimeUpbitData(
+      candlePeriod,
+      chartRenderOption.marketType,
+      candleData,
+      priceInfo
+    )
   return (
     <HomeContainer>
       <ChartAreaContainer>
@@ -67,7 +72,7 @@ export default function Detail({
         ) : (
           <InfoContainerDesktop>
             <CoinDetailedInfo market={market} />
-            <RealTimeCoinPrice />
+            <RealTimeCoinPrice priceInfo={realtimePriceInfo} />
           </InfoContainerDesktop>
         )}
       </InfoContainer>
@@ -78,6 +83,7 @@ export default function Detail({
 interface CandleChartPageProps {
   market: string
   candleData: CandleData[]
+  priceInfo: CoinPriceObj
 } //페이지 자체의 props interface
 export const getServerSideProps: GetServerSideProps<
   CandleChartPageProps
@@ -92,8 +98,8 @@ export const getServerSideProps: GetServerSideProps<
   }
 
   const market = Array.isArray(context.params.market)
-    ? context.params.market[0]
-    : context.params.market
+    ? context.params.market[0].toUpperCase()
+    : context.params.market?.toUpperCase()
 
   if (!market) {
     return {
@@ -117,10 +123,21 @@ export const getServerSideProps: GetServerSideProps<
       }
     }
   }
+
+  const priceInfo: CoinPriceObj = await getPriceInfo()
+  if (priceInfo === null) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/'
+      }
+    }
+  }
   return {
     props: {
       market: market,
-      candleData: fetchedCandleData
+      candleData: fetchedCandleData,
+      priceInfo: priceInfo
     } // will be passed to the page component as props
   }
 }
@@ -152,7 +169,7 @@ const InfoContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 390px;
+  min-width: 500px;
   height: calc(100% - 48px);
   ${props => props.theme.breakpoints.down('tablet')} {
     height: auto;

@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { getData } = require("./data/configData");
+const { getData, getPriceData } = require("./data/configData");
 
 const PORT = 8080;
 let coinInfos = null;
@@ -43,6 +43,14 @@ app.get("/market-cap-info", (req, res) => {
     res.status(503).end();
   }
   res.status(200).send(marketCapInfos);
+});
+
+app.get("/market-price-info", async (req, res) => {
+  const priceData = await getPriceData(coinInfos);
+  if (priceData === null) {
+    res.status(503).end();
+  }
+  res.status(200).send(priceData);
 });
 
 app.listen(PORT, () => {
