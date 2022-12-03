@@ -11,7 +11,7 @@ import {
 } from '@/types/ChartTypes'
 import { getTreeData, updateTreeData } from './getCoinData'
 
-const coinIntervalRate = 5000
+const coinIntervalRate = 50000
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -203,16 +203,14 @@ export default function TreeChart({ data }) {
   }, [width, height])
 
   useEffect(() => {
-    console.log('not data init')
-    if (data) {
-      console.log('data init')
+    getTreeData().then(data => {
+      console.log('here')
       setCoinRate(data)
-    }
-  }, [data])
+    })
+  }, [])
 
   useInterval(() => {
-    console.log('useInterval')
-    setCoinRate(updateTreeData(coinRate))
+    setCoinRate(updateTreeData({ ...coinRate }))
   }, coinIntervalRate)
 
   useEffect(() => {
@@ -220,19 +218,21 @@ export default function TreeChart({ data }) {
     const parentNode: CoinRateContentType[] = [
       { name: 'Origin', parent: '', value: 0 }
     ]
-    console.log('not changeRate')
     if (!coinRate) return
-    console.log('changeRate')
     setChangeRate([
       ...parentNode,
       ...Object.values(coinRate)
     ] as CoinRateContentType[])
   }, [coinRate])
+
   useEffect(() => {
     // 5. 트리맵에 데이터 바인딩
-    console.log('not updateChart')
-    if (changeRate.length > 1 && changeRate[1].value !== 1) {
-      console.log('updateChart')
+
+    if (changeRate.length === undefined || changeRate[1] === undefined) {
+      return
+    }
+
+    if (changeRate.length > 1 && changeRate[2].value !== 1) {
       updateChart(chartSvg, changeRate, width, height)
     }
   }, [changeRate, width, height])

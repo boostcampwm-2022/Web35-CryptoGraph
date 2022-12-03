@@ -1,10 +1,16 @@
 import { getCoinTicker } from '@/utils/upbitManager'
 import { getTreeMapDataArray } from '@/utils/upbitManager'
+import { CoinRateType } from '@/types/ChartTypes'
 
 export async function getTreeData() {
-  let coinRate = {}
+  const coinRate: CoinRateType = {}
   const updateData = await getCoinTicker()
     .then(data => {
+      //각 코인별 english_name, korean_name, market이름을 객체 배열로 가져옴
+      //english_name: "Bitcoin"
+      //korean_name: "비트코인"
+      //market: "KRW-BTC"
+      // 선택한 코인 티커를 받아오는 작업
       for (const coin of data) {
         if (coin.market.split('-')[0] === 'KRW') {
           coinRate[coin.market] = {
@@ -13,6 +19,13 @@ export async function getTreeData() {
             parent: 'Origin',
             value: 1
           }
+          //위 값에 KRW-BTC를 대입한경우 예시 :
+          //action.coinRate[KRW-BTC] = {
+          //name: BTC,
+          //ticker : KRW-BTC,
+          //parent:'Origin,
+          //value:1
+          //}
         }
       }
       return coinRate
@@ -23,7 +36,7 @@ export async function getTreeData() {
   return updateData
 }
 
-export function updateTreeData(coinRate) {
+export function updateTreeData(coinRate: CoinRateType) {
   if (!coinRate) {
     return
   }
