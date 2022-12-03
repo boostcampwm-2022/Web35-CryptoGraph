@@ -46,7 +46,7 @@ const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
         </p>
         <p>
           {(isMinus ? '' : '+') +
-            Math.floor(coinPrice.signed_change_rate * 100) / 100}
+            Math.floor(coinPrice.signed_change_rate * 10000) / 100}
           %
         </p>
       </div>

@@ -32,11 +32,13 @@ export default function Detail({
   const [candlePeriod, setCandlePeriod] = useState<ChartPeriod>(
     DEFAULT_CANDLE_PERIOD
   )
-  const [realtimeCandleData, setRealtimeCandleData] = useRealTimeUpbitData(
-    candlePeriod,
-    chartRenderOption.marketType,
-    candleData
-  )
+  const [realtimeCandleData, setRealtimeCandleData, realtimePriceInfo] =
+    useRealTimeUpbitData(
+      candlePeriod,
+      chartRenderOption.marketType,
+      candleData,
+      priceInfo
+    )
   return (
     <HomeContainer>
       <ChartContainer>
@@ -71,7 +73,7 @@ export default function Detail({
         ) : (
           <InfoContainerDesktop>
             <CoinDetailedInfo market={market} />
-            <RealTimeCoinPrice priceInfo={priceInfo} />
+            <RealTimeCoinPrice priceInfo={realtimePriceInfo} />
           </InfoContainerDesktop>
         )}
       </InfoContainer>
@@ -97,8 +99,8 @@ export const getServerSideProps: GetServerSideProps<
   }
 
   const market = Array.isArray(context.params.market)
-    ? context.params.market[0]
-    : context.params.market
+    ? context.params.market[0].toUpperCase()
+    : context.params.market?.toUpperCase()
 
   if (!market) {
     return {
