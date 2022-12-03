@@ -9,8 +9,9 @@ import {
   CoinRateType,
   CoinRateContentType
 } from '@/types/ChartTypes'
+import { getTreeData, updateTreeData } from './getCoinData'
 
-const coinIntervalRate = 1000
+const coinIntervalRate = 5000
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -187,51 +188,51 @@ const initChart = (
   chartContainer.attr('height', height)
 }
 
-export default function TreeChart() {
+export default function TreeChart({ data }) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     { name: 'Origin', parent: '', value: 0 }
   ]) //coin의 등락률 값에 parentNode가 추가된 값
-  const [coinRate, setCoinRate] = useState<CoinRateType[]>([]) //coin의 등락률 값
-  const [data, dispatch] = useReducer<
-    (
-      data: CoinRateType | EmptyObject,
-      action: ActionType
-    ) => CoinRateType | undefined
-  >(dataReducer, {} as never) //coin의 등락률 변화값을 받아서 coinRate에 넣어줌
+  const [coinRate, setCoinRate] = useState<CoinRateType[]>() //coin의 등락률 값
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerSvg)
+
   useEffect(() => {
-    // 1. 트리맵 초기화 (트리맵에 티커 추가)
-    dispatch({ type: 'init', coinRate: coinRate[0] })
-  }, [])
-  useEffect(() => {
+    console.log('init chart')
     initChart(chartSvg, width, height)
   }, [width, height])
+
   useEffect(() => {
-    // 2. 티커를 받아오면 data init
-    setCoinRate([data])
+    console.log('not data init')
+    if (data) {
+      console.log('data init')
+      setCoinRate(data)
+    }
   }, [data])
-  //}, [Object.keys(data)])
+
   useInterval(() => {
-    // 3. 주기적으로 코인 등락률을 업데이트
-    dispatch({ type: 'update', coinRate: coinRate[0] })
-    setCoinRate([data])
+    console.log('useInterval')
+    setCoinRate(updateTreeData(coinRate))
   }, coinIntervalRate)
+
   useEffect(() => {
     // 4. CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
     const parentNode: CoinRateContentType[] = [
       { name: 'Origin', parent: '', value: 0 }
     ]
+    console.log('not changeRate')
+    if (!coinRate) return
+    console.log('changeRate')
     setChangeRate([
       ...parentNode,
-      ...Object.values(data)
+      ...Object.values(coinRate)
     ] as CoinRateContentType[])
-  }, [coinRate, data])
-
+  }, [coinRate])
   useEffect(() => {
     // 5. 트리맵에 데이터 바인딩
+    console.log('not updateChart')
     if (changeRate.length > 1 && changeRate[1].value !== 1) {
+      console.log('updateChart')
       updateChart(chartSvg, changeRate, width, height)
     }
   }, [changeRate, width, height])

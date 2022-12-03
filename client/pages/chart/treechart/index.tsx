@@ -1,10 +1,19 @@
 import { styled } from '@mui/material/styles'
 import { Box } from '@mui/material'
 import TreeChart from '@/components/Treechart'
+import { getTreeData, updateTreeData } from '@/components/Treechart/getCoinData'
+import { useEffect, useState } from 'react'
 export default function TreeChartPage() {
+  const [updateData, setUpdateData] = useState()
+  useEffect(() => {
+    getTreeData().then(data => {
+      setUpdateData(data)
+    })
+  }, [])
+
   return (
     <HomeContainer>
-      <TreeChart />
+      <TreeChart data={updateData} />
     </HomeContainer>
   )
 }
