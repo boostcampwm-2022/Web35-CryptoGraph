@@ -4,12 +4,8 @@ import {
   PointerPosition
 } from '@/types/ChartTypes'
 
-export const CHART_CONTAINER_X_SIZE = 1000
-export const CHART_CONTAINER_Y_SIZE = 800
-export const X_RIGHT_MARGIN = 100
-export const Y_RIGHT_MARGIN = 100
-export const CHART_AREA_X_SIZE = CHART_CONTAINER_X_SIZE - X_RIGHT_MARGIN
-export const CHART_AREA_Y_SIZE = CHART_CONTAINER_Y_SIZE - Y_RIGHT_MARGIN
+export const CHART_Y_AXIS_MARGIN = 70
+export const CHART_X_AXIS_MARGIN = 20
 
 export const DEFAULT_CANDLE_COUNT = 200
 export const DEFAULT_CANDLE_RENDER_COUNT = 30
@@ -36,4 +32,4 @@ export const CANDLE_COLOR_RED = '#D24F45'
 export const CANDLE_COLOR_BLUE = '#1D61C4'
 export const CANDLE_CHART_GRID_COLOR = '#EEEFEE'
 export const CANDLE_CHART_POINTER_LINE_COLOR = '#999999'
-export const CHART_FONT_SIZE = 15
+export const CHART_FONT_SIZE = `0.7rem`

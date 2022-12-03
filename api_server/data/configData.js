@@ -31,6 +31,7 @@ async function getCoinInfo() {
         coinInfo.total_supply = data.total_supply;
         coinInfo.cmc_rank = data.cmc_rank;
         coinInfo.time = time;
+        coinInfo.volume_24h = transPrice(data.quote.KRW.volume_24h);
         coinIds.push(data.id);
         break;
       }
@@ -56,9 +57,7 @@ function getTime() {
   const utcCurr = curr.getTime() + curr.getTimezoneOffset() * 60 * 1000;
   const diffFromKst = 9 * 60 * 60 * 1000;
   const kstCurr = new Date(utcCurr + diffFromKst);
-  const dateString = `${
-    kstCurr.getHours() < 10 ? "0" + kstCurr.getHours() : kstCurr.getHours()
-  }:00`;
+  const dateString = `${kstCurr.getMonth() + 1}/${kstCurr.getDate()} ${kstCurr.getHours()}시`;
   return dateString;
 }
 
@@ -83,15 +82,14 @@ function transPrice(price) {
 async function getData() {
   return getCoinInfo().then((result) => {
     coinInfos = result;
-    marketCapInfos = Object.values(result)
-      .map((coinInfo) => {
-        return {
-          name: coinInfo.symbol,
-          market_cap: coinInfo.market_cap,
-          name_kr: coinInfo.name_kr,
-        };
-      })
-      .sort((a, b) => -a.market_cap + b.market_cap);
+    marketCapInfos = Object.values(result).map((coinInfo) => {
+      return {
+        name: coinInfo.symbol,
+        cmc_rank: coinInfo.cmc_rank,
+        name_kr: coinInfo.name_kr,
+        logo: coinInfo.logo,
+      };
+    });
     return { coinInfos, marketCapInfos };
   });
 }
@@ -118,22 +116,3 @@ async function getPriceData(coinInfos) {
   return result;
 }
 module.exports = { getCoinInfo, getData, getPriceData };
-
-// 업비트 api의 coin 심볼을 키로하며 객체형식의 코인정보를 값으로 갖는 객체 반환
-// BTC: {
-// 	symbol  코인이름1
-// 	name  코인이름2
-// 	slug  코인이름3
-// 	market_cap_dominance 시장 점유율?
-// 	market_cap 시가총액 number
-// 	market_cap_kr 시가총액 한글로 변환 string
-// 	cmc_rank 시가총액 순위
-// 	max_supply 최대공급량 -> 발행가능한 최대 코인수인듯? null값이 존재하는 유일한 속성
-// 	circulating_supply -> 현재 거래되는 공급량
-// 	total_supply 총 공급량 -> 현재까지 채굴된 코인수인듯?
-// 	website 코인 사이트 링크
-// 	logo 코인 이미지 링크
-// 	description 코인 설명 (영어로 되어있음)
-// 	last_updated 마지막 업데이트 시간 YYYY MM DD HH 00
-//  time 마지막 업데이트 된 시간 01:00 02:00
-// }

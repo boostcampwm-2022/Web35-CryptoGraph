@@ -1,15 +1,19 @@
 import Image from 'next/image'
-import TextField from '@mui/material/TextField'
-import SearchIcon from '@mui/icons-material/Search'
-import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import { styled } from '@mui/material/styles'
 import { Container, useMediaQuery, useTheme } from '@mui/material'
+import SearchInput from './searchInput'
 
 const GNBContainer = styled('div')`
-  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   height: 96px;
+  padding-top: 24px;
   background-color: ${props => props.theme.palette.primary.main};
   ${props => props.theme.breakpoints.down('tablet')} {
+    padding-top: 8px;
     height: 64px;
   }
   ${props => props.theme.breakpoints.up('tablet')} {
@@ -25,27 +29,20 @@ export default function GNB() {
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
   return (
     <GNBContainer>
-      <Container maxWidth="max" sx={{ display: 'flex', alignItems: 'center' }}>
+      <Container
+        maxWidth="max"
+        id="GNBcontainer"
+        sx={{
+          display: 'flex',
+          alignItems: 'center'
+        }}
+      >
         {isMobile ? (
           <Image src="/logo-only-white.svg" alt="" width={40} height={40} />
         ) : (
           <Image src="/logo-white.svg" alt="" width={200} height={48} />
         )}
-        <TextField
-          sx={{ marginLeft: 'auto' }}
-          InputProps={{
-            sx: {
-              backgroundColor: 'white',
-              height: '48px',
-              width: { mobile: '100%', tablet: 400, desktop: 600 },
-              p: 2,
-              gap: 2
-            },
-            placeholder: '검색어를 입력하세요',
-            startAdornment: <SearchIcon sx={{ opacity: 0.2 }} />,
-            endAdornment: <HighlightOffIcon sx={{ opacity: 0.2 }} />
-          }}
-        />
+        <SearchInput />
       </Container>
     </GNBContainer>
   )

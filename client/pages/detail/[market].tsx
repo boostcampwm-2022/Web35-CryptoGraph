@@ -10,7 +10,7 @@ import {
 import { CandleData, ChartPeriod, ChartRenderOption } from '@/types/ChartTypes'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import { CandleChart } from '@/components/CandleChart'
+import { CandleChart } from '@/components/Candlechart'
 import { useRealTimeUpbitData } from 'hooks/useRealTimeUpbitData'
 import { useState } from 'react'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
@@ -41,7 +41,7 @@ export default function Detail({
     )
   return (
     <HomeContainer>
-      <ChartContainer>
+      <ChartAreaContainer>
         <ChartPeriodSelector
           selected={candlePeriod}
           selectedSetter={setCandlePeriod}
@@ -53,15 +53,14 @@ export default function Detail({
           option={chartRenderOption}
           optionSetter={setRenderOption}
         ></CandleChart>
-      </ChartContainer>
+      </ChartAreaContainer>
       <InfoContainer>
         {isMobile ? (
           <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              width: '100%',
-              height: '100%'
+              width: '100%'
             }}
           >
             <InfoContainerMobile>
@@ -147,23 +146,21 @@ const HomeContainer = styled(Box)`
   display: flex;
   width: 100%;
   max-width: 1920px;
-  height: 100%;
-  align-items: center;
   ${props => props.theme.breakpoints.down('tablet')} {
+    align-items: center;
     flex-direction: column;
   }
 `
 //왼쪽 메인차트
-const ChartContainer = styled('div')`
+const ChartAreaContainer = styled('div')`
   display: flex;
   box-sizing: content-box;
   min-width: 300px;
   width: 100%;
-  height: calc(100% - 48px);
   flex-direction: column;
-  border-radius: 32px;
-  ${props => props.theme.breakpoints.down('tablet')} {
-    height: 50%;
+  ${props => props.theme.breakpoints.up('tablet')} {
+    height: 90%; //분봉선택바가 10%이다.
+    max-height: 1080px;
   }
 `
 
@@ -175,6 +172,7 @@ const InfoContainer = styled(Box)`
   min-width: 500px;
   height: calc(100% - 48px);
   ${props => props.theme.breakpoints.down('tablet')} {
+    height: auto;
     margin: 0;
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
   }
