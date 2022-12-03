@@ -3,83 +3,27 @@ import { styled } from '@mui/material/styles'
 import Checkbox from '@mui/material/Checkbox'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-
-interface CoinSelectControllerProps {
-  isSideBarOpened: boolean
-}
-
-interface CoinInfo {
-  name: string
-  cmc_rank: number
-  name_kr: string
-  logo: string
-}
+import { getMarketCapInfo } from '@/utils/metaDataManages'
+import { MarketCapInfo } from '@/types/CoinDataTypes'
 
 interface CoinChecked {
   [key: string]: boolean
 }
 
-const SelectCoinTitle = styled('div')`
-  display: flex;
-  justify-content: space-between;
-  margin: 8% 12%;
-  align-items: center;
-`
-const SelectCoinTitleFont = styled('div')`
-  font-size: 24px;
-`
-
-const SelectCoinTitleBox = styled('div')`
-  display: flex;
-  align-items: center;
-`
-
-const SelectCoinTitleBoxFont = styled('div')`
-  font-size: 12px;
-`
-
-const SelectCoinInnerLayer = styled('div')`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 8% 12%;
-`
-
-const SelectCoinInnerFont = styled('div')`
-  align-items: center;
-  margin: 8% 12%;
-  font-size: 24px;
-`
-
-const SelectCoinHead = styled('div')`
-  overflow: scroll;
-  height: 100%;
-`
-
-const getCoinInfo = async () => {
-  const res = await fetch(
-    process.env.NEXT_PUBLIC_SERVER_URL + '/market-cap-info',
-    {
-      method: 'GET',
-      headers: { accept: 'application/json' }
-    }
-  )
-  return res.json()
-}
-
-export default function CoinSelectController(props: CoinSelectControllerProps) {
-  const [coinList, setCoinList] = useState<CoinInfo[]>([])
+export default function CoinSelectController() {
+  const [coinList, setCoinList] = useState<MarketCapInfo[] | null>([])
   const [checked, setChecked] = useState<CoinChecked>({
-    all: true
+    all: false
   })
 
   useEffect(() => {
-    getCoinInfo().then(data => {
+    getMarketCapInfo().then(data => {
       setCoinList(data)
     })
   }, [])
 
   useEffect(() => {
+    if (coinList == null) return
     for (const coin of coinList) {
       checked[coin.name] = false
     }
@@ -105,35 +49,78 @@ export default function CoinSelectController(props: CoinSelectControllerProps) {
   }
 
   return (
-    <>
-      <SelectCoinHead
-        style={{ display: props.isSideBarOpened ? 'block' : 'none' }}
-      >
-        <SelectCoinTitle>
-          <SelectCoinTitleFont>코인선택</SelectCoinTitleFont>
-          <SelectCoinTitleBox>
-            <SelectCoinTitleBoxFont>전부 [선택/해제]</SelectCoinTitleBoxFont>
-            <Checkbox
-              checked={checked.all}
-              onChange={coinCheckAll}
-              name="all"
-            />
-          </SelectCoinTitleBox>
-        </SelectCoinTitle>
-        {coinList.map((coin: CoinInfo, index) => {
+    <Container>
+      <Header>
+        <HeaderTitle>코인선택</HeaderTitle>
+        <HeaderSelectBox>
+          <HeaderSelectBoxContent>전부 [선택/해제]</HeaderSelectBoxContent>
+          <Checkbox checked={checked.all} onChange={coinCheckAll} name="all" />
+        </HeaderSelectBox>
+      </Header>
+      <Body>
+        {coinList?.map((coin: MarketCapInfo, index) => {
           return (
             <SelectCoinInnerLayer key={index}>
               <Image src={coin.logo} alt="" width={44} height={44} />
               <SelectCoinInnerFont>{coin.name_kr}</SelectCoinInnerFont>
               <Checkbox
-                checked={checked[coin.name]}
+                checked={
+                  checked[coin.name] !== undefined ? checked[coin.name] : false
+                  //undefined일때 처리 안해주면 mui에러 남..
+                }
                 onChange={coinCheck}
                 name={coin.name}
               />
             </SelectCoinInnerLayer>
           )
         })}
-      </SelectCoinHead>
-    </>
+      </Body>
+    </Container>
   )
 }
+
+const Container = styled('div')`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+`
+const Header = styled('div')`
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  align-items: center;
+`
+const Body = styled('div')`
+  overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+`
+
+const HeaderTitle = styled('div')`
+  font-size: 1.5rem;
+`
+
+const HeaderSelectBox = styled('div')`
+  display: flex;
+  align-items: center;
+`
+
+const HeaderSelectBoxContent = styled('div')`
+  font-size: 0.8rem;
+`
+
+const SelectCoinInnerLayer = styled('div')`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  width: 100%;
+`
+
+const SelectCoinInnerFont = styled('div')`
+  align-items: center;
+  font-size: 1rem;
+`
