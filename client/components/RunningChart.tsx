@@ -7,7 +7,7 @@ import {
 } from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
 import useInterval from '@/hooks/useInterval'
-import { getTreeMapDataArray } from '@/utils/upbitManager'
+import { getCoinTicker, getTreeMapDataArray } from '@/utils/upbitManager'
 //------------------------------interface------------------------------
 interface RunningChartProps {
   coinRate: CoinRateType
@@ -157,34 +157,53 @@ const updateChart = (
 export const RunningChart: React.FunctionComponent<
   RunningChartProps
 > = props => {
-  const COIN_INTERVAL_RATE = 1000
+  const COIN_INTERVAL_RATE = 3000
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
   const chartSvg = React.useRef(null)
   const { width, height } = useWindowSize(chartContainerRef)
-
+  const [coinRate, setCoinRate] = React.useState<CoinRateType>({}) //coin의 등락률 값
+  React.useEffect(() => {
+    const initCoinRate: CoinRateType = {}
+    getCoinTicker().then(data => {
+      for (const key of data) {
+        if (key.market.split('-')[0] === 'KRW') {
+          initCoinRate[key.market] = {
+            name: key.market.split('-')[1],
+            ticker: key.market,
+            parent: 'Origin',
+            value: 0
+          }
+        }
+      }
+      setCoinRate(initCoinRate)
+    })
+  }, [])
   React.useEffect(() => {
     initChart(chartSvg, width, height)
   }, [width, height]) // 창크기에 따른 차트크기 조절
 
+  React.useEffect(() => {
+    updateChart(chartSvg, coinRate, width, height, props.candleCount)
+  }, [width, height, coinRate, props.candleCount]) // 창크기에 따른 차트크기 조절
+
   useInterval(() => {
     // 주기적으로 코인 등락률을 업데이트
-    const tick = Object.keys(props.coinRate).join(',')
+    const tick = Object.keys(coinRate).join(',') //CoinRate값의 Key를 활용해서 데이터를 받고,업데이트한다 이거지?
     getTreeMapDataArray(tick) //트리맵에서 사용하는 메서드 그대로 사용
       .then(data => {
         //data는 코인별 실시간 정보
         // 업비트에 선택된 티커에 대한 코인등락률을 받아와서 기존 데이터 업데이트
+        console.log('데이터 업데이트')
+        const tosetData = { ...coinRate }
         for (const coin of data) {
-          if (props.coinRate[coin.market]) {
-            props.coinRate[coin.market].value = Number(
+          if (tosetData[coin.market]) {
+            tosetData[coin.market].value = Number(
               (coin.signed_change_rate * 100) //실시간 등락rate를 퍼센테이지로 변경
                 .toFixed(2)
             ) //소수점 두자리로 fix
           }
         }
-        return props.coinRate
-      })
-      .then(coinRate => {
-        updateChart(chartSvg, coinRate, width, height, props.candleCount)
+        setCoinRate(tosetData)
       })
   }, COIN_INTERVAL_RATE)
 
