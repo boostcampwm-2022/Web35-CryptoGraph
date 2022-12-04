@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - name: SSH RemoteCommands
-        uses: appleboy/ssh-action@0.1.5
+        uses: appleboy/ssh-action@v0.1.5
         with:
           host: ${{secrets.SERVER_HOST}}
           port: ${{secrets.SERVER_PORT}}
