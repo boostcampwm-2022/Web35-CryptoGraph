@@ -1,17 +1,12 @@
 import * as d3 from 'd3'
 import { useState, useEffect, useRef, useReducer } from 'react'
 import useInterval from '@/hooks/useInterval'
-import { dataReducer } from '@/hooks/reducers/dataReducer'
 import { useWindowSize } from '@/hooks/useWindowSize'
-import {
-  ActionType,
-  EmptyObject,
-  CoinRateType,
-  CoinRateContentType
-} from '@/types/ChartTypes'
-import { getTreeData, updateTreeData } from './getCoinData'
+import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
+import { updateTreeData } from './getCoinData'
+import { TreeChartPageProps } from '@/types/CoinDataTypes'
 
-const coinIntervalRate = 5000
+const coinIntervalRate = 1000
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -188,24 +183,31 @@ const initChart = (
   chartContainer.attr('height', height)
 }
 
-export default function TreeChart({ data }) {
+export default function TreeChart({ data }: TreeChartPageProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     { name: 'Origin', parent: '', value: 0 }
   ]) //coin의 등락률 값에 parentNode가 추가된 값
-  const [coinRate, setCoinRate] = useState<CoinRateType[]>() //coin의 등락률 값
+  const [coinRate, setCoinRate] = useState<CoinRateType>({}) //coin의 등락률 값
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerSvg)
-
   useEffect(() => {
-    console.log('init chart')
     initChart(chartSvg, width, height)
   }, [width, height])
 
   useEffect(() => {
-    getTreeData().then(data => {
-      console.log('here')
-      setCoinRate(data)
+    data.forEach(coinData => {
+      const coinContent: CoinRateContentType = {
+        name: '',
+        ticker: '',
+        parent: '',
+        value: 0
+      }
+      coinContent.name = coinData.name_kr
+      coinContent.ticker = 'KRW-' + coinData.name
+      coinContent.parent = 'Origin'
+      coinContent.value = coinData.percent_change_24h
+      coinRate[coinContent.ticker] = coinContent
     })
   }, [])
 

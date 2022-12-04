@@ -1,32 +1,18 @@
 import { styled } from '@mui/material/styles'
 import { Box } from '@mui/material'
 import TreeChart from '@/components/Treechart'
-import { getTreeData, updateTreeData } from '@/components/Treechart/getCoinData'
-import { useEffect, useState } from 'react'
-import { CoinRateContentType } from '@/types/ChartTypes'
-import { MarketCapInfo } from '@/types/CoinDataTypes'
+import { MarketCapInfo, TreeChartPageProps } from '@/types/CoinDataTypes'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 
 export default function TreeChartPage({
   data
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  // const [updateData, setUpdateData] = useState<CoinRateContentType>()
-  console.log(data)
-  // useEffect(() => {
-  //   getTreeData().then(data => {
-  //     setUpdateData(data)
-  //   })
-  // }, [])
   return (
     <HomeContainer>
       <TreeChart data={data} />
     </HomeContainer>
   )
-}
-
-interface TreeChartPageProps {
-  data: MarketCapInfo[]
 }
 
 export const getServerSideProps: GetServerSideProps<

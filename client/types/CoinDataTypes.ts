@@ -25,3 +25,7 @@ export interface MarketCapInfo {
   logo: string
   percent_change_24h: number
 }
+
+export interface TreeChartPageProps {
+  data: MarketCapInfo[]
+}

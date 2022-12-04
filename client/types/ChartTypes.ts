@@ -93,19 +93,13 @@ export interface CoinRateType {
 }
 
 export interface CoinRateContentType {
-  name?: string
+  name: string
   ticker?: string
-  parent?: string
-  value?: number
+  parent: string
+  value: number
 }
 
 export interface PointerPosition {
   positionX: number
   positionY: number
-}
-
-export interface tickerData {
-  market: string
-  korean_name: string
-  english_name: string
 }
