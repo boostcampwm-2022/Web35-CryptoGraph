@@ -7,8 +7,7 @@ import {
 } from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
 import useInterval from '@/hooks/useInterval'
-import { getTreeMapDataArray } from '@/utils/upbitManager'
-import { updateTreeData } from './Treechart/getCoinData'
+import { updateTreeData } from '@/components/Treechart/getCoinData'
 const COIN_INTERVAL_RATE = 3000
 //------------------------------interface------------------------------
 interface RunningChartProps {
@@ -158,30 +157,12 @@ const updateChart = (
 //------------------------------Component------------------------------
 export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   candleCount,
-  toRenderCoinTickerList = ['CELO', 'ETH', 'MFT', 'WEMIX']
+  toRenderCoinTickerList = ['BTC']
 }) => {
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
   const chartSvg = React.useRef(null)
   const { width, height } = useWindowSize(chartContainerRef)
   const [coinRate, setCoinRate] = React.useState<CoinRateType>({}) //coin의 등락률 값
-  function GetChartData(coinRate: CoinRateType) {
-    const tick = Object.keys(coinRate).join(',') //CoinRate값의 Key를 활용해서 데이터를 받고,업데이트한다 이거지?
-    getTreeMapDataArray(tick) //트리맵에서 사용하는 메서드 그대로 사용
-      .then(data => {
-        //data는 코인별 실시간 정보
-        // 업비트에 선택된 티커에 대한 코인등락률을 받아와서 기존 데이터 업데이트
-        const tosetData = { ...coinRate }
-        for (const coin of data) {
-          if (tosetData[coin.market]) {
-            tosetData[coin.market].value = Number(
-              (coin.signed_change_rate * 100) //실시간 등락rate를 퍼센테이지로 변경
-                .toFixed(2)
-            ) //소수점 두자리로 fix
-          }
-        }
-        setCoinRate(tosetData)
-      })
-  }
   React.useEffect(() => {
     const initCoinRate: CoinRateType = {}
     toRenderCoinTickerList.forEach(market => {
@@ -197,8 +178,6 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       setCoinRate(a)
     }
     update()
-
-    // GetChartData(initCoinRate) //초기에 로딩없이 바로 렌더될 수 있도록 호출
   }, [])
   React.useEffect(() => {
     initChart(chartSvg, width, height)

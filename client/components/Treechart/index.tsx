@@ -198,7 +198,6 @@ const getInitData = (data: MarketCapInfo[]) => {
     coinContent.value = Number((coinData.signed_change_rate * 100).toFixed(2))
     initData[coinContent.ticker] = coinContent
   })
-  console.log(initData)
   return initData
 }
 export interface TreeChartProps {
@@ -223,8 +222,8 @@ export default function TreeChart({
 
   useInterval(() => {
     async function update() {
-      const a = await updateTreeData(coinRate)
-      setCoinRate(a)
+      const updatedCoinRate = await updateTreeData(coinRate)
+      setCoinRate(updatedCoinRate)
     }
     update()
   }, coinIntervalRate)
