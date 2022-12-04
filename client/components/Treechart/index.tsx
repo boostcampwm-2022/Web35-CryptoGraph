@@ -196,7 +196,7 @@ const getInitData = (data: MarketCapInfo[]) => {
     coinContent.name = coinData.name_kr
     coinContent.ticker = 'KRW-' + coinData.name
     coinContent.parent = 'Origin'
-    coinContent.value = coinData.signed_change_rate
+    coinContent.value = Number((coinData.signed_change_rate * 100).toFixed(2))
     initData[coinContent.ticker] = coinContent
   })
   return initData
