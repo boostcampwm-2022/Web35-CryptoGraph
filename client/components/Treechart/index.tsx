@@ -206,7 +206,7 @@ export default function TreeChart({ data }: TreeChartPageProps) {
       coinContent.name = coinData.name_kr
       coinContent.ticker = 'KRW-' + coinData.name
       coinContent.parent = 'Origin'
-      coinContent.value = coinData.percent_change_24h
+      coinContent.value = coinData.signed_change_rate
       coinRate[coinContent.ticker] = coinContent
     })
   }, [])

@@ -23,7 +23,7 @@ export interface MarketCapInfo {
   cmc_rank: string
   name_kr: string
   logo: string
-  percent_change_24h: number
+  signed_change_rate: number
 }
 
 export interface TreeChartPageProps {

@@ -1,4 +1,9 @@
-const { getCoinData, getCoinMetaData, getUpbitMarketCode } = require("./getData");
+const {
+  getCoinData,
+  getCoinMetaData,
+  getUpbitMarketCode,
+  getUpbitMarketDatas,
+} = require("./getData");
 
 async function getCoinInfo() {
   const time = getTime();
@@ -75,20 +80,26 @@ function transPrice(price) {
 }
 
 // 최종적으로 사용할 데이터 변환함수
-async function getData() {
-  return getCoinInfo().then((result) => {
-    coinInfos = result;
-    marketCapInfos = Object.values(result).map((coinInfo) => {
-      return {
-        name: coinInfo.symbol,
-        cmc_rank: coinInfo.cmc_rank,
-        name_kr: coinInfo.name_kr,
-        logo: coinInfo.logo,
-        percent_change_24h: coinInfo.percent_change_24h,
-      };
-    });
-    return { coinInfos, marketCapInfos };
+async function getMarketCapInfos(coinInfos) {
+  if (!coinInfos) {
+    return null;
+  }
+  const upbitMarketDatas = await getUpbitMarketDatas(
+    Object.keys(coinInfos)
+      .map((code) => `KRW-${code}`)
+      .join(",")
+  );
+  const result = upbitMarketDatas.map((marketData) => {
+    const code = marketData.market.split("-")[1];
+    return {
+      name: code,
+      name_kr: coinInfos[code].name_kr,
+      cmc_rank: coinInfos[code].cmc_rank,
+      logo: coinInfos[code].logo,
+      signed_change_rate: marketData.signed_change_rate,
+    };
   });
+  return result;
 }
 
-module.exports = { getCoinInfo, getData };
+module.exports = { getCoinInfo, getMarketCapInfos };
