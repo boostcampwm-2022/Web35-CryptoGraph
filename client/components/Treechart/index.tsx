@@ -5,6 +5,7 @@ import { useWindowSize } from '@/hooks/useWindowSize'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
 import { updateTreeData } from './getCoinData'
 import { TreeChartPageProps } from '@/types/CoinDataTypes'
+import { MarketCapInfo } from '@/types/CoinDataTypes'
 
 const coinIntervalRate = 1000
 
@@ -183,33 +184,35 @@ const initChart = (
   chartContainer.attr('height', height)
 }
 
+const getInitData = (data: MarketCapInfo[]) => {
+  const initData: CoinRateType = {}
+  data.forEach(coinData => {
+    const coinContent: CoinRateContentType = {
+      name: '',
+      ticker: '',
+      parent: '',
+      value: 0
+    }
+    coinContent.name = coinData.name_kr
+    coinContent.ticker = 'KRW-' + coinData.name
+    coinContent.parent = 'Origin'
+    coinContent.value = coinData.signed_change_rate
+    initData[coinContent.ticker] = coinContent
+  })
+  return initData
+}
+
 export default function TreeChart({ data }: TreeChartPageProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     { name: 'Origin', parent: '', value: 0 }
   ]) //coin의 등락률 값에 parentNode가 추가된 값
-  const [coinRate, setCoinRate] = useState<CoinRateType>({}) //coin의 등락률 값
+  const [coinRate, setCoinRate] = useState<CoinRateType>(getInitData(data)) //coin의 등락률 값
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerSvg)
   useEffect(() => {
     initChart(chartSvg, width, height)
   }, [width, height])
-
-  useEffect(() => {
-    data.forEach(coinData => {
-      const coinContent: CoinRateContentType = {
-        name: '',
-        ticker: '',
-        parent: '',
-        value: 0
-      }
-      coinContent.name = coinData.name_kr
-      coinContent.ticker = 'KRW-' + coinData.name
-      coinContent.parent = 'Origin'
-      coinContent.value = coinData.signed_change_rate
-      coinRate[coinContent.ticker] = coinContent
-    })
-  }, [])
 
   useInterval(() => {
     setCoinRate(updateTreeData({ ...coinRate }))
@@ -229,10 +232,6 @@ export default function TreeChart({ data }: TreeChartPageProps) {
 
   useEffect(() => {
     // 5. 트리맵에 데이터 바인딩
-
-    if (changeRate.length === undefined || changeRate[1] === undefined) {
-      return
-    }
 
     if (changeRate.length > 1 && changeRate[2].value !== 1) {
       updateChart(chartSvg, changeRate, width, height)
