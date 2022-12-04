@@ -2,9 +2,11 @@ const {
   getCoinData,
   getCoinMetaData,
   getUpbitMarketCode,
-  getCoinPriceFromUpbit,
+  getUpbitMarketDatas,
 } = require("./getData");
 
+// 코인정보 반환하는 함수
+// 업비트API를 이용하여 코인종류 확인하고 해당 코인들 정보 코인마켓캡에서 받아와 조합
 async function getCoinInfo() {
   const time = getTime();
   const upbitMarketCodes = await getUpbitMarketCode();
@@ -25,6 +27,7 @@ async function getCoinInfo() {
         coinInfo.slug = data.slug;
         coinInfo.market_cap_dominance = data.quote.KRW.market_cap_dominance;
         coinInfo.market_cap = data.quote.KRW.market_cap;
+        coinInfo.percent_change_24h = data.quote.KRW.percent_change_24h;
         coinInfo.market_cap_kr = transPrice(data.quote.KRW.market_cap);
         coinInfo.max_supply = data.max_supply;
         coinInfo.circulating_supply = data.circulating_supply;
@@ -40,7 +43,7 @@ async function getCoinInfo() {
   }
   // info에서 얻는 메타데이터 추가 result에 2차로 저장
   const coinMetaDatas = await getCoinMetaData(coinIds.join(","));
-  for (const { code, name } of upbitMarketCodes) {
+  for (const { code } of upbitMarketCodes) {
     const coinInfo = result[code];
     const id = coinInfo.id;
     const metaData = coinMetaDatas[id];
@@ -78,32 +81,46 @@ function transPrice(price) {
   return price;
 }
 
-// 최종적으로 사용할 데이터 변환함수
-async function getData() {
-  return getCoinInfo().then((result) => {
-    coinInfos = result;
-    marketCapInfos = Object.values(result).map((coinInfo) => {
-      return {
-        name: coinInfo.symbol,
-        cmc_rank: coinInfo.cmc_rank,
-        name_kr: coinInfo.name_kr,
-        logo: coinInfo.logo,
-      };
-    });
-    return { coinInfos, marketCapInfos };
-  });
-}
-
-async function getPriceData(coinInfos) {
-  if (coinInfos === null) {
+// 메인페이지에 전달할 데이터 조합
+// 기존 coinInfo의 키에 저장된 코인종류를 이용하여 업비트 API로 현재 가격 변동률받아와 조합
+async function getMarketCapInfos(coinInfos) {
+  if (!coinInfos) {
     return null;
   }
-  const marketCodes = Object.keys(coinInfos);
-  const marketCodesString = marketCodes.map((code) => "KRW-" + code).join(",");
-  const priceData = await getCoinPriceFromUpbit(marketCodesString);
+  const upbitMarketDatas = await getUpbitMarketDatas(
+    Object.keys(coinInfos)
+      .map((code) => `KRW-${code}`)
+      .join(",")
+  );
+  const result = upbitMarketDatas.map((marketData) => {
+    const code = marketData.market.split("-")[1];
+    return {
+      name: code,
+      name_kr: coinInfos[code].name_kr,
+      cmc_rank: coinInfos[code].cmc_rank,
+      logo: coinInfos[code].logo,
+      market_cap: coinInfos[code].market_cap,
+      acc_trade_price_24h: marketData.acc_trade_price_24h,
+      signed_change_rate: marketData.signed_change_rate,
+    };
+  });
+  return result;
+}
+
+// detail페이지 전달할 데이터 조합
+async function getPriceData(coinInfos) {
+  if (!coinInfos) {
+    return null;
+  }
+  const priceData = await getUpbitMarketDatas(
+    Object.keys(coinInfos)
+      .map((code) => `KRW-${code}`)
+      .join(",")
+  );
   const result = {};
-  marketCodes.forEach((code, index) => {
+  priceData.forEach((data, index) => {
     const info = {};
+    const code = data.market.split("-")[1];
     info.logo = coinInfos[code].logo;
     info.name_kr = coinInfos[code].name_kr;
     info.name = coinInfos[code].symbol;
@@ -115,4 +132,4 @@ async function getPriceData(coinInfos) {
   });
   return result;
 }
-module.exports = { getCoinInfo, getData, getPriceData };
+module.exports = { getCoinInfo, getPriceData, getMarketCapInfos };

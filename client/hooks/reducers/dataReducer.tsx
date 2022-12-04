@@ -36,7 +36,6 @@ export const dataReducer = (data: CoinRateType, action: ActionType) => {
       if (!action.coinRate) {
         return
       }
-
       const tick = Object.keys(action.coinRate).join(',')
       //tick은 코인들의 이름배열 [KRW-BTC,KRW-ETC 등등]
       getTreeMapDataArray(tick).then(data => {

@@ -1,6 +1,7 @@
 const axios = require("axios");
 require("dotenv").config();
 
+// 업비트에서 marketCode받는 함수
 async function getUpbitMarketCode() {
   const marketCodes = await axios({
     method: "get",
@@ -20,15 +21,17 @@ async function getUpbitMarketCode() {
   }, []);
 }
 
-async function getCoinPriceFromUpbit(coinCodes) {
-  const priceInfo = await axios({
+// 업비트에서 실시간 시세정보 가져오는 함수
+async function getUpbitMarketDatas(marketCodes) {
+  const responseBody = await axios({
     method: "get",
     baseURL: "https://api.upbit.com",
-    url: `/v1/ticker?markets=${coinCodes}`,
+    url: `v1/ticker?markets=${marketCodes}`,
   }).then((response) => response.data);
-  return priceInfo;
+  return responseBody;
 }
 
+// 코인마켓캡에서 코인정보 가져오는 함수 (시가총액, 최대발급량, 현재발급량 필요)
 async function getCoinData() {
   const responseBody = await axios({
     method: "get",
@@ -42,6 +45,7 @@ async function getCoinData() {
   return responseBody.data;
 }
 
+// 코인마켓캡에서 코인의 메타데이터 가져오는 함수 (코인 이미지, 코인 사이트주소, 코인설명 필요)
 /**
  *
  * @param {string} coinIds 조회할 코인ID들을 ,로 연결한 문자열
@@ -60,4 +64,9 @@ async function getCoinMetaData(coinIds) {
   return responseBody.data;
 }
 
-module.exports = { getUpbitMarketCode, getCoinData, getCoinMetaData, getCoinPriceFromUpbit };
+module.exports = {
+  getUpbitMarketCode,
+  getCoinData,
+  getCoinMetaData,
+  getUpbitMarketDatas,
+};

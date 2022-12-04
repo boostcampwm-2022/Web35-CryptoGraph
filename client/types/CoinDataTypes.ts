@@ -23,4 +23,11 @@ export interface MarketCapInfo {
   cmc_rank: string
   name_kr: string
   logo: string
+  market_cap: number
+  acc_trade_price_24h: number
+  signed_change_rate: number
+}
+
+export interface TreeChartPageProps {
+  data: MarketCapInfo[]
 }
