@@ -8,6 +8,7 @@ import {
 import { useWindowSize } from 'hooks/useWindowSize'
 import useInterval from '@/hooks/useInterval'
 import { getTreeMapDataArray } from '@/utils/upbitManager'
+import { updateTreeData } from './Treechart/getCoinData'
 const COIN_INTERVAL_RATE = 3000
 //------------------------------interface------------------------------
 interface RunningChartProps {
@@ -191,8 +192,13 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
         value: 0
       }
     })
-    setCoinRate(initCoinRate)
-    GetChartData(initCoinRate) //초기에 로딩없이 바로 렌더될 수 있도록 호출
+    async function update() {
+      const a = await updateTreeData(initCoinRate)
+      setCoinRate(a)
+    }
+    update()
+
+    // GetChartData(initCoinRate) //초기에 로딩없이 바로 렌더될 수 있도록 호출
   }, [])
   React.useEffect(() => {
     initChart(chartSvg, width, height)
@@ -204,7 +210,11 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
 
   useInterval(() => {
     // 주기적으로 코인 등락률을 업데이트
-    GetChartData(coinRate)
+    async function update() {
+      const a = await updateTreeData(coinRate)
+      setCoinRate(a)
+    }
+    update()
   }, COIN_INTERVAL_RATE)
 
   return (

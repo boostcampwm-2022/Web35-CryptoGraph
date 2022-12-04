@@ -1,10 +1,9 @@
 import * as d3 from 'd3'
-import { useState, useEffect, useRef, useReducer } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import useInterval from '@/hooks/useInterval'
 import { useWindowSize } from '@/hooks/useWindowSize'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
 import { updateTreeData } from './getCoinData'
-import { TreeChartPageProps } from '@/types/CoinDataTypes'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 
 const coinIntervalRate = 1000
@@ -199,10 +198,17 @@ const getInitData = (data: MarketCapInfo[]) => {
     coinContent.value = Number((coinData.signed_change_rate * 100).toFixed(2))
     initData[coinContent.ticker] = coinContent
   })
+  console.log(initData)
   return initData
 }
-
-export default function TreeChart({ data }: TreeChartPageProps) {
+export interface TreeChartProps {
+  data: MarketCapInfo[]
+  toRenderCoinTickerList?: string[] //선택된 코인 리스트
+}
+export default function TreeChart({
+  data,
+  toRenderCoinTickerList = ['CELO', 'ETH', 'MFT', 'WEMIX']
+}: TreeChartProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     { name: 'Origin', parent: '', value: 0 }
   ]) //coin의 등락률 값에 parentNode가 추가된 값
@@ -210,12 +216,17 @@ export default function TreeChart({ data }: TreeChartPageProps) {
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerSvg)
+
   useEffect(() => {
     initChart(chartSvg, width, height)
   }, [width, height])
 
   useInterval(() => {
-    setCoinRate(updateTreeData({ ...coinRate }))
+    async function update() {
+      const a = await updateTreeData(coinRate)
+      setCoinRate(a)
+    }
+    update()
   }, coinIntervalRate)
 
   useEffect(() => {
@@ -232,7 +243,6 @@ export default function TreeChart({ data }: TreeChartPageProps) {
 
   useEffect(() => {
     // 5. 트리맵에 데이터 바인딩
-
     if (changeRate.length > 1 && changeRate[2].value !== 1) {
       updateChart(chartSvg, changeRate, width, height)
     }
