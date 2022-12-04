@@ -5,7 +5,7 @@ import {
   PointerPosition
 } from '@/types/ChartTypes'
 import * as d3 from 'd3'
-import { D3ZoomEvent } from 'd3'
+import { D3DragEvent } from 'd3'
 import {
   calculateCandlewidth,
   getYAxisScale,
@@ -124,7 +124,6 @@ function updateChart(
               ? CANDLE_COLOR_RED
               : CANDLE_COLOR_BLUE
           )
-
         return $g
       },
       update => {
@@ -178,8 +177,6 @@ interface CandleChartProps {
 
 function initChart(
   svgRef: React.RefObject<SVGSVGElement>,
-  data: CandleData[],
-  option: ChartRenderOption,
   optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>,
   pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerPosition>>,
   windowSize: WindowSize
@@ -205,94 +202,53 @@ function initChart(
   chartContainer.select('svg#current-price').attr('height', chartAreaYsize)
   // text 위치설정 매직넘버? 반응형 고려하면 변수화도 고려되어야할듯
   chartContainer.select('text#price-info').attr('x', 20).attr('y', 20)
-  const yAxisScale = getYAxisScale(
-    data.slice(
-      option.renderStartDataIndex,
-      option.renderStartDataIndex + option.renderCandleCount
-    ),
-    chartAreaYsize
-  )
-  if (!yAxisScale) {
-    console.error('받아온 API 데이터 에러')
-    return undefined
-  }
-  const xAxisScale = getXAxisScale(option, data, chartAreaXsize)
-  chartContainer
-    .select<SVGSVGElement>('g#y-axis')
-    .attr('transform', `translate(${chartAreaXsize},0)`)
-    .call(d3.axisRight(yAxisScale).tickSizeInner(-1 * chartAreaXsize))
-    .call(g => {
-      g.selectAll('.tick line').attr('stroke', CANDLE_CHART_GRID_COLOR)
-      g.selectAll('.tick text')
-        .attr('stroke', 'black')
-        .style('font-size', CHART_FONT_SIZE)
-    })
-  chartContainer
-    .select<SVGSVGElement>('g#x-axis')
-    .attr('transform', `translate(0,${chartAreaYsize})`)
-    .attr('width', chartAreaXsize)
+  d3.select<SVGSVGElement, CandleData>('#chart-container')
     .call(
       d3
-        .axisBottom(xAxisScale)
-        .tickSizeInner(-1 * chartAreaYsize)
-        .ticks(5)
-    )
-    .call(g => {
-      g.selectAll('.tick line').attr('stroke', CANDLE_CHART_GRID_COLOR)
-      g.selectAll('.tick text')
-        .attr('stroke', 'black')
-        .style('font-size', CHART_FONT_SIZE)
-    })
-  let transalateX = 0
-  let movedCandle = 0
-  const zoom = d3
-    .zoom<SVGSVGElement, CandleData>()
-    .scaleExtent([1, 1])
-    .translateExtent([
-      [-Infinity, 0],
-      [chartContainerXsize, chartContainerYsize]
-    ])
-    .on('zoom', function (event: D3ZoomEvent<SVGSVGElement, CandleData>) {
-      transalateX = event.transform.x
-      optionSetter((prev: ChartRenderOption) => {
-        movedCandle = Math.floor(
-          transalateX / calculateCandlewidth(prev, chartAreaXsize)
+        .drag<SVGSVGElement, CandleData>()
+        .on(
+          'drag',
+          (event: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
+            optionSetter((prev: ChartRenderOption) => {
+              const movedCandle = Math.max(
+                Math.floor(
+                  (prev.translateX + event.dx) /
+                    calculateCandlewidth(prev, chartAreaXsize)
+                ),
+                0
+              )
+
+              return {
+                ...prev,
+                renderStartDataIndex: movedCandle,
+                translateX: Math.max(prev.translateX + event.dx, 0)
+              }
+            })
+            handleMouseEvent(
+              event.sourceEvent,
+              pointerPositionSetter,
+              chartAreaXsize,
+              chartAreaYsize
+            )
+          }
         )
-        return {
-          ...prev,
-          renderStartDataIndex: movedCandle,
-          translateX: event.transform.x
-        }
-      })
-      handleMouseEvent(
-        event.sourceEvent,
-        pointerPositionSetter,
-        chartAreaXsize,
-        chartAreaYsize
-      )
-    })
-  d3.select<SVGSVGElement, CandleData>('#chart-container')
-    .call(zoom)
+    )
     .on('wheel', (e: WheelEvent) => {
       e.preventDefault()
-      // 휠이벤트에 따라 확대 축소가 이루어진다.
-      // candleCount가 변함에따라 candleWidth도 변경되고 기존의 translateX와 연산하여 그래프의 시작인덱스를 재조정
       optionSetter(prev => {
         const newRenderCandleCount = Math.max(
           prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1), //휠이벤트 e.deltaY가 확대면 -1 축소면 +1
           MIN_CANDLE_COUNT
         )
-        const newRenderStartDataIndex = Math.floor(
-          prev.translateX /
-            calculateCandlewidth(
-              { ...prev, renderCandleCount: newRenderCandleCount },
-              chartAreaXsize
-            )
-        )
+        const newTranslateX =
+          calculateCandlewidth(
+            { ...prev, renderCandleCount: newRenderCandleCount },
+            chartAreaXsize
+          ) * prev.renderStartDataIndex
         return {
           ...prev,
           renderCandleCount: newRenderCandleCount,
-          renderStartDataIndex: newRenderStartDataIndex
+          translateX: newTranslateX
         }
       })
     })
@@ -325,15 +281,8 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   )
   const isFetching = React.useRef(false)
   React.useEffect(() => {
-    initChart(
-      chartSvg,
-      props.candleData,
-      props.option,
-      props.optionSetter,
-      setPointerInfo,
-      windowSize
-    )
-  }, [props.candleData, props.option, props.optionSetter, windowSize])
+    initChart(chartSvg, props.optionSetter, setPointerInfo, windowSize)
+  }, [windowSize, props.optionSetter])
 
   React.useEffect(() => {
     //디바운싱 구문
