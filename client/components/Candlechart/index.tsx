@@ -97,7 +97,7 @@ function updateChart(
     .join(
       enter => {
         const $g = enter.append('g')
-        $g.attr('transform', `translate(${option.보정값 + option.translateX})`) //263번 줄에서 수정, 차트 움직임을 zoom이벤트 ->updateChart에서 관리
+        $g.attr('transform', `translate(${option.translateX})`) //263번 줄에서 수정, 차트 움직임을 zoom이벤트 ->updateChart에서 관리
         $g.append('line')
           .attr(
             'x1',
@@ -128,7 +128,7 @@ function updateChart(
       },
       update => {
         update
-          .attr('transform', `translate(${option.보정값 + option.translateX})`) //263번 줄에서 수정, 차트 움직임을 zoom이벤트 ->updateChart에서 관리
+          .attr('transform', `translate(${option.translateX})`) //263번 줄에서 수정, 차트 움직임을 zoom이벤트 ->updateChart에서 관리
           .select('rect')
           .attr('width', candleWidth * 0.6)
           .attr('height', d =>

@@ -47,7 +47,6 @@ export interface ChartRenderOption {
   renderStartDataIndex: number
   renderCandleCount: number
   translateX: number
-  보정값: number
   isVolumeVislble: boolean
   isMovingAverageVisible: boolean
 }
