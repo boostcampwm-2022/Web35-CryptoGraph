@@ -5,6 +5,8 @@ const {
   getUpbitMarketDatas,
 } = require("./getData");
 
+// 코인정보 반환하는 함수
+// 업비트API를 이용하여 코인종류 확인하고 해당 코인들 정보 코인마켓캡에서 받아와 조합
 async function getCoinInfo() {
   const time = getTime();
   const upbitMarketCodes = await getUpbitMarketCode();
@@ -41,7 +43,7 @@ async function getCoinInfo() {
   }
   // info에서 얻는 메타데이터 추가 result에 2차로 저장
   const coinMetaDatas = await getCoinMetaData(coinIds.join(","));
-  for (const { code, name } of upbitMarketCodes) {
+  for (const { code } of upbitMarketCodes) {
     const coinInfo = result[code];
     const id = coinInfo.id;
     const metaData = coinMetaDatas[id];
@@ -79,7 +81,8 @@ function transPrice(price) {
   return price;
 }
 
-// 최종적으로 사용할 데이터 변환함수
+// 메인페이지에 전달할 데이터 조합
+// 기존 coinInfo의 키에 저장된 코인종류를 이용하여 업비트 API로 현재 가격 변동률받아와 조합
 async function getMarketCapInfos(coinInfos) {
   if (!coinInfos) {
     return null;
@@ -96,10 +99,37 @@ async function getMarketCapInfos(coinInfos) {
       name_kr: coinInfos[code].name_kr,
       cmc_rank: coinInfos[code].cmc_rank,
       logo: coinInfos[code].logo,
+      market_cap: coinInfos[code].market_cap,
+      acc_trade_price_24h: marketData.acc_trade_price_24h,
       signed_change_rate: marketData.signed_change_rate,
     };
   });
   return result;
 }
 
-module.exports = { getCoinInfo, getMarketCapInfos };
+// detail페이지 전달할 데이터 조합
+async function getPriceData(coinInfos) {
+  if (!coinInfos) {
+    return null;
+  }
+  const priceData = await getUpbitMarketDatas(
+    Object.keys(coinInfos)
+      .map((code) => `KRW-${code}`)
+      .join(",")
+  );
+  const result = {};
+  priceData.forEach((data, index) => {
+    const info = {};
+    const code = data.market.split("-")[1];
+    info.logo = coinInfos[code].logo;
+    info.name_kr = coinInfos[code].name_kr;
+    info.name = coinInfos[code].symbol;
+    info.price = priceData[index].trade_price;
+    info.signed_change_price = priceData[index].signed_change_price;
+    info.signed_change_rate = priceData[index].signed_change_rate;
+    info.acc_trade_price_24h = priceData[index].acc_trade_price_24h;
+    result[code] = info;
+  });
+  return result;
+}
+module.exports = { getCoinInfo, getPriceData, getMarketCapInfos };

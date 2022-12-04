@@ -3,15 +3,23 @@ import { useEffect, useState, useRef, Dispatch, SetStateAction } from 'react'
 import { ChartPeriod } from '@/types/ChartTypes'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { transDate } from '@/utils/dateManager'
+import {
+  CoinPrice,
+  CoinPriceObj,
+  SocketTickerData
+} from '@/types/CoinPriceTypes'
 let socket: WebSocket | undefined
 
 export const useRealTimeUpbitData = (
   period: ChartPeriod,
   market: string,
-  initData: CandleData[]
-): [CandleData[], Dispatch<SetStateAction<CandleData[]>>] => {
+  initData: CandleData[],
+  priceInfo: CoinPriceObj
+): [CandleData[], Dispatch<SetStateAction<CandleData[]>>, CoinPriceObj] => {
   const [realtimeCandleData, setRealtimeCandleData] =
     useState<CandleData[]>(initData)
+  const [realtimePriceInfo, setRealtimePriceInfo] =
+    useState<CoinPriceObj>(priceInfo)
   const isInitialMount = useRef(true)
   const fetchData = async () => {
     const fetched: CandleData[] | null = await getCandleDataArray(
@@ -27,11 +35,14 @@ export const useRealTimeUpbitData = (
   }
 
   useEffect(() => {
-    connectWS(market)
+    const markets = Object.keys(priceInfo)
+      .map(code => `"KRW-${code}"`)
+      .join(',')
+    connectWS(markets)
     return () => {
       closeWS()
     }
-  }, [])
+  }, [priceInfo])
 
   useEffect(() => {
     if (!isInitialMount.current) fetchData() //첫 마운트면
@@ -46,15 +57,19 @@ export const useRealTimeUpbitData = (
       const str_d = enc.decode(arr)
       const d = JSON.parse(str_d)
       if (d.type == 'ticker') {
-        setRealtimeCandleData(prevData => updateData(prevData, d, period))
+        const code = d.code.split('-')[1]
+        if (code === market) {
+          setRealtimeCandleData(prevData => updateData(prevData, d, period))
+        }
+        setRealtimePriceInfo(prev => updateRealTimePrice(prev, d, code))
       }
     }
   }, [market, period])
 
-  return [realtimeCandleData, setRealtimeCandleData] //socket을 state해서 같이 뺀다. 변화감지 (끊길때) -> ui표시..
+  return [realtimeCandleData, setRealtimeCandleData, realtimePriceInfo] //socket을 state해서 같이 뺀다. 변화감지 (끊길때) -> ui표시..
 }
 
-export function connectWS(market: string) {
+export function connectWS(markets: string) {
   if (socket != undefined) {
     socket.close()
   }
@@ -62,9 +77,7 @@ export function connectWS(market: string) {
   socket.binaryType = 'arraybuffer'
 
   socket.onopen = function () {
-    filterRequest(
-      `[{"ticket":"test"},{"type":"ticker","codes":["KRW-${market}"]}]`
-    )
+    filterRequest(`[{"ticket":"test"},{"type":"ticker","codes":[${markets}]}]`)
   }
   socket.onclose = function () {
     socket = undefined
@@ -117,4 +130,17 @@ function updateData(
   toInsert.timestamp = toInsert.trade_timestamp
 
   return [toInsert, ...prevData] //한화면에 보여주는 캔들 * 2
+}
+
+function updateRealTimePrice(
+  prevData: CoinPriceObj,
+  newTickerData: SocketTickerData,
+  code: string
+): CoinPriceObj {
+  const newCoinPrice: CoinPrice = { ...prevData[code] }
+  newCoinPrice.acc_trade_price_24h = newTickerData.acc_trade_price_24h
+  newCoinPrice.signed_change_price = newTickerData.signed_change_price
+  newCoinPrice.signed_change_rate = newTickerData.signed_change_rate
+  newCoinPrice.price = newTickerData.trade_price
+  return { ...prevData, [code]: newCoinPrice }
 }
