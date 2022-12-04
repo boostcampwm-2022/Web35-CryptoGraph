@@ -1,14 +1,13 @@
 import * as d3 from 'd3'
 import * as React from 'react'
 import {
-  ActionType,
   CoinRateContentType,
   CoinRateType,
   EmptyObject
 } from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
-import { dataReducer } from '@/hooks/reducers/dataReducer'
 import useInterval from '@/hooks/useInterval'
+import { getTreeMapDataArray } from '@/utils/upbitManager'
 //------------------------------interface------------------------------
 interface RunningChartProps {
   coinRate: CoinRateType
@@ -159,21 +158,9 @@ export const RunningChart: React.FunctionComponent<
   RunningChartProps
 > = props => {
   const COIN_INTERVAL_RATE = 1000
-
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
-  const { width, height } = useWindowSize(chartContainerRef)
   const chartSvg = React.useRef(null)
-  const [coinRate, setCoinRate] = React.useState<CoinRateType>(props.coinRate) //coin의 등락률 값
-
-  React.useEffect(() => {
-    setCoinRate(props.coinRate)
-  }, [props.coinRate])
-  const [data, dispatch] = React.useReducer<
-    (
-      data: CoinRateType | EmptyObject,
-      action: ActionType
-    ) => CoinRateType | undefined
-  >(dataReducer, props.coinRate as never) //coin의 등락률 변화값을 받아서 coinRate에 넣어줌
+  const { width, height } = useWindowSize(chartContainerRef)
 
   React.useEffect(() => {
     initChart(chartSvg, width, height)
@@ -181,11 +168,24 @@ export const RunningChart: React.FunctionComponent<
 
   useInterval(() => {
     // 주기적으로 코인 등락률을 업데이트
-    if (Object.keys(coinRate).length) {
-      dispatch({ type: 'update', coinRate: coinRate }) //coinRate업데이트
-    }
-    setCoinRate(data)
-    updateChart(chartSvg, coinRate, width, height, props.candleCount)
+    const tick = Object.keys(props.coinRate).join(',')
+    getTreeMapDataArray(tick) //트리맵에서 사용하는 메서드 그대로 사용
+      .then(data => {
+        //data는 코인별 실시간 정보
+        // 업비트에 선택된 티커에 대한 코인등락률을 받아와서 기존 데이터 업데이트
+        for (const coin of data) {
+          if (props.coinRate[coin.market]) {
+            props.coinRate[coin.market].value = Number(
+              (coin.signed_change_rate * 100) //실시간 등락rate를 퍼센테이지로 변경
+                .toFixed(2)
+            ) //소수점 두자리로 fix
+          }
+        }
+        return props.coinRate
+      })
+      .then(coinRate => {
+        updateChart(chartSvg, coinRate, width, height, props.candleCount)
+      })
   }, COIN_INTERVAL_RATE)
 
   return (
@@ -199,8 +199,6 @@ export const RunningChart: React.FunctionComponent<
       }}
     >
       <svg id="chart-container" ref={chartSvg}>
-        <g id="y-axis" />
-        <g id="x-axis" />
         <svg id="running-chart" />
       </svg>
     </div>

@@ -103,7 +103,6 @@ export default function CoinSelectController(props: CoinSelectControllerProps) {
       [event.target.name]: event.target.checked
     })
   }
-  console.log(checked)
   return (
     <>
       <SelectCoinHead
