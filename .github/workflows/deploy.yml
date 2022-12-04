@@ -13,7 +13,7 @@ jobs:
           port: ${{secrets.SERVER_PORT}}
           username: ${{secrets.SERVER_USERNAME}}
           password: ${{secrets.SERVER_PASSWORD}}
-          scripts: |
+          script: |
             cd ~/CryptoGraph
             git pull origin main
             export NVM_DIR=~/.nvm
@@ -22,6 +22,6 @@ jobs:
             npm install
             npm run build
             pm2 reload client
-            cd ../server
+            cd ../api_server
             npm install
             pm2 reload server
