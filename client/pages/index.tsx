@@ -1,8 +1,14 @@
 import { useState } from 'react'
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
-import { useMediaQuery, useTheme } from '@mui/material'
 import CoinSelectController from '@/components/CoinSelectController'
+import TreeChart, { TreeChartProps } from '@/components/Treechart'
+import { RunningChart } from '@/components/RunningChart'
+import { ChartType } from '@/types/ChartTypes'
+import ChartSelectController from '@/components/ChartSelectController'
+import { MarketCapInfo } from '@/types/CoinDataTypes'
+import { getMarketCapInfo } from '@/utils/metaDataManages'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 const HomeContainer = styled('div')`
   display: flex;
   width: 100%;
@@ -15,6 +21,7 @@ const HomeContainer = styled('div')`
 `
 const SideBarContainer = styled(Box)`
   display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   align-items: center;
   width: 500px;
@@ -33,16 +40,50 @@ const ChartContainer = styled(Box)`
   border-radius: 32px;
 `
 
-export default function Home() {
-  const [selectedMarket, setSelectedMarket] = useState<string[]>(['btc']) //선택된 market 컨트롤
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
+export default function Home({
+  data
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [selectedChart, setSelectedChart] = useState<ChartType>('RunningChart')
+  const [selectedMarket, setSelectedMarket] = useState<string[]>([
+    'CELO',
+    'ETH',
+    'MFT',
+    'WEMIX'
+  ]) //선택된 market 컨트롤
   return (
     <HomeContainer>
       <SideBarContainer>
-        <CoinSelectController />
+        <ChartSelectController
+          selected={selectedChart}
+          selectedSetter={setSelectedChart}
+        />
+        <CoinSelectController
+          selectedCoinList={selectedMarket}
+          selectedCoinListSetter={setSelectedMarket}
+        />
       </SideBarContainer>
-      <ChartContainer />
+      <ChartContainer>
+        {selectedChart === 'RunningChart' ? (
+          <RunningChart
+            candleCount={20}
+            toRenderCoinTickerList={selectedMarket}
+          />
+        ) : (
+          <TreeChart data={data} />
+        )}
+      </ChartContainer>
     </HomeContainer>
   )
+}
+
+//솔직히 서버사이드 프롭스 없애는게 낫지 않나 싶음..
+export const getServerSideProps: GetServerSideProps<
+  TreeChartProps
+> = async () => {
+  const fetchedData: MarketCapInfo[] | null = await getMarketCapInfo()
+  return {
+    props: {
+      data: fetchedData === null ? [] : fetchedData
+    }
+  }
 }
