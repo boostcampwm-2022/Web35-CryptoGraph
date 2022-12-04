@@ -47,7 +47,6 @@ export default function CoinSelectController() {
       [event.target.name]: event.target.checked
     })
   }
-
   return (
     <Container>
       <Header>
