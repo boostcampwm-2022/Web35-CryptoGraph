@@ -7,11 +7,12 @@ import {
 } from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
 import useInterval from '@/hooks/useInterval'
-import { getCoinTicker, getTreeMapDataArray } from '@/utils/upbitManager'
+import { getTreeMapDataArray } from '@/utils/upbitManager'
+const COIN_INTERVAL_RATE = 3000
 //------------------------------interface------------------------------
 interface RunningChartProps {
-  coinRate: CoinRateType
   candleCount: number
+  toRenderCoinTickerList?: string[] //선택된 코인 리스트
 }
 
 //------------------------------initChart------------------------------
@@ -154,46 +155,20 @@ const updateChart = (
     )
 }
 //------------------------------Component------------------------------
-export const RunningChart: React.FunctionComponent<
-  RunningChartProps
-> = props => {
-  const COIN_INTERVAL_RATE = 3000
+export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
+  candleCount,
+  toRenderCoinTickerList = ['CELO', 'ETH', 'MFT', 'WEMIX']
+}) => {
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
   const chartSvg = React.useRef(null)
   const { width, height } = useWindowSize(chartContainerRef)
   const [coinRate, setCoinRate] = React.useState<CoinRateType>({}) //coin의 등락률 값
-  React.useEffect(() => {
-    const initCoinRate: CoinRateType = {}
-    getCoinTicker().then(data => {
-      for (const key of data) {
-        if (key.market.split('-')[0] === 'KRW') {
-          initCoinRate[key.market] = {
-            name: key.market.split('-')[1],
-            ticker: key.market,
-            parent: 'Origin',
-            value: 0
-          }
-        }
-      }
-      setCoinRate(initCoinRate)
-    })
-  }, [])
-  React.useEffect(() => {
-    initChart(chartSvg, width, height)
-  }, [width, height]) // 창크기에 따른 차트크기 조절
-
-  React.useEffect(() => {
-    updateChart(chartSvg, coinRate, width, height, props.candleCount)
-  }, [width, height, coinRate, props.candleCount]) // 창크기에 따른 차트크기 조절
-
-  useInterval(() => {
-    // 주기적으로 코인 등락률을 업데이트
+  function GetChartData(coinRate: CoinRateType) {
     const tick = Object.keys(coinRate).join(',') //CoinRate값의 Key를 활용해서 데이터를 받고,업데이트한다 이거지?
     getTreeMapDataArray(tick) //트리맵에서 사용하는 메서드 그대로 사용
       .then(data => {
         //data는 코인별 실시간 정보
         // 업비트에 선택된 티커에 대한 코인등락률을 받아와서 기존 데이터 업데이트
-        console.log('데이터 업데이트')
         const tosetData = { ...coinRate }
         for (const coin of data) {
           if (tosetData[coin.market]) {
@@ -205,6 +180,31 @@ export const RunningChart: React.FunctionComponent<
         }
         setCoinRate(tosetData)
       })
+  }
+  React.useEffect(() => {
+    const initCoinRate: CoinRateType = {}
+    toRenderCoinTickerList.forEach(market => {
+      initCoinRate[`KRW-${market}`] = {
+        name: market,
+        ticker: `KRW-${market}`,
+        parent: 'Origin',
+        value: 0
+      }
+    })
+    setCoinRate(initCoinRate)
+    GetChartData(initCoinRate) //초기에 로딩없이 바로 렌더될 수 있도록 호출
+  }, [])
+  React.useEffect(() => {
+    initChart(chartSvg, width, height)
+  }, [width, height]) // 창크기에 따른 차트크기 조절
+
+  React.useEffect(() => {
+    updateChart(chartSvg, coinRate, width, height, candleCount)
+  }, [width, height, coinRate, candleCount]) // 창크기에 따른 차트크기 조절
+
+  useInterval(() => {
+    // 주기적으로 코인 등락률을 업데이트
+    GetChartData(coinRate)
   }, COIN_INTERVAL_RATE)
 
   return (
