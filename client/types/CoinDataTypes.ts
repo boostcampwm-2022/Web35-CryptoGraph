@@ -27,7 +27,3 @@ export interface MarketCapInfo {
   acc_trade_price_24h: number
   signed_change_rate: number
 }
-
-export interface TreeChartPageProps {
-  data: MarketCapInfo[]
-}
