@@ -66,7 +66,10 @@ export default function Detail({
           >
             <InfoContainerMobile>
               <CoinDetailedInfo market={market} tabLabelInfo={'코인 디테일'} />
-              <RealTimeCoinPrice tabLabelInfo={'실시간 코인 정보'} />
+              <RealTimeCoinPrice
+                tabLabelInfo={'실시간 코인 정보'}
+                priceInfo={realtimePriceInfo}
+              />
             </InfoContainerMobile>
             <LinkButton goto="/" content="Go to Main" />
           </Box>
