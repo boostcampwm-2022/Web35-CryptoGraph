@@ -12,7 +12,7 @@ const COIN_INTERVAL_RATE = 3000
 //------------------------------interface------------------------------
 interface RunningChartProps {
   candleCount: number
-  toRenderCoinTickerList?: string[] //선택된 코인 리스트
+  toRenderCoinTickerList?: CoinRate //선택된 코인 리스트
 }
 
 //------------------------------initChart------------------------------
@@ -157,28 +157,13 @@ const updateChart = (
 //------------------------------Component------------------------------
 export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   candleCount,
-  toRenderCoinTickerList = ['BTC']
+  data
 }) => {
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
   const chartSvg = React.useRef(null)
   const { width, height } = useWindowSize(chartContainerRef)
-  const [coinRate, setCoinRate] = React.useState<CoinRateType>({}) //coin의 등락률 값
-  React.useEffect(() => {
-    const initCoinRate: CoinRateType = {}
-    toRenderCoinTickerList.forEach(market => {
-      initCoinRate[`KRW-${market}`] = {
-        name: market,
-        ticker: `KRW-${market}`,
-        parent: 'Origin',
-        value: 0
-      }
-    })
-    async function update() {
-      const a = await updateTreeData(initCoinRate)
-      setCoinRate(a)
-    }
-    update()
-  }, [])
+  const [coinRate, setCoinRate] = React.useState<CoinRateType>(data) //coin의 등락률 값
+
   React.useEffect(() => {
     initChart(chartSvg, width, height)
   }, [width, height]) // 창크기에 따른 차트크기 조절
@@ -187,14 +172,9 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     updateChart(chartSvg, coinRate, width, height, candleCount)
   }, [width, height, coinRate, candleCount]) // 창크기에 따른 차트크기 조절
 
-  useInterval(() => {
-    // 주기적으로 코인 등락률을 업데이트
-    async function update() {
-      const a = await updateTreeData(coinRate)
-      setCoinRate(a)
-    }
-    update()
-  }, COIN_INTERVAL_RATE)
+  React.useEffect(() => {
+    setCoinRate(data)
+  }, [data])
 
   return (
     <div
