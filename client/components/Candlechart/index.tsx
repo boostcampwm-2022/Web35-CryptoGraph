@@ -39,7 +39,11 @@ function updateChart(
   windowSize: WindowSize
 ) {
   //candleData를 fetchStartDataIndex에 맞게 잘라주는작업
-  data = data.slice(option.fetchStartDataIndex)
+  data = data.slice(
+    option.fetchStartDataIndex,
+    option.fetchStartDataIndex + 600
+  )
+  console.log('데이터길이 : ', data.length)
 
   const chartContainerXsize = windowSize.width
   const chartContainerYsize = windowSize.height
@@ -285,7 +289,7 @@ function checkNeedFutureFetch(
   option: ChartRenderOption
 ) {
   return (
-    candleData.length > 500 &&
+    candleData.length >= 600 &&
     option.renderStartDataIndex < 100 &&
     option.fetchStartDataIndex > 0
   )
@@ -359,54 +363,22 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       return
     }
 
-    // if (checkNeedFutureFetch(props.candleData, props.option)) {
-    //   // 남은 candleData가 일정개수 이하로 내려가면 Fetch
-    //   if (!isFetching.current) {
-    //     //fetching중인데 한번더 요청이 일어나면 추가fetch 작동하지않음
-    //     isFetching.current = true
-    //     //추가적인 candleData Fetch
-    //     getCandleDataArray(
-    //       DEFAULT_CANDLE_PERIOD,
-    //       props.option.marketType,
-    //       200,
-    //       makeDate(
-    //         //endTime설정
-    //         props.candleData[props.candleData.length - 1].timestamp,
-    //         60
-    //       )
-    //         .toJSON()
-    //         .slice(0, -5)
-    //         .concat('Z')
-    //         .replaceAll(':', '%3A') //업비트 쿼리문 규칙
-    //     ).then(res => {
-    //       //fetch완료된 newData를 기존 data와 병합
-    //       if (res === null) {
-    //         console.error('코인 쿼리 실패, 404에러')
-    //         return
-    //       }
-    //       isFetching.current = false
-    //       props.candleDataSetter(prev => {
-    //         if (prev.length > 500) {
-    //           props.optionSetter({
-    //             ...props.option,
-    //             fetchStartDataIndex: props.option.fetchStartDataIndex + 200,
-    //             renderStartDataIndex: props.option.renderStartDataIndex - 200,
-    //             translateX:
-    //               props.option.translateX -
-    //               200 *
-    //                 calculateCandlewidth(
-    //                   props.option,
-    //                   windowSize.width - CHART_Y_AXIS_MARGIN
-    //                 )
-    //           })
-    //           return [...prev, ...res].slice(200)
-    //         }
-    //         return [...prev, ...res]
-    //       })
-    //     })
-    //   }
-    //   return
-    // }
+    if (checkNeedFutureFetch(props.candleData, props.option)) {
+      props.optionSetter({
+        ...props.option,
+        fetchStartDataIndex: props.option.fetchStartDataIndex - 200,
+        renderStartDataIndex: props.option.renderStartDataIndex + 200,
+        translateX:
+          props.option.translateX +
+          200 *
+            calculateCandlewidth(
+              props.option,
+              windowSize.width - CHART_Y_AXIS_MARGIN
+            )
+      })
+      return
+    }
+
     updateChart(
       chartSvg,
       props.candleData,
