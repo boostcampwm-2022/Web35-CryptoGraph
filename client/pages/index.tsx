@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Box from '@mui/material/Box'
-import { styled } from '@mui/material/styles'
+import { styled, useTheme } from '@mui/material/styles'
 import CoinSelectController from '@/components/CoinSelectController'
 import TreeChart, { TreeChartProps } from '@/components/Treechart'
 import { RunningChart } from '@/components/RunningChart'
@@ -9,6 +9,9 @@ import ChartSelectController from '@/components/ChartSelectController'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import { useMediaQuery } from '@mui/material'
+import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
+import InfoContainerMobile from '@/components/InfoContainerMobile'
 const HomeContainer = styled('div')`
   display: flex;
   width: 100%;
@@ -33,11 +36,11 @@ const SideBarContainer = styled(Box)`
 `
 const ChartContainer = styled(Box)`
   display: flex;
-  box-sizing: border-box;
+  box-sizing: content-box; //얘가 차트 크기를 고정해준다. 이유는 아직 모르겠다..
+  min-width: 300px;
   width: 100%;
   height: 100%;
-  border: 1px solid black;
-  border-radius: 32px;
+  flex-direction: column;
 `
 
 export default function Home({
@@ -50,18 +53,39 @@ export default function Home({
     'MFT',
     'WEMIX'
   ]) //선택된 market 컨트롤
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
   return (
     <HomeContainer>
-      <SideBarContainer>
-        <ChartSelectController
-          selected={selectedChart}
-          selectedSetter={setSelectedChart}
-        />
-        <CoinSelectController
-          selectedCoinList={selectedMarket}
-          selectedCoinListSetter={setSelectedMarket}
-        />
-      </SideBarContainer>
+      {isMobile ? (
+        <Box sx={{ position: 'absolute' }}>
+          <SwipeableTemporaryDrawer>
+            <InfoContainerMobile>
+              <ChartSelectController
+                selected={selectedChart}
+                selectedSetter={setSelectedChart}
+                tabLabelInfo={'차트 선택'}
+              />
+              <CoinSelectController
+                selectedCoinList={selectedMarket}
+                selectedCoinListSetter={setSelectedMarket}
+                tabLabelInfo={'코인 선택'}
+              />
+            </InfoContainerMobile>
+          </SwipeableTemporaryDrawer>
+        </Box>
+      ) : (
+        <SideBarContainer>
+          <ChartSelectController
+            selected={selectedChart}
+            selectedSetter={setSelectedChart}
+          />
+          <CoinSelectController
+            selectedCoinList={selectedMarket}
+            selectedCoinListSetter={setSelectedMarket}
+          />
+        </SideBarContainer>
+      )}
       <ChartContainer>
         {selectedChart === 'RunningChart' ? (
           <RunningChart
