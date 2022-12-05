@@ -12,7 +12,11 @@ import {
   getXAxisScale,
   handleMouseEvent,
   updateCurrentPrice,
-  updatePointerUI
+  updatePointerUI,
+  checkNeedPastFetch,
+  goToPast,
+  checkNeedFutureFetch,
+  goToFuture
 } from '@/utils/chartManager'
 import {
   DEFAULT_CANDLE_PERIOD,
@@ -175,7 +179,7 @@ function updateChart(
       }
     )
 }
-interface CandleChartProps {
+export interface CandleChartProps {
   candlePeriod: ChartPeriod
   candleData: CandleData[]
   candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>
@@ -276,34 +280,6 @@ function initChart(
   )
 }
 
-function checkNeedPastFetch(
-  candleData: CandleData[],
-  option: ChartRenderOption
-) {
-  return {
-    result:
-      Math.min(
-        candleData.length - option.fetchStartDataIndex,
-        DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
-      ) <
-      option.renderStartDataIndex + option.renderCandleCount + 100,
-    //1000개의 data인데 현재 200~800인 경우 fetch할 필요가 없이 optionSetter만 넘겨주면 됩니다.
-    willFetch:
-      Math.ceil((candleData.length - option.fetchStartDataIndex) / 100) * 100 <=
-      DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
-  }
-}
-function checkNeedFutureFetch(
-  candleData: CandleData[],
-  option: ChartRenderOption
-) {
-  return (
-    candleData.length >= DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT &&
-    option.renderStartDataIndex < 100 &&
-    option.fetchStartDataIndex > 0
-  )
-}
-
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = React.useRef<SVGSVGElement>(null)
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
@@ -316,42 +292,6 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
     initChart(chartSvg, props.optionSetter, setPointerInfo, windowSize)
   }, [windowSize, props.optionSetter])
 
-  function goToPast(props: CandleChartProps) {
-    return {
-      ...props.option,
-      fetchStartDataIndex:
-        props.option.fetchStartDataIndex +
-        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-      renderStartDataIndex:
-        props.option.renderStartDataIndex -
-        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-      translateX:
-        props.option.translateX -
-        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
-          calculateCandlewidth(
-            props.option,
-            windowSize.width - CHART_Y_AXIS_MARGIN
-          )
-    }
-  }
-  function goToFuture(props: CandleChartProps) {
-    return {
-      ...props.option,
-      fetchStartDataIndex:
-        props.option.fetchStartDataIndex -
-        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-      renderStartDataIndex:
-        props.option.renderStartDataIndex +
-        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-      translateX:
-        props.option.translateX +
-        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
-          calculateCandlewidth(
-            props.option,
-            windowSize.width - CHART_Y_AXIS_MARGIN
-          )
-    }
-  }
   React.useEffect(() => {
     //디바운싱 구문
     const { result, willFetch } = checkNeedPastFetch(
@@ -367,7 +307,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
           !willFetch &&
           props.candleData.length - props.option.fetchStartDataIndex > 500
         ) {
-          props.optionSetter(goToPast(props))
+          props.optionSetter(goToPast(props, windowSize))
 
           return
         }
@@ -400,7 +340,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
             props.candleData.length - props.option.fetchStartDataIndex >
             500
           ) {
-            props.optionSetter(goToPast(props))
+            props.optionSetter(goToPast(props, windowSize))
           }
         })
       }
@@ -408,7 +348,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
     }
     //-----------------------우측(미래)으로 이동-----------------------
     if (checkNeedFutureFetch(props.candleData, props.option)) {
-      props.optionSetter(goToFuture(props))
+      props.optionSetter(goToFuture(props, windowSize))
       return
     }
 

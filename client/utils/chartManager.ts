@@ -2,8 +2,12 @@ import {
   CANDLE_COLOR_RED,
   CANDLE_COLOR_BLUE,
   CANDLE_CHART_POINTER_LINE_COLOR,
-  CHART_FONT_SIZE
+  CHART_FONT_SIZE,
+  DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT,
+  DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+  CHART_Y_AXIS_MARGIN
 } from '@/constants/ChartConstants'
+import { WindowSize } from 'hooks/useWindowSize'
 import {
   ChartRenderOption,
   CandleData,
@@ -11,6 +15,7 @@ import {
 } from '@/types/ChartTypes'
 import * as d3 from 'd3'
 import { makeDate } from './dateManager'
+import { CandleChartProps } from '@/components/Candlechart'
 
 export function calculateCandlewidth(
   option: ChartRenderOption,
@@ -266,4 +271,67 @@ export function handleMouseEvent(
     return
   }
   pointerPositionSetter({ positionX: -1, positionY: -1 })
+}
+export function checkNeedPastFetch(
+  candleData: CandleData[],
+  option: ChartRenderOption
+) {
+  return {
+    result:
+      Math.min(
+        candleData.length - option.fetchStartDataIndex,
+        DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
+      ) <
+      option.renderStartDataIndex + option.renderCandleCount + 100,
+    //1000개의 data인데 현재 200~800인 경우 fetch할 필요가 없이 optionSetter만 넘겨주면 됩니다.
+    willFetch:
+      Math.ceil((candleData.length - option.fetchStartDataIndex) / 100) * 100 <=
+      DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
+  }
+}
+export function checkNeedFutureFetch(
+  candleData: CandleData[],
+  option: ChartRenderOption
+) {
+  return (
+    candleData.length >= DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT &&
+    option.renderStartDataIndex < 100 &&
+    option.fetchStartDataIndex > 0
+  )
+}
+export function goToPast(props: CandleChartProps, windowSize: WindowSize) {
+  return {
+    ...props.option,
+    fetchStartDataIndex:
+      props.option.fetchStartDataIndex +
+      DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+    renderStartDataIndex:
+      props.option.renderStartDataIndex -
+      DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+    translateX:
+      props.option.translateX -
+      DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
+        calculateCandlewidth(
+          props.option,
+          windowSize.width - CHART_Y_AXIS_MARGIN
+        )
+  }
+}
+export function goToFuture(props: CandleChartProps, windowSize: WindowSize) {
+  return {
+    ...props.option,
+    fetchStartDataIndex:
+      props.option.fetchStartDataIndex -
+      DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+    renderStartDataIndex:
+      props.option.renderStartDataIndex +
+      DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+    translateX:
+      props.option.translateX +
+      DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
+        calculateCandlewidth(
+          props.option,
+          windowSize.width - CHART_Y_AXIS_MARGIN
+        )
+  }
 }
