@@ -1,6 +1,6 @@
 import { useState, useEffect, useReducer } from 'react'
 import { CoinRateType } from '@/types/ChartTypes'
-import { RunningChart } from '@/components/RunningChart'
+import { RunningChart } from '@/components/Runningchart'
 import { getCoinTicker } from '@/utils/upbitManager'
 
 export default function RunningChartPage() {

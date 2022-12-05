@@ -235,10 +235,13 @@ function initChart(
     )
     .on('wheel', (e: WheelEvent) => {
       e.preventDefault()
-      optionSetter(prev => {
-        const newRenderCandleCount = Math.max(
-          prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1), //휠이벤트 e.deltaY가 확대면 -1 축소면 +1
-          MIN_CANDLE_COUNT
+      optionSetter((prev: ChartRenderOption) => {
+        const newRenderCandleCount = Math.min(
+          Math.max(
+            prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1), //휠이벤트 e.deltaY가 확대면 -1 축소면 +1
+            MIN_CANDLE_COUNT
+          ),
+          200 //최소 5~200개로 제한
         )
         const newTranslateX =
           calculateCandlewidth(
