@@ -43,8 +43,6 @@ function updateChart(
     option.fetchStartDataIndex,
     option.fetchStartDataIndex + 600
   )
-  console.log('데이터길이 : ', data.length)
-
   const chartContainerXsize = windowSize.width
   const chartContainerYsize = windowSize.height
   const chartAreaXsize = chartContainerXsize - CHART_Y_AXIS_MARGIN
@@ -280,7 +278,7 @@ function checkNeedPastFetch(
   option: ChartRenderOption
 ) {
   return (
-    candleData.length - option.fetchStartDataIndex <
+    Math.min(candleData.length - option.fetchStartDataIndex, 600) <
     option.renderStartDataIndex + option.renderCandleCount + 100
   )
 }
@@ -309,11 +307,6 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
 
   React.useEffect(() => {
     //디바운싱 구문
-    // console.log(fetchStartDataIndex, props.candleData.length)
-    console.log(
-      props.option.renderStartDataIndex + props.option.renderCandleCount,
-      props.option.translateX
-    )
     if (checkNeedPastFetch(props.candleData, props.option)) {
       // 남은 candleData가 일정개수 이하로 내려가면 Fetch
       if (!isFetching.current) {
