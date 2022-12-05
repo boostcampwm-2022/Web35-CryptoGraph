@@ -26,6 +26,7 @@ const SideBarContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  padding: 0 1rem;
   align-items: center;
   width: 500px;
   height: 100%;
@@ -80,10 +81,12 @@ export default function Home({
             selected={selectedChart}
             selectedSetter={setSelectedChart}
           />
-          <CoinSelectController
-            selectedCoinList={selectedMarket}
-            selectedCoinListSetter={setSelectedMarket}
-          />
+          <Box sx={{ width: '100%', height: '90%' }}>
+            <CoinSelectController
+              selectedCoinList={selectedMarket}
+              selectedCoinListSetter={setSelectedMarket}
+            />
+          </Box>
         </SideBarContainer>
       )}
       <ChartContainer>
