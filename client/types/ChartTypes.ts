@@ -17,7 +17,8 @@ export interface CandleData {
   timestamp: number
   trade_timestamp: number
 }
-
+export const ChartTypeArr = ['TreeChart', 'RunningChart'] as const
+export type ChartType = typeof ChartTypeArr[number]
 type ChartPeriodItered<T> = {
   [K in ChartPeriod]: T
 }
