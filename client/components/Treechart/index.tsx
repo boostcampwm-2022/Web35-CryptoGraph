@@ -205,19 +205,12 @@ export default function TreeChart({
 
   useEffect(() => {
     // 4. CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
-    const parentNode: CoinRateContentType[] = [
-      { name: 'Origin', parent: '', value: 0 }
-    ]
-    if (!coinRate) return
-    const newCoinData = {}
+    if (!coinRate || !Market) return
+    const newCoinData = [{ name: 'Origin', parent: '', value: 0 }]
     for (const tick of Market) {
-      newCoinData['KRW-' + tick] = coinRate['KRW-' + tick]
+      newCoinData.push(coinRate['KRW-' + tick])
     }
-
-    setChangeRate([
-      ...parentNode,
-      ...Object.values(newCoinData)
-    ] as CoinRateContentType[])
+    setChangeRate(newCoinData)
   }, [data, Market])
   useEffect(() => {
     // 5. 트리맵에 데이터 바인딩

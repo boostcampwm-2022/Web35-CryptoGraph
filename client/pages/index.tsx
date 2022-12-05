@@ -70,7 +70,11 @@ export default function Home({
       </SideBarContainer>
       <ChartContainer>
         {selectedChart === 'RunningChart' ? (
-          <RunningChart candleCount={20} data={coinData} />
+          <RunningChart
+            candleCount={20}
+            data={coinData}
+            Market={selectedMarket}
+          />
         ) : (
           <TreeChart data={coinData} Market={selectedMarket} />
         )}
