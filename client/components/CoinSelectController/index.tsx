@@ -9,8 +9,14 @@ import { MarketCapInfo } from '@/types/CoinDataTypes'
 interface CoinChecked {
   [key: string]: boolean
 }
-
-export default function CoinSelectController() {
+interface ChartSelectControllerProps {
+  selectedCoinList: string[]
+  selectedCoinListSetter: React.Dispatch<React.SetStateAction<string[]>>
+}
+export default function CoinSelectController({
+  selectedCoinList,
+  selectedCoinListSetter
+}: ChartSelectControllerProps) {
   const [coinList, setCoinList] = useState<MarketCapInfo[] | null>([])
   const [checked, setChecked] = useState<CoinChecked>({
     all: false

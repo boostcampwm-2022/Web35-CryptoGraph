@@ -1,7 +1,7 @@
 import { styled } from '@mui/material/styles'
 import { Box } from '@mui/material'
-import TreeChart from '@/components/Treechart'
-import { MarketCapInfo, TreeChartPageProps } from '@/types/CoinDataTypes'
+import TreeChart, { TreeChartProps } from '@/components/Treechart'
+import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 
@@ -16,7 +16,7 @@ export default function TreeChartPage({
 }
 
 export const getServerSideProps: GetServerSideProps<
-  TreeChartPageProps
+  TreeChartProps
 > = async () => {
   const fetchedData: MarketCapInfo[] | null = await getMarketCapInfo()
   return {
