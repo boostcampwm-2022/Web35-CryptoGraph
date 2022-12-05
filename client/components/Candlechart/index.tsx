@@ -289,6 +289,10 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
 
   React.useEffect(() => {
     //디바운싱 구문
+    // console.log(fetchStartDataIndex, props.candleData.length)
+    console.log(
+      props.option.renderStartDataIndex + props.option.renderCandleCount
+    )
     if (checkNeedFetch(props.candleData, props.option)) {
       // 남은 candleData가 일정개수 이하로 내려가면 Fetch
       if (!isFetching.current) {
@@ -316,6 +320,21 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
           }
           isFetching.current = false
           props.candleDataSetter(prev => {
+            if (prev.length > 500) {
+              props.optionSetter({
+                ...props.option,
+                fetchStartDataIndex: props.option.fetchStartDataIndex + 200,
+                renderStartDataIndex: props.option.renderStartDataIndex - 200,
+                translateX:
+                  props.option.translateX -
+                  200 *
+                    calculateCandlewidth(
+                      props.option,
+                      windowSize.width - CHART_Y_AXIS_MARGIN
+                    )
+              })
+              return [...prev, ...res].slice(200)
+            }
             return [...prev, ...res]
           })
         })
