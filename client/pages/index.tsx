@@ -12,6 +12,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { useMediaQuery } from '@mui/material'
 import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
 import InfoContainerMobile from '@/components/InfoContainerMobile'
+import CoinDetailedInfo from '@/components/CoinDetailedInfo'
 const HomeContainer = styled('div')`
   display: flex;
   width: 100%;
@@ -72,6 +73,10 @@ export default function Home({
                 selectedCoinListSetter={setSelectedMarket}
                 tabLabelInfo={'코인 선택'}
               />
+              <CoinDetailedInfo
+                market="btc"
+                tabLabelInfo={'상세 정보'}
+              ></CoinDetailedInfo>
             </InfoContainerMobile>
           </SwipeableTemporaryDrawer>
         </Box>
@@ -81,11 +86,14 @@ export default function Home({
             selected={selectedChart}
             selectedSetter={setSelectedChart}
           />
-          <Box sx={{ width: '100%', height: '90%' }}>
+          <Box sx={{ width: '100%', height: '60%' }}>
             <CoinSelectController
               selectedCoinList={selectedMarket}
               selectedCoinListSetter={setSelectedMarket}
             />
+          </Box>
+          <Box sx={{ width: '100%', height: '30%' }}>
+            <CoinDetailedInfo market="btc"></CoinDetailedInfo>
           </Box>
         </SideBarContainer>
       )}

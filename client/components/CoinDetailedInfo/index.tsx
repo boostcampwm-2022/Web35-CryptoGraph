@@ -5,22 +5,6 @@ import Image from 'next/image'
 import { CoinMetaData } from '@/types/CoinDataTypes'
 import { useCoinMetaData } from 'hooks/useCoinMetaData'
 
-type mockingType = {
-  [key: string]: string
-}
-const mocking: mockingType = {
-  market_Cap: '1',
-  Data2: '2',
-  Data3: '3',
-  Data4: '4',
-  Data5: '12',
-  Data6: '22',
-  Data7: '32',
-  Data23: '12',
-  Data231: '22',
-  Data2341: '32',
-  Data8: '42'
-}
 //코인 상세정보
 interface CoinDetailedInfoProps extends TabProps {
   market: string
@@ -76,7 +60,7 @@ const Container = styled('div')`
   flex-direction: column;
   width: 100%;
   height: 100%;
-
+  box-sizing: border-box;
   padding: 24px;
 `
 
