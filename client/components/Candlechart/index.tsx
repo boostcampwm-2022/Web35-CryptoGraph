@@ -45,10 +45,10 @@ function updateChart(
   pointerInfo: PointerPosition,
   windowSize: WindowSize
 ) {
-  //candleData를 fetchStartDataIndex에 맞게 잘라주는작업
+  //candleData를 DomElementStartIndex에 맞게 잘라주는작업
   data = data.slice(
-    option.fetchStartDataIndex,
-    option.fetchStartDataIndex + DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
+    option.DomElementStartIndex,
+    option.DomElementStartIndex + DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
   )
   const chartContainerXsize = windowSize.width
   const chartContainerYsize = windowSize.height
@@ -305,7 +305,8 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
         // 279번째 줄 참고 과거로 이동하되 fetch하지 않는경우 optionSetter만 발동
         if (
           !willFetch &&
-          props.candleData.length - props.option.fetchStartDataIndex > 500
+          props.candleData.length - props.option.DomElementStartIndex >
+            DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
         ) {
           props.optionSetter(goToPast(props, windowSize))
 
@@ -337,8 +338,8 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
           isFetching.current = false
           props.candleDataSetter(prev => [...prev, ...res])
           if (
-            props.candleData.length - props.option.fetchStartDataIndex >
-            500
+            props.candleData.length - props.option.DomElementStartIndex >
+            DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
           ) {
             props.optionSetter(goToPast(props, windowSize))
           }

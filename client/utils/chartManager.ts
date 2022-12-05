@@ -279,13 +279,14 @@ export function checkNeedPastFetch(
   return {
     result:
       Math.min(
-        candleData.length - option.fetchStartDataIndex,
+        candleData.length - option.DomElementStartIndex,
         DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
       ) <
       option.renderStartDataIndex + option.renderCandleCount + 100,
     //1000개의 data인데 현재 200~800인 경우 fetch할 필요가 없이 optionSetter만 넘겨주면 됩니다.
     willFetch:
-      Math.ceil((candleData.length - option.fetchStartDataIndex) / 100) * 100 <=
+      Math.ceil((candleData.length - option.DomElementStartIndex) / 100) *
+        100 <=
       DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
   }
 }
@@ -296,14 +297,14 @@ export function checkNeedFutureFetch(
   return (
     candleData.length >= DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT &&
     option.renderStartDataIndex < 100 &&
-    option.fetchStartDataIndex > 0
+    option.DomElementStartIndex > 0
   )
 }
 export function goToPast(props: CandleChartProps, windowSize: WindowSize) {
   return {
     ...props.option,
-    fetchStartDataIndex:
-      props.option.fetchStartDataIndex +
+    DomElementStartIndex:
+      props.option.DomElementStartIndex +
       DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
     renderStartDataIndex:
       props.option.renderStartDataIndex -
@@ -320,8 +321,8 @@ export function goToPast(props: CandleChartProps, windowSize: WindowSize) {
 export function goToFuture(props: CandleChartProps, windowSize: WindowSize) {
   return {
     ...props.option,
-    fetchStartDataIndex:
-      props.option.fetchStartDataIndex -
+    DomElementStartIndex:
+      props.option.DomElementStartIndex -
       DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
     renderStartDataIndex:
       props.option.renderStartDataIndex +

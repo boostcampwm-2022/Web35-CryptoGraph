@@ -16,7 +16,7 @@ export const DEFAULT_CANDLER_CHART_RENDER_OPTION: ChartRenderOption = {
   marketType: 'BTC',
   isMovingAverageVisible: false,
   isVolumeVislble: false,
-  fetchStartDataIndex: 0,
+  DomElementStartIndex: 0,
   fetchCandleCount: DEFAULT_CANDLE_COUNT,
   renderStartDataIndex: 0,
   renderCandleCount: DEFAULT_CANDLE_RENDER_COUNT,
