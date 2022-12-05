@@ -12,11 +12,11 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
 import useInterval from '@/hooks/useInterval'
 import { updateTreeData } from '@/components/Treechart/getCoinData'
-import { update } from 'lodash'
 
 const coinIntervalRate = 5000
 
-const getInitData = (data: MarketCapInfo[]) => {
+const getInitData = (data: MarketCapInfo[]): CoinRateType => {
+  //initData
   const initData: CoinRateType = {}
   data.forEach(coinData => {
     const coinContent: CoinRateContentType = {
@@ -35,8 +35,14 @@ const getInitData = (data: MarketCapInfo[]) => {
   return initData
 }
 
-const dataMarket = data => {
-  return Object.keys(data).map(x => data[x].name_k)
+interface getDataProps {
+  data: MarketCapInfo[]
+  Market?: string[] //선택된 코인 리스트
+}
+
+const dataMarket = (data: MarketCapInfo[]): string[] => {
+  // initMarket
+  return data.map(coin => coin.name)
 }
 
 export default function Home({
@@ -46,7 +52,7 @@ export default function Home({
   const [selectedMarket, setSelectedMarket] = useState<string[]>(
     dataMarket(data)
   ) //선택된 market 컨트롤
-  const [coinData, setCoinData] = useState(getInitData(data))
+  const [coinData, setCoinData] = useState<CoinRateType>(getInitData(data))
 
   useInterval(() => {
     async function update() {
@@ -68,24 +74,28 @@ export default function Home({
           selectedCoinListSetter={setSelectedMarket}
         />
       </SideBarContainer>
-      <ChartContainer>
-        {selectedChart === 'RunningChart' ? (
-          <RunningChart
-            candleCount={20}
-            data={coinData}
-            Market={selectedMarket}
-          />
-        ) : (
-          <TreeChart data={coinData} Market={selectedMarket} />
-        )}
-      </ChartContainer>
+      {selectedMarket.length !== 0 ? (
+        <ChartContainer>
+          {selectedChart === 'RunningChart' ? (
+            <RunningChart
+              candleCount={20}
+              data={coinData}
+              Market={selectedMarket}
+            />
+          ) : (
+            <TreeChart data={coinData} Market={selectedMarket} />
+          )}
+        </ChartContainer>
+      ) : (
+        '선택된 코인이 없습니다.' // 괜찮은 이미지 추가하면 좋을듯
+      )}
     </HomeContainer>
   )
 }
 
 //솔직히 서버사이드 프롭스 없애는게 낫지 않나 싶음..
 export const getServerSideProps: GetServerSideProps<
-  TreeChartProps
+  getDataProps
 > = async () => {
   const fetchedData: MarketCapInfo[] | null = await getMarketCapInfo()
   return {

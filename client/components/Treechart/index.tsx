@@ -184,7 +184,7 @@ const initChart = (
 }
 
 export interface TreeChartProps {
-  data: MarketCapInfo[]
+  data: CoinRateType
   Market?: string[] //선택된 코인 리스트
 }
 export default function TreeChart({
@@ -204,19 +204,18 @@ export default function TreeChart({
   }, [width, height])
 
   useEffect(() => {
-    // 4. CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
+    // CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
     if (!coinRate || !Market) return
-    const newCoinData = [{ name: 'Origin', parent: '', value: 0 }]
+    const newCoinData: CoinRateContentType[] = [
+      { name: 'Origin', ticker: '', parent: '', value: 0 }
+    ]
     for (const tick of Market) {
       newCoinData.push(coinRate['KRW-' + tick])
     }
     setChangeRate(newCoinData)
   }, [data, Market])
   useEffect(() => {
-    // 5. 트리맵에 데이터 바인딩
-    if (changeRate.length > 1) {
-      updateChart(chartSvg, changeRate, width, height)
-    }
+    updateChart(chartSvg, changeRate, width, height)
   }, [changeRate, width, height])
 
   return (

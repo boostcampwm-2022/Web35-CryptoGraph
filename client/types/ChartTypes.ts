@@ -90,7 +90,7 @@ export interface ActionType {
 export type EmptyObject = Record<string, never>
 
 export interface CoinRateType {
-  [key: string]: EmptyObject | CoinRateContentType
+  [key: string]: CoinRateContentType
 }
 
 export interface CoinRateContentType {

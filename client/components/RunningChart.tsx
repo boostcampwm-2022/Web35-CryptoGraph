@@ -12,7 +12,8 @@ const COIN_INTERVAL_RATE = 3000
 //------------------------------interface------------------------------
 interface RunningChartProps {
   candleCount: number
-  toRenderCoinTickerList?: CoinRate //선택된 코인 리스트
+  data: CoinRateType //선택된 코인 리스트
+  Market: string[]
 }
 
 //------------------------------initChart------------------------------
@@ -176,7 +177,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
 
   React.useEffect(() => {
     if (!coinRate || !Market[0]) return
-    const newCoinData = {}
+    const newCoinData: CoinRateType = {}
     for (const tick of Market) {
       newCoinData['KRW-' + tick] = coinRate['KRW-' + tick]
     }
