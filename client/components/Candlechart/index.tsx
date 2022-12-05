@@ -23,7 +23,10 @@ import {
   CANDLE_CHART_GRID_COLOR,
   CHART_FONT_SIZE,
   CHART_Y_AXIS_MARGIN,
-  CHART_X_AXIS_MARGIN
+  CHART_X_AXIS_MARGIN,
+  DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+  DEFAULT_CANDLE_COUNT,
+  DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
 } from '@/constants/ChartConstants'
 import { makeDate } from '@/utils/dateManager'
 import { getCandleDataArray } from '@/utils/upbitManager'
@@ -41,7 +44,7 @@ function updateChart(
   //candleData를 fetchStartDataIndex에 맞게 잘라주는작업
   data = data.slice(
     option.fetchStartDataIndex,
-    option.fetchStartDataIndex + 600
+    option.fetchStartDataIndex + DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
   )
   const chartContainerXsize = windowSize.width
   const chartContainerYsize = windowSize.height
@@ -246,7 +249,7 @@ function initChart(
             prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1), //휠이벤트 e.deltaY가 확대면 -1 축소면 +1
             MIN_CANDLE_COUNT
           ),
-          200 //최소 5~200개로 제한
+          DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT //최소 5~200개로 제한
         )
         const newTranslateX =
           calculateCandlewidth(
@@ -278,7 +281,10 @@ function checkNeedPastFetch(
   option: ChartRenderOption
 ) {
   return (
-    Math.min(candleData.length - option.fetchStartDataIndex, 600) <
+    Math.min(
+      candleData.length - option.fetchStartDataIndex,
+      DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
+    ) <
     option.renderStartDataIndex + option.renderCandleCount + 100
   )
 }
@@ -287,7 +293,7 @@ function checkNeedFutureFetch(
   option: ChartRenderOption
 ) {
   return (
-    candleData.length >= 600 &&
+    candleData.length >= DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT &&
     option.renderStartDataIndex < 100 &&
     option.fetchStartDataIndex > 0
   )
@@ -316,7 +322,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
         getCandleDataArray(
           DEFAULT_CANDLE_PERIOD,
           props.option.marketType,
-          200,
+          DEFAULT_CANDLE_COUNT,
           makeDate(
             //endTime설정
             props.candleData[props.candleData.length - 1].timestamp,
@@ -340,11 +346,15 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
           ) {
             props.optionSetter({
               ...props.option,
-              fetchStartDataIndex: props.option.fetchStartDataIndex + 200,
-              renderStartDataIndex: props.option.renderStartDataIndex - 200,
+              fetchStartDataIndex:
+                props.option.fetchStartDataIndex +
+                DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+              renderStartDataIndex:
+                props.option.renderStartDataIndex -
+                DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
               translateX:
                 props.option.translateX -
-                200 *
+                DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
                   calculateCandlewidth(
                     props.option,
                     windowSize.width - CHART_Y_AXIS_MARGIN
@@ -359,11 +369,15 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
     if (checkNeedFutureFetch(props.candleData, props.option)) {
       props.optionSetter({
         ...props.option,
-        fetchStartDataIndex: props.option.fetchStartDataIndex - 200,
-        renderStartDataIndex: props.option.renderStartDataIndex + 200,
+        fetchStartDataIndex:
+          props.option.fetchStartDataIndex -
+          DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+        renderStartDataIndex:
+          props.option.renderStartDataIndex +
+          DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
         translateX:
           props.option.translateX +
-          200 *
+          DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
             calculateCandlewidth(
               props.option,
               windowSize.width - CHART_Y_AXIS_MARGIN
