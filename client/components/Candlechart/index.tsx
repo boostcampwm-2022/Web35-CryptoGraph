@@ -280,13 +280,18 @@ function checkNeedPastFetch(
   candleData: CandleData[],
   option: ChartRenderOption
 ) {
-  return (
-    Math.min(
-      candleData.length - option.fetchStartDataIndex,
+  return {
+    result:
+      Math.min(
+        candleData.length - option.fetchStartDataIndex,
+        DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
+      ) <
+      option.renderStartDataIndex + option.renderCandleCount + 100,
+    //1000개의 data인데 현재 200~800인 경우 fetch할 필요가 없이 optionSetter만 넘겨주면 됩니다.
+    willFetch:
+      Math.ceil((candleData.length - option.fetchStartDataIndex) / 100) * 100 <=
       DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
-    ) <
-    option.renderStartDataIndex + option.renderCandleCount + 100
-  )
+  }
 }
 function checkNeedFutureFetch(
   candleData: CandleData[],
@@ -311,11 +316,62 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
     initChart(chartSvg, props.optionSetter, setPointerInfo, windowSize)
   }, [windowSize, props.optionSetter])
 
+  function goToPast(props: CandleChartProps) {
+    return {
+      ...props.option,
+      fetchStartDataIndex:
+        props.option.fetchStartDataIndex +
+        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+      renderStartDataIndex:
+        props.option.renderStartDataIndex -
+        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+      translateX:
+        props.option.translateX -
+        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
+          calculateCandlewidth(
+            props.option,
+            windowSize.width - CHART_Y_AXIS_MARGIN
+          )
+    }
+  }
+  function goToFuture(props: CandleChartProps) {
+    return {
+      ...props.option,
+      fetchStartDataIndex:
+        props.option.fetchStartDataIndex -
+        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+      renderStartDataIndex:
+        props.option.renderStartDataIndex +
+        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
+      translateX:
+        props.option.translateX +
+        DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
+          calculateCandlewidth(
+            props.option,
+            windowSize.width - CHART_Y_AXIS_MARGIN
+          )
+    }
+  }
   React.useEffect(() => {
     //디바운싱 구문
-    if (checkNeedPastFetch(props.candleData, props.option)) {
-      // 남은 candleData가 일정개수 이하로 내려가면 Fetch
+    const { result, willFetch } = checkNeedPastFetch(
+      props.candleData,
+      props.option
+    )
+    //-----------------------좌측(과거)으로 이동-----------------------
+    if (result) {
+      //디바운싱
       if (!isFetching.current) {
+        // 279번째 줄 참고 과거로 이동하되 fetch하지 않는경우 optionSetter만 발동
+        if (
+          !willFetch &&
+          props.candleData.length - props.option.fetchStartDataIndex > 500
+        ) {
+          props.optionSetter(goToPast(props))
+
+          return
+        }
+
         //fetching중인데 한번더 요청이 일어나면 추가fetch 작동하지않음
         isFetching.current = true
         //추가적인 candleData Fetch
@@ -344,45 +400,15 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
             props.candleData.length - props.option.fetchStartDataIndex >
             500
           ) {
-            props.optionSetter({
-              ...props.option,
-              fetchStartDataIndex:
-                props.option.fetchStartDataIndex +
-                DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-              renderStartDataIndex:
-                props.option.renderStartDataIndex -
-                DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-              translateX:
-                props.option.translateX -
-                DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
-                  calculateCandlewidth(
-                    props.option,
-                    windowSize.width - CHART_Y_AXIS_MARGIN
-                  )
-            })
+            props.optionSetter(goToPast(props))
           }
         })
       }
       return
     }
-
+    //-----------------------우측(미래)으로 이동-----------------------
     if (checkNeedFutureFetch(props.candleData, props.option)) {
-      props.optionSetter({
-        ...props.option,
-        fetchStartDataIndex:
-          props.option.fetchStartDataIndex -
-          DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-        renderStartDataIndex:
-          props.option.renderStartDataIndex +
-          DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-        translateX:
-          props.option.translateX +
-          DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
-            calculateCandlewidth(
-              props.option,
-              windowSize.width - CHART_Y_AXIS_MARGIN
-            )
-      })
+      props.optionSetter(goToFuture(props))
       return
     }
 
