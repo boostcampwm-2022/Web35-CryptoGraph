@@ -12,19 +12,6 @@ interface SortSelectControllerProps {
   selectedChart: string
 }
 
-const SortSelectorContainer = styled('div')`
-  display: flex;
-  width: 100%;
-  height: 10%;
-  background-color: #ffffff;
-  box-sizing: border-box;
-  border: 1px solid #cac4d0;
-  border-radius: 20px;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-`
-
 export default function SortSelectController({
   selectedSort,
   selectedSortSetter,
@@ -62,3 +49,16 @@ export default function SortSelectController({
     </SortSelectorContainer>
   )
 }
+
+const SortSelectorContainer = styled('div')`
+  display: flex;
+  width: 100%;
+  height: 10%;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  border: 1px solid #cac4d0;
+  border-radius: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+`
