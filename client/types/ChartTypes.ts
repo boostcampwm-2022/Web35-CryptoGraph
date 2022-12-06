@@ -43,7 +43,7 @@ export const DatePeriod: ChartPeriodItered<number> = {
 export const ChartPeriodList = Object.keys(DatePeriod)
 export interface ChartRenderOption {
   marketType: string
-  fetchStartDataIndex: number
+  DomElementStartIndex: number
   fetchCandleCount: number
   renderStartDataIndex: number
   renderCandleCount: number
@@ -90,7 +90,7 @@ export interface ActionType {
 export type EmptyObject = Record<string, never>
 
 export interface CoinRateType {
-  [key: string]: EmptyObject | CoinRateContentType
+  [key: string]: CoinRateContentType
 }
 
 export interface CoinRateContentType {

@@ -12,7 +12,8 @@ const COIN_INTERVAL_RATE = 3000
 //------------------------------interface------------------------------
 interface RunningChartProps {
   candleCount: number
-  toRenderCoinTickerList?: string[] //선택된 코인 리스트
+  data: CoinRateType //선택된 코인 리스트
+  Market: string[]
 }
 
 //------------------------------initChart------------------------------
@@ -157,44 +158,31 @@ const updateChart = (
 //------------------------------Component------------------------------
 export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   candleCount,
-  toRenderCoinTickerList = ['BTC']
+  data,
+  Market
 }) => {
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
   const chartSvg = React.useRef(null)
   const { width, height } = useWindowSize(chartContainerRef)
-  const [coinRate, setCoinRate] = React.useState<CoinRateType>({}) //coin의 등락률 값
-  React.useEffect(() => {
-    const initCoinRate: CoinRateType = {}
-    toRenderCoinTickerList.forEach(market => {
-      initCoinRate[`KRW-${market}`] = {
-        name: market,
-        ticker: `KRW-${market}`,
-        parent: 'Origin',
-        value: 0
-      }
-    })
-    async function update() {
-      const a = await updateTreeData(initCoinRate)
-      setCoinRate(a)
-    }
-    update()
-  }, [])
+  const [coinRate, setCoinRate] = React.useState<CoinRateType>(data) //coin의 등락률 값, 모든 코인 값 보유
+  const [changeRate, setchangeRate] = React.useState<CoinRateType>(data) //선택된 코인 값만 보유
+
   React.useEffect(() => {
     initChart(chartSvg, width, height)
   }, [width, height]) // 창크기에 따른 차트크기 조절
 
   React.useEffect(() => {
-    updateChart(chartSvg, coinRate, width, height, candleCount)
-  }, [width, height, coinRate, candleCount]) // 창크기에 따른 차트크기 조절
+    updateChart(chartSvg, changeRate, width, height, candleCount)
+  }, [width, height, changeRate, candleCount]) // 창크기에 따른 차트크기 조절
 
-  useInterval(() => {
-    // 주기적으로 코인 등락률을 업데이트
-    async function update() {
-      const a = await updateTreeData(coinRate)
-      setCoinRate(a)
+  React.useEffect(() => {
+    if (!coinRate || !Market[0]) return
+    const newCoinData: CoinRateType = {}
+    for (const tick of Market) {
+      newCoinData['KRW-' + tick] = coinRate['KRW-' + tick]
     }
-    update()
-  }, COIN_INTERVAL_RATE)
+    setchangeRate(newCoinData)
+  }, [data, Market])
 
   return (
     <div
