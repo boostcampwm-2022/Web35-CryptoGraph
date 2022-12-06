@@ -1,7 +1,7 @@
 import { styled } from '@mui/material/styles'
 import { Box, useMediaQuery, useTheme } from '@mui/material'
-import InfoContainerMobile from '@/components/InfoContainerMobile'
-import InfoContainerDesktop from '@/components/InfoContainerDesktop'
+import TabContainer from '@/components/TabContainer'
+import InfoSidebarContainer from '@/components/InfoSidebarContainer'
 import ChartHeader from '@/components/ChartHeader'
 import {
   DEFAULT_CANDLE_PERIOD,
@@ -64,20 +64,20 @@ export default function Detail({
               width: '100%'
             }}
           >
-            <InfoContainerMobile>
+            <TabContainer>
               <CoinDetailedInfo market={market} tabLabelInfo={'코인 디테일'} />
               <RealTimeCoinPrice
                 tabLabelInfo={'실시간 코인 정보'}
                 priceInfo={realtimePriceInfo}
               />
-            </InfoContainerMobile>
+            </TabContainer>
             <LinkButton goto="/" content="Go to Main" />
           </Box>
         ) : (
-          <InfoContainerDesktop>
+          <InfoSidebarContainer>
             <CoinDetailedInfo market={market} />
             <RealTimeCoinPrice priceInfo={realtimePriceInfo} />
-          </InfoContainerDesktop>
+          </InfoSidebarContainer>
         )}
       </InfoContainer>
     </HomeContainer>
