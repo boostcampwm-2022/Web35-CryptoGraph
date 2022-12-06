@@ -21,7 +21,8 @@ import {
   getXAxisScale,
   updateCurrentPrice,
   updatePointerUI,
-  handleMouseEvent
+  handleMouseEvent,
+  getVolumeHeightScale
 } from '@/utils/chartManager'
 import * as d3 from 'd3'
 import { D3DragEvent } from 'd3'
@@ -61,6 +62,14 @@ export function updateCandleChart(
     ),
     chartAreaYsize
   )
+  // const volumeHeightScale = getVolumeHeightScale(
+  //   data.slice(
+  //     option.renderStartDataIndex,
+  //     option.renderStartDataIndex + option.renderCandleCount
+  //   ),
+  //   chartAreaYsize
+  // )
+  // 볼륨 스케일 함수, 추후 볼륨 추가시 해금예정
   if (!yAxisScale) {
     return undefined
   }
@@ -73,6 +82,7 @@ export function updateCandleChart(
     chartAreaYsize
   ) // axis를 업데이트한다.
   updateCurrentPrice(yAxisScale, data, option, chartAreaXsize)
+  // 현재 가격을 업데이트한다.
   updatePointerUI(
     pointerInfo,
     yAxisScale,
@@ -80,7 +90,7 @@ export function updateCandleChart(
     data,
     chartAreaXsize,
     chartAreaYsize
-  )
+  ) //마우스 포인터에 따른 UI를 업데이트한다.
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')
     .data(data)
@@ -88,17 +98,19 @@ export function updateCandleChart(
       enter => {
         let $g = enter.append('g')
         $g.attr('transform', `translate(${option.translateX})`)
+        /*  $g.append('rect').classed('volumeRect', true)
+        $g = placeVolumeRect($g, chartAreaXsize, candleWidth, yAxisScale) */
+        // 거래량, 개발예정, 성능 문제로 보류
         $g.append('line')
         $g = placeCandleLine($g, chartAreaXsize, candleWidth, yAxisScale)
-        $g.append('rect')
+        $g.append('rect').classed('candleRect', true)
         $g = placeCandleRect($g, chartAreaXsize, candleWidth, yAxisScale)
         return $g
       },
       update => {
-        // placeCandleLine, Rect
         update
           .attr('transform', `translate(${option.translateX})`) //263번 줄에서 수정, 차트 움직임을 zoom이벤트 ->updateChart에서 관리
-          .select('rect')
+          .select('rect.candleRect')
           .attr('width', candleWidth * 0.6)
           .attr('height', d =>
             Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price)) <=
@@ -117,6 +129,16 @@ export function updateCandleChart(
               ? CANDLE_COLOR_RED
               : CANDLE_COLOR_BLUE
           )
+        // update
+        //   .select('rect.volumeRect')
+        //   .attr('width', candleWidth * 0.6)
+        //   .attr('height', 10)
+        //   .attr('height', d => d.candle_acc_trade_price)
+        //   .attr('x', (d, i) => chartAreaXsize - candleWidth * (i + 0.8))
+        //   .attr('y', 300)
+        //   .attr('fill', 'yellow')
+        //   .attr('opacity', 0.5)
+        // 거래량
         update
           .select('line')
           .attr(
@@ -312,6 +334,22 @@ function placeCandleRect(
     .attr('y', d =>
       Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
     )
+    .attr('fill', d =>
+      d.opening_price <= d.trade_price ? CANDLE_COLOR_RED : CANDLE_COLOR_BLUE
+    )
+  return $g
+}
+
+function placeVolumeRect(
+  $g: d3.Selection<SVGGElement, CandleData, d3.BaseType, unknown>,
+  chartAreaXsize: number,
+  candleWidth: number,
+  yAxisScale: d3.ScaleLinear<number, number, never>
+) {
+  $g.attr('width', candleWidth * 0.6)
+    .attr('height', d => yAxisScale(d.trade_volume))
+    .attr('x', (d, i) => chartAreaXsize - candleWidth * (i + 0.8))
+    .attr('y', 30)
     .attr('fill', d =>
       d.opening_price <= d.trade_price ? CANDLE_COLOR_RED : CANDLE_COLOR_BLUE
     )
