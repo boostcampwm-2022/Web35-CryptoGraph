@@ -53,17 +53,14 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
     if (result) {
       //디바운싱
       if (!isFetching.current) {
-        // 279번째 줄 참고 과거로 이동하되 fetch하지 않는경우 optionSetter만 발동
         if (
           !willFetch &&
           props.candleData.length - props.option.DomElementStartIndex >
             DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
         ) {
           props.optionSetter(goToPast(props, windowSize))
-
           return
         }
-
         //fetching중인데 한번더 요청이 일어나면 추가fetch 작동하지않음
         isFetching.current = true
         //추가적인 candleData Fetch
