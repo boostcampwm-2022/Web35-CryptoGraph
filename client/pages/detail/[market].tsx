@@ -157,10 +157,10 @@ const HomeContainer = styled(Box)`
 `
 //왼쪽 메인차트
 const ChartAreaContainer = styled('div')`
+  flex: 1 1 auto;
   display: flex;
   box-sizing: content-box;
-  min-width: 300px;
-  width: 100%;
+  min-width: 350px;
   flex-direction: column;
   ${props => props.theme.breakpoints.up('tablet')} {
     height: 90%; //분봉선택바가 10%이다.
@@ -173,11 +173,9 @@ const InfoContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  // width %로 비율조절 가능한듯??
-  // chart와 info가 2:1의 비율
-  min-width: 300px;
-  width: 50%;
-  height: calc(100% - 48px);
+  width: 400px;
+  min-width: 400px;
+  height: 100%;
   ${props => props.theme.breakpoints.down('tablet')} {
     height: auto;
     margin: 0;
