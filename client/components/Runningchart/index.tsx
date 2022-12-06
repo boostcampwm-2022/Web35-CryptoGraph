@@ -167,10 +167,14 @@ const updateChart = (
           .transition()
           .duration(1000)
           .attr('x', d => {
-            return scale(
-              selectedSort !== 'market capitalization'
-                ? Math.abs(d.value) / 2
-                : Number(d.market_cap) / 2
+            return (
+              scale(
+                selectedSort !== 'descending'
+                  ? selectedSort !== 'market capitalization'
+                    ? Math.abs(d.value)
+                    : Number(d.market_cap)
+                  : d.value
+              ) / 2
             )
           })
           .attr('y', barHeight / 2)
