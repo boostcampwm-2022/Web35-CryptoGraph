@@ -20,7 +20,11 @@ export default function SortSelectController({
   const handleChange = (event: SelectChangeEvent) => {
     selectedSortSetter(event.target.value)
   }
-  const treeSortTypeArr = ['change rate', 'market capitalization']
+  const treeSortTypeArr = [
+    'change rate',
+    'change rate(absolute)',
+    'market capitalization'
+  ]
   const runningSortTypeArr = ['ascending', 'descending', 'absolute']
   return (
     <SortSelectorContainer>

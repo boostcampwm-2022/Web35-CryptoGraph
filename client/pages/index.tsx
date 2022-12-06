@@ -24,11 +24,15 @@ const getInitData = (data: MarketCapInfo[]): CoinRateType => {
       name: '',
       ticker: '',
       parent: '',
+      market_cap: 0,
+      cmc_rank: 0,
       value: 0
     }
     coinContent.name = coinData.name_kr
     coinContent.ticker = 'KRW-' + coinData.name
     coinContent.parent = 'Origin'
+    coinContent.market_cap = Number(coinData.market_cap)
+    coinContent.cmc_rank = Number(coinData.cmc_rank)
     coinContent.value = Number((coinData.signed_change_rate * 100).toFixed(2))
     initData[coinContent.ticker] = coinContent
   })
@@ -98,7 +102,11 @@ export default function Home({
               Market={selectedMarket}
             />
           ) : (
-            <TreeChart data={coinData} Market={selectedMarket} />
+            <TreeChart
+              data={coinData}
+              Market={selectedMarket}
+              selectedSort={selectedSort}
+            />
           )}
         </ChartContainer>
       ) : (
