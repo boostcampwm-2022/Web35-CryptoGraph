@@ -1,12 +1,7 @@
 import * as d3 from 'd3'
 import { useState, useEffect, useRef } from 'react'
-import useInterval from '@/hooks/useInterval'
 import { useWindowSize } from '@/hooks/useWindowSize'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
-import { updateTreeData } from './getCoinData'
-import { MarketCapInfo } from '@/types/CoinDataTypes'
-
-const coinIntervalRate = 1000
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -45,7 +40,11 @@ const updateChart = (
 
   root
     .sum(function (d): number {
-      return Math.abs(+d.value)
+      // return Math.abs(d.value)
+      if (d.name === 'Origin') {
+        return 0
+      }
+      return Math.max(0.5, Math.abs(d.value))
     })
     .sort(sort)
 
@@ -73,10 +72,14 @@ const updateChart = (
             return d.y1 - d.y0
           })
           .attr('fill', function (d) {
-            return d.data.value > 0 ? 'red' : 'blue'
+            return d.data.value >= 0
+              ? d.data.value > 0
+                ? 'red'
+                : 'black'
+              : 'blue'
           })
           .attr('opacity', function (d) {
-            return treeMapvalueScale(Math.abs(d.data.value as number))
+            return treeMapvalueScale(Math.abs(d.data.value))
           })
           .style('stroke', 'black')
         $g.append('text')
@@ -116,10 +119,14 @@ const updateChart = (
             return d.y1 - d.y0
           })
           .attr('fill', function (d) {
-            return d.data.value > 0 ? 'red' : 'blue'
+            return d.data.value >= 0
+              ? d.data.value > 0
+                ? 'red'
+                : 'black'
+              : 'blue'
           })
           .attr('opacity', function (d) {
-            return treeMapvalueScale(Math.abs(d.data.value as number))
+            return treeMapvalueScale(Math.abs(d.data.value))
           })
           .transition()
           .duration(500)
@@ -137,7 +144,10 @@ const updateChart = (
           .attr('text-anchor', 'middle')
           .text(function (d) {
             return (
-              d.data.name + '\n' + String(Number(d.data.value).toFixed(2)) + '%'
+              d.data.ticker?.split('-')[1] +
+              '\n' +
+              String(Number(d.data.value).toFixed(2)) +
+              '%'
             )
           })
           .style('font-size', function (d) {
