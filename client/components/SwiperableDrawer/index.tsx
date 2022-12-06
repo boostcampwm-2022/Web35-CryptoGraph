@@ -3,6 +3,8 @@ import Box from '@mui/material/Box'
 import SwipeableDrawer from '@mui/material/SwipeableDrawer'
 import Button from '@mui/material/Button'
 
+import Fab from '@mui/material/Fab'
+import NavigationIcon from '@mui/icons-material/Navigation'
 interface SwipeableTemporaryDrawerProps {
   children: React.ReactNode
 }
@@ -27,7 +29,17 @@ export default function SwipeableTemporaryDrawer({
 
   return (
     <div>
-      <Button onClick={toggleDrawer(true)}>{'열어줘요'}</Button>
+      <Fab
+        onClick={toggleDrawer(true)}
+        variant="extended"
+        size="medium"
+        color="primary"
+        aria-label="add"
+        sx={{ mb: 3 }}
+      >
+        <NavigationIcon sx={{ mr: 1 }} />
+        차트 정보 더보기
+      </Fab>
       <SwipeableDrawer
         anchor={'bottom'}
         open={state}
