@@ -13,31 +13,7 @@ import { useMediaQuery } from '@mui/material'
 import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
 import TabContainer from '@/components/TabContainer'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
-import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
-import useInterval from '@/hooks/useInterval'
-import { updateTreeData } from '@/components/Treechart/getCoinData'
-
-const coinIntervalRate = 5000
-
-const getInitData = (data: MarketCapInfo[]): CoinRateType => {
-  //initData
-  const initData: CoinRateType = {}
-  data.forEach(coinData => {
-    const coinContent: CoinRateContentType = {
-      name: '',
-      ticker: '',
-      parent: '',
-      value: 0
-    }
-    coinContent.name = coinData.name_kr
-    coinContent.ticker = 'KRW-' + coinData.name
-    coinContent.parent = 'Origin'
-    coinContent.value = Number((coinData.signed_change_rate * 100).toFixed(2))
-    initData[coinContent.ticker] = coinContent
-  })
-
-  return initData
-}
+import { useRealTimeCoinListData } from '@/hooks/useRealtimeCoinListData'
 
 interface getDataProps {
   data: MarketCapInfo[]
@@ -56,17 +32,9 @@ export default function Home({
   const [selectedMarket, setSelectedMarket] = useState<string[]>(
     dataMarket(data)
   ) //선택된 market 컨트롤
-  const [coinData, setCoinData] = useState<CoinRateType>(getInitData(data))
+  const coinData = useRealTimeCoinListData(data)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
-  useInterval(() => {
-    async function update() {
-      const updatedCoinRate = await updateTreeData(coinData)
-      setCoinData(updatedCoinRate)
-    }
-    update()
-  }, coinIntervalRate)
-
   return (
     <HomeContainer>
       {isMobile ? (
