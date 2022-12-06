@@ -20,17 +20,12 @@ interface getDataProps {
   Market?: string[] //선택된 코인 리스트
 }
 
-const dataMarket = (data: MarketCapInfo[]): string[] => {
-  // initMarket
-  return data.map(coin => coin.name)
-}
-
 export default function Home({
   data
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [selectedChart, setSelectedChart] = useState<ChartType>('RunningChart')
   const [selectedMarket, setSelectedMarket] = useState<string[]>(
-    dataMarket(data)
+    data.map(coin => coin.name)
   ) //선택된 market 컨트롤
   const coinData = useRealTimeCoinListData(data)
   const theme = useTheme()
