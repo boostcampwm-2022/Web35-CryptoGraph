@@ -19,7 +19,7 @@ export default function CoinSelectController({
 }: ChartSelectControllerProps) {
   const [coinList, setCoinList] = useState<MarketCapInfo[] | null>([])
   const [checked, setChecked] = useState<CoinChecked>({
-    all: false
+    all: true
   })
 
   useEffect(() => {
@@ -31,13 +31,22 @@ export default function CoinSelectController({
   useEffect(() => {
     if (coinList == null) return
     for (const coin of coinList) {
-      checked[coin.name] = false
+      checked[coin.name] = true
     }
 
     setChecked({
       ...checked
     })
   }, [coinList])
+
+  useEffect(() => {
+    selectedCoinListSetter(
+      Object.keys(checked).filter(x => {
+        return checked[x] && x !== 'all'
+      })
+    )
+  }, [checked])
+
   const coinCheckAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     for (const coin in checked) {
       checked[coin] = event.target.checked
