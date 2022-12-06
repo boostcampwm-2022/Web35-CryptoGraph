@@ -25,7 +25,12 @@ export default function SortSelectController({
     'change rate(absolute)',
     'market capitalization'
   ]
-  const runningSortTypeArr = ['ascending', 'descending', 'absolute']
+  const runningSortTypeArr = [
+    'ascending',
+    'descending',
+    'absolute',
+    'market capitalization'
+  ]
   return (
     <SortSelectorContainer>
       <Box sx={{ minWidth: 300 }}>

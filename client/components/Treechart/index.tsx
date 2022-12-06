@@ -159,12 +159,12 @@ const updateChart = (
           })
           .attr('text-anchor', 'middle')
           .text(function (d) {
-            return (
-              d.data.ticker?.split('-')[1] +
-              '\n' +
-              String(Number(d.data.value).toFixed(2)) +
-              '%'
-            )
+            const text =
+              selectedSort === 'market capitalization'
+                ? String(Number(d.data.market_cap / 1000000000000).toFixed(2)) +
+                  '조원'
+                : String(Number(d.data.value).toFixed(2)) + '%'
+            return d.data.ticker?.split('-')[1] + '\n' + text
           })
           .style('font-size', function (d) {
             return `${(d.x1 - d.x0) / 9}px`
@@ -220,7 +220,7 @@ export default function TreeChart({
   selectedSort
 }: TreeChartProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
-    { name: 'Origin', parent: '', value: 0, market_cap: 0 }
+    { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
   ]) //coin의 등락률 값에 parentNode가 추가된 값
   const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값
   const chartSvg = useRef<SVGSVGElement>(null)
@@ -235,7 +235,7 @@ export default function TreeChart({
     // CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
     if (!coinRate || !Market) return
     const newCoinData: CoinRateContentType[] = [
-      { name: 'Origin', parent: '', value: 0, market_cap: 0 }
+      { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
     ]
     for (const tick of Market) {
       newCoinData.push(coinRate['KRW-' + tick])

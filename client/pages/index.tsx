@@ -100,6 +100,7 @@ export default function Home({
               candleCount={20}
               data={coinData}
               Market={selectedMarket}
+              selectedSort={selectedSort}
             />
           ) : (
             <TreeChart
