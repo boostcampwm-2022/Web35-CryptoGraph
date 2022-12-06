@@ -111,7 +111,8 @@ const Header = styled('div')`
 `
 
 const CoinPriceContainer = styled('div')`
-  flex: 1;
+  flex: 1 1 auto;
+  margin-top: 8px;
   width: 100%;
   overflow-y: auto;
   display: flex;

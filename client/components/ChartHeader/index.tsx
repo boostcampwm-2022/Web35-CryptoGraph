@@ -120,7 +120,6 @@ const ChartHeaderContainer = styled('div')`
   border-radius: 20px;
   justify-content: space-around;
   align-items: center;
-  margin-bottom: 20px;
   ${props => props.theme.breakpoints.down('tablet')} {
     flex-direction: column;
     height: 150px;
