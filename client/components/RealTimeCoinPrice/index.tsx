@@ -1,6 +1,6 @@
 import { styled } from '@mui/material'
 import * as React from 'react'
-import { TabProps } from '../InfoContainerMobile'
+import { TabProps } from '@/components/TabContainer'
 import Image from 'next/image'
 import { CoinPrice } from '@/types/CoinPriceTypes'
 //코인 실시간 정보

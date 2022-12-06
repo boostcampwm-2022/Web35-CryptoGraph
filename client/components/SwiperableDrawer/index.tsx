@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import SwipeableDrawer from '@mui/material/SwipeableDrawer'
-import Button from '@mui/material/Button'
 
 import Fab from '@mui/material/Fab'
 import NavigationIcon from '@mui/icons-material/Navigation'

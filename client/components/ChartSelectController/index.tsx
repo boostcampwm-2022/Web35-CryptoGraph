@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { ChartTypeArr, ChartType } from '@/types/ChartTypes'
-import { TabProps } from '@/components/InfoContainerMobile'
+import { TabProps } from '@/components/TabContainer'
 interface ChartSelectControllerProps extends TabProps {
   selected: ChartType
   selectedSetter: Dispatch<SetStateAction<ChartType>>

@@ -11,7 +11,7 @@ import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { useMediaQuery } from '@mui/material'
 import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
-import InfoContainerMobile from '@/components/InfoContainerMobile'
+import TabContainer from '@/components/TabContainer'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
 import useInterval from '@/hooks/useInterval'
@@ -72,7 +72,7 @@ export default function Home({
       {isMobile ? (
         <Box sx={{ position: 'absolute' }}>
           <SwipeableTemporaryDrawer>
-            <InfoContainerMobile>
+            <TabContainer>
               <ChartSelectController
                 selected={selectedChart}
                 selectedSetter={setSelectedChart}
@@ -87,7 +87,7 @@ export default function Home({
                 market="btc"
                 tabLabelInfo={'상세 정보'}
               ></CoinDetailedInfo>
-            </InfoContainerMobile>
+            </TabContainer>
           </SwipeableTemporaryDrawer>
         </Box>
       ) : (
