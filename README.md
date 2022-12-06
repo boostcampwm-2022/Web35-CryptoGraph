@@ -1,11 +1,11 @@
 # 실시간 암호화폐 데이터 시각화 웹 서비스 - CryptoGraph📊
 
 -   부스트캠프 멤버십 웹 7기 그룹 프로젝트
--   Web35-teamMars
+    **Web35-teamMars**
 
 ![logo primary](https://user-images.githubusercontent.com/60903175/205961174-e6bd9e88-2d0f-4b51-9eeb-d7db05af9885.svg)
 
-Tech Stack: D3.js, Emotion, MaterialUI, Nextjs, React.js, Typescript, Websocket, express
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)![Express](https://img.shields.io/badge/Express.js-3982CE?style=for-the-badge&logo=Express&logoColor=white)![Next JS](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white)![D3](https://img.shields.io/badge/-d3.js-brightgreen?style=for-the-badge&logo=d3.js&logoColor=white)![Emotion](https://img.shields.io/badge/-emotion-brightgreen?style=for-the-badge&logo=emotion&logoColor=white)![MUI](https://img.shields.io/badge/-MaterialUI-blue?style=for-the-badge&logo=mui&logoColor=white)
 
 -   배포 URL: [배포 URL 바로가기](https://cryptograph.servehttp.com/)
 -   팀 Notion:[Notion 바로가기](https://www.notion.so/boostcamp-wm/Web35-CryptoGraph-035444908f1f4beb8d4c1ba40e2beb4d)
@@ -43,6 +43,7 @@ Tech Stack: D3.js, Emotion, MaterialUI, Nextjs, React.js, Typescript, Websocket,
 ### 불편함을 불편해할 줄 아는 프론트엔드 개발자
 
 [이력서 바로가기](https://www.notion.so/010dc5a42f8b4c08a2f2592682eba48c)
+
 [깃헙 바로가기 💻](http://github.com/rkdwoals159)
 
 </td>
