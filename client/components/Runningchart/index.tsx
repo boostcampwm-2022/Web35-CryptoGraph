@@ -40,16 +40,16 @@ const updateChart = (
   ]
     .sort((a, b) => {
       if (selectedSort === 'descending') {
-        return d3.descending(a.value, b.value)
+        return d3.descending(a.value, b.value) // 내림차순
       }
       if (selectedSort === 'ascending') {
-        return d3.ascending(a.value, b.value)
+        return d3.ascending(a.value, b.value) // 오름차순
       }
       if (selectedSort === 'absolute') {
-        return d3.descending(Math.abs(a.value), Math.abs(b.value))
+        return d3.descending(Math.abs(a.value), Math.abs(b.value)) // 절댓값
       }
-      return d3.ascending(a.cmc_rank, b.cmc_rank)
-    }) // 변동 퍼센트 오름차순 정렬
+      return d3.ascending(a.cmc_rank, b.cmc_rank) //시가총액
+    })
     .slice(0, candleCount)
   const min =
     selectedSort !== 'descending'
