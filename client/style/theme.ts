@@ -29,6 +29,10 @@ const theme = createTheme({
     },
     error: {
       main: red.A400
+    },
+    custom: {
+      red: '#D24F45',
+      blue: '#1D61C4'
     }
   },
   typography: {

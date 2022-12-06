@@ -1,4 +1,4 @@
-import { styled } from '@mui/material/styles'
+import { styled, useTheme } from '@mui/material/styles'
 import { ChartPeriod } from '@/types/ChartTypes'
 import { Dispatch, SetStateAction } from 'react'
 import InputLabel from '@mui/material/InputLabel'
@@ -9,6 +9,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { ChartPeriodList } from '@/types/ChartTypes'
 import { CoinPrice } from '@/types/CoinPriceTypes'
 import Image from 'next/image'
+import { Typography } from '@mui/material'
 
 interface ChartHeaderProps {
   selected: ChartPeriod
@@ -34,8 +35,15 @@ interface HeaderCoinPriceInfoProps {
 }
 // 코인의 정보를 표시하는 컴포넌트
 function HeaderCoinInfo(props: HeaderCoinPriceInfoProps) {
+  const theme = useTheme()
   const coinPrice = props.coinPriceInfo
-  const isMinus = coinPrice.signed_change_rate < 0
+  const isMinus = coinPrice.signed_change_price <= 0
+  const textColor =
+    coinPrice.signed_change_price === 0
+      ? 'black'
+      : coinPrice.signed_change_price < 0
+      ? theme.palette.custom.blue
+      : theme.palette.custom.red
   return (
     <HeaderCoinInfoContainer>
       <Image src={coinPrice.logo} alt="" width={50} height={50} />
@@ -46,14 +54,21 @@ function HeaderCoinInfo(props: HeaderCoinPriceInfoProps) {
         </span>
       </div>
       <div className="price">
-        <p>{coinPrice.price.toLocaleString() + 'KRW'}</p>
-        <span>
-          {(isMinus ? '' : '+') +
-            coinPrice.signed_change_price.toLocaleString() +
+        <Typography sx={{ color: textColor }}>
+          {coinPrice.price.toLocaleString() + 'KRW'}
+        </Typography>
+        <Typography sx={{ color: textColor }}>
+          {`${
             (isMinus ? '' : '+') +
-            Math.floor(coinPrice.signed_change_rate * 10000) / 100}
+            coinPrice.signed_change_price.toLocaleString() +
+            'KRW'
+          } 
+            ${
+              (isMinus ? '' : '+') +
+              Math.floor(coinPrice.signed_change_rate * 10000) / 100
+            }`}
           %
-        </span>
+        </Typography>
       </div>
     </HeaderCoinInfoContainer>
   )

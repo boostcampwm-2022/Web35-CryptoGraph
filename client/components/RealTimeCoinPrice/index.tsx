@@ -1,4 +1,4 @@
-import { styled } from '@mui/material'
+import { styled, Typography, useTheme } from '@mui/material'
 import * as React from 'react'
 import { TabProps } from '@/components/TabContainer'
 import Image from 'next/image'
@@ -28,27 +28,36 @@ interface CoinPriceTabProps {
 const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
   coinPrice
 }) => {
-  const isMinus = coinPrice.signed_change_price < 0
+  const theme = useTheme()
+  const isMinus = coinPrice.signed_change_price <= 0
+  const textColor =
+    coinPrice.signed_change_price === 0
+      ? 'black'
+      : coinPrice.signed_change_price < 0
+      ? theme.palette.custom.blue
+      : theme.palette.custom.red
   return (
     <CoinPriceDiv>
       <Image src={coinPrice.logo} alt="" width={40} height={40} />
       <div className="name">
-        <p>{coinPrice.name_kr}</p>
-        <p>{coinPrice.name}</p>
+        <Typography sx={{ margin: 0 }}>{coinPrice.name_kr}</Typography>
+        <Typography sx={{ margin: 0 }}>{coinPrice.name}</Typography>
       </div>
-      <div className={isMinus ? 'price red' : 'price'}>
-        {coinPrice.price.toLocaleString()}
+      <div className="price">
+        <Typography sx={{ color: textColor }}>
+          {coinPrice.price.toLocaleString()}
+        </Typography>
       </div>
-      <div className={isMinus ? 'yesterday red' : 'yesterday'}>
-        <p>
+      <div className="yesterday">
+        <Typography sx={{ color: textColor, margin: 0 }}>
           {(isMinus ? '' : '+') +
             coinPrice.signed_change_price.toLocaleString()}
-        </p>
-        <p>
+        </Typography>
+        <Typography sx={{ color: textColor }}>
           {(isMinus ? '' : '+') +
             Math.floor(coinPrice.signed_change_rate * 10000) / 100}
           %
-        </p>
+        </Typography>
       </div>
       <div className="amount">{transPrice(coinPrice.acc_trade_price_24h)}</div>
     </CoinPriceDiv>
@@ -112,31 +121,22 @@ const CoinPriceDiv = styled('div')`
   display: flex;
   width: 100%;
   height: 50px;
-  font-size: 15px;
+  font-size: 12px;
   gap: 4px;
   align-items: center;
   text-align: right;
   & > div.name {
     flex: 1;
     text-align: left;
-    p {
-      margin: 0;
-      line-height: 100%;
-      padding-left: 10px;
-    }
+    padding-left: 10px;
   }
   & > div.price {
     flex: 1;
   }
   & > div.yesterday {
     flex: 1;
-    p {
-      margin: 0;
-      line-height: 100%;
-    }
   }
   & > div.amount {
-    color: black;
     flex: 1;
   }
 `
