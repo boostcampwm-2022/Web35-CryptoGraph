@@ -2,7 +2,7 @@ import { styled } from '@mui/material/styles'
 import { Box, useMediaQuery, useTheme } from '@mui/material'
 import InfoContainerMobile from '@/components/InfoContainerMobile'
 import InfoContainerDesktop from '@/components/InfoContainerDesktop'
-import ChartPeriodSelector from '@/components/ChartPeriodSelector'
+import ChartHeader from '@/components/ChartHeader'
 import {
   DEFAULT_CANDLE_PERIOD,
   DEFAULT_CANDLER_CHART_RENDER_OPTION
@@ -42,9 +42,10 @@ export default function Detail({
   return (
     <HomeContainer>
       <ChartAreaContainer>
-        <ChartPeriodSelector
+        <ChartHeader
           selected={candlePeriod}
           selectedSetter={setCandlePeriod}
+          coinPriceInfo={realtimePriceInfo[market]}
         />
         <CandleChart
           candlePeriod={candlePeriod}
@@ -65,7 +66,10 @@ export default function Detail({
           >
             <InfoContainerMobile>
               <CoinDetailedInfo market={market} tabLabelInfo={'코인 디테일'} />
-              <RealTimeCoinPrice tabLabelInfo={'실시간 코인 정보'} />
+              <RealTimeCoinPrice
+                tabLabelInfo={'실시간 코인 정보'}
+                priceInfo={realtimePriceInfo}
+              />
             </InfoContainerMobile>
             <LinkButton goto="/" content="Go to Main" />
           </Box>
@@ -169,7 +173,10 @@ const InfoContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 500px;
+  // width %로 비율조절 가능한듯??
+  // chart와 info가 2:1의 비율
+  min-width: 300px;
+  width: 50%;
   height: calc(100% - 48px);
   ${props => props.theme.breakpoints.down('tablet')} {
     height: auto;
