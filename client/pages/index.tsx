@@ -12,6 +12,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
 import useInterval from '@/hooks/useInterval'
 import { updateTreeData } from '@/components/Treechart/getCoinData'
+import SortSelectController from '@/components/SortSelectController'
 
 const coinIntervalRate = 5000
 
@@ -52,6 +53,7 @@ export default function Home({
   const [selectedMarket, setSelectedMarket] = useState<string[]>(
     dataMarket(data)
   ) //선택된 market 컨트롤
+  const [selectedSort, setSelectedSort] = useState<string>('descending')
   const [coinData, setCoinData] = useState<CoinRateType>(getInitData(data))
 
   useInterval(() => {
@@ -62,12 +64,25 @@ export default function Home({
     update()
   }, coinIntervalRate)
 
+  useEffect(() => {
+    if (selectedChart === 'RunningChart') {
+      setSelectedSort('descending')
+    } else {
+      setSelectedSort('change rate')
+    }
+  }, [selectedChart])
+
   return (
     <HomeContainer>
       <SideBarContainer>
         <ChartSelectController
           selected={selectedChart}
           selectedSetter={setSelectedChart}
+        />
+        <SortSelectController
+          selectedSort={selectedSort}
+          selectedSortSetter={setSelectedSort}
+          selectedChart={selectedChart}
         />
         <CoinSelectController
           selectedCoinList={selectedMarket}

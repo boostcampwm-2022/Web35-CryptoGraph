@@ -1,0 +1,64 @@
+import * as React from 'react'
+import { styled } from '@mui/material/styles'
+import InputLabel from '@mui/material/InputLabel'
+import Box from '@mui/material/Box'
+import MenuItem from '@mui/material/MenuItem'
+import FormControl from '@mui/material/FormControl'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
+
+interface SortSelectControllerProps {
+  selectedSort: string
+  selectedSortSetter: React.Dispatch<React.SetStateAction<string>>
+  selectedChart: string
+}
+
+const SortSelectorContainer = styled('div')`
+  display: flex;
+  width: 100%;
+  height: 10%;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  border: 1px solid #cac4d0;
+  border-radius: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+`
+
+export default function SortSelectController({
+  selectedSort,
+  selectedSortSetter,
+  selectedChart
+}: SortSelectControllerProps) {
+  const handleChange = (event: SelectChangeEvent) => {
+    selectedSortSetter(event.target.value)
+  }
+  const treeSortTypeArr = ['change rate', 'market capitalization']
+  const runningSortTypeArr = ['ascending', 'descending', 'absolute']
+  return (
+    <SortSelectorContainer>
+      <Box sx={{ minWidth: 300 }}>
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">정렬 기준</InputLabel>
+          <Select value={selectedSort} onChange={handleChange}>
+            {selectedChart === 'RunningChart'
+              ? runningSortTypeArr.map(value => {
+                  return (
+                    <MenuItem key={value} value={value}>
+                      {value}
+                    </MenuItem>
+                  )
+                })
+              : treeSortTypeArr.map(value => {
+                  return (
+                    <MenuItem key={value} value={value}>
+                      {value}
+                    </MenuItem>
+                  )
+                })}
+          </Select>
+        </FormControl>
+      </Box>
+    </SortSelectorContainer>
+  )
+}
