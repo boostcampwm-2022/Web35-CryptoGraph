@@ -13,7 +13,7 @@ import { useMediaQuery } from '@mui/material'
 import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
 import TabContainer from '@/components/TabContainer'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
-import { useRealTimeCoinListData } from '@/hooks/useRealtimeCoinListData'
+import { useRealTimeCoinListData } from '@/hooks/useRealTimeCoinListData'
 
 interface getDataProps {
   data: MarketCapInfo[]
