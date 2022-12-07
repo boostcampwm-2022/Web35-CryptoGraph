@@ -1,9 +1,4 @@
-import {
-  CandleData,
-  ChartPeriod,
-  TreeMapData,
-  tickerData
-} from '@/types/ChartTypes'
+import { CandleData, ChartPeriod, TreeMapData } from '@/types/ChartTypes'
 import { DEFAULT_CANDLE_COUNT } from '@/constants/ChartConstants'
 export async function getCandleDataArray(
   period: ChartPeriod,
@@ -48,11 +43,5 @@ export async function getTreeMapDataArray(
     }
   )
   const data: TreeMapData[] = await res.json()
-  return data
-}
-
-export async function getCoinTicker(): Promise<tickerData[]> {
-  const res = await fetch('https://api.upbit.com/v1/market/all')
-  const data: tickerData[] = await res.json()
   return data
 }

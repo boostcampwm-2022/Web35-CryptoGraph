@@ -96,6 +96,7 @@ export default function Home({
           {selectedChart === 'RunningChart' ? (
             <RunningChart
               candleCount={selectedMarket.length}
+              durationPeriod={500}
               data={coinData}
               Market={selectedMarket}
               selectedSort={selectedSort}

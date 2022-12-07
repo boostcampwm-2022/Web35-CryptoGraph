@@ -6,6 +6,7 @@ import { colorQuantizeScale } from '@/utils/chartManager'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
+  durationPeriod: number
   candleCount: number
   data: CoinRateType //선택된 코인 리스트
   Market: string[]
@@ -25,6 +26,7 @@ const setChartContainerSize = (
 
 //------------------------------updateChart------------------------------
 const updateChart = (
+  durationPeriod: number,
   svgRef: React.RefObject<SVGSVGElement>,
   data: CoinRateType,
   width: number,
@@ -62,16 +64,23 @@ const updateChart = (
       ? selectedSort === 'market capitalization'
         ? (d3.max(ArrayDataValue, d => d.market_cap) as number)
         : (d3.max(ArrayDataValue, d => Math.abs(d.value)) as number)
-      : (d3.max(ArrayDataValue, d => Math.abs(d.value)) as number)
+      : (d3.max(ArrayDataValue, d => d.value) as number)
+  const threshold =
+    Math.max(min, max) <= 66
+      ? Math.max(min, max) <= 33
+        ? 33
+        : 66
+      : Math.max(min, max, 100) // 66보다 큰 경우는 시가총액 or 66% 이상
+  const domainRange =
+    selectedSort !== 'descending' ? [0, threshold] : [min, threshold]
+
   const barMargin = height / 10 / 5 //바 사이사이 마진값
   const barHeight = height / 18 //각각의 수평 바 y 높이
   setChartContainerSize(svgRef, width, (barHeight + barMargin) * candleCount)
-  // 창크기에 따른 차트크기 조절
+
   const scale = d3
     .scaleLinear()
-    .domain(
-      selectedSort === 'descending' ? [min, max] : [0, Math.max(min, max)]
-    )
+    .domain(domainRange)
     .range([100, width - 100])
 
   const svgChart = d3
@@ -113,72 +122,6 @@ const updateChart = (
           })
 
         $g.append('text')
-          .attr('x', function (d) {
-            return (
-              scale(
-                selectedSort !== 'descending'
-                  ? selectedSort !== 'market capitalization'
-                    ? Math.abs(d.value)
-                    : Number(d.market_cap)
-                  : Math.abs(d.value)
-              ) / 2
-            )
-          })
-          .attr('y', barHeight / 2)
-          .attr('text-anchor', 'middle')
-          .attr('dominant-baseline', 'middle')
-          .style('font-size', `${barHeight * 0.6}px`)
-          .text('0.00%')
-
-        $g.append('text')
-          .attr('id', 'CoinName')
-          .attr('x', function (d) {
-            return scale(
-              selectedSort !== 'descending'
-                ? selectedSort !== 'market capitalization'
-                  ? Math.abs(d.value)
-                  : d.market_cap
-                : Math.abs(d.value)
-            )
-          })
-          .attr('y', barHeight / 2)
-          .style('font-size', `${barHeight * 0.6}px`)
-          .attr('text-anchor', 'start')
-          .attr('dominant-baseline', 'middle')
-          .text('loading...')
-        return $g
-      },
-      update => {
-        update // 차트들
-          .transition()
-          .duration(1000)
-          .attr(
-            'transform',
-            (d, i) => `translate(0,  ${i * (barHeight + barMargin)} )`
-          )
-        update
-          .select('rect')
-          .transition()
-          .duration(1000)
-          .attr('width', d => {
-            return scale(
-              selectedSort !== 'descending'
-                ? selectedSort !== 'market capitalization'
-                  ? Math.abs(d.value)
-                  : d.market_cap
-                : Math.abs(d.value)
-            )
-          })
-          .attr('height', barHeight)
-          .style('fill', (d, i) => {
-            if (d.value > 0) return colorQuantizeScale(min, max, d.value)
-            else if (d.value === 0) return 'gray'
-            else return colorQuantizeScale(min, max, d.value)
-          })
-        update
-          .select('text')
-          .transition()
-          .duration(1000)
           .attr('x', d => {
             return (
               scale(
@@ -197,7 +140,78 @@ const updateChart = (
           .text(d =>
             selectedSort !== 'descending' && selectedSort !== 'ascending'
               ? selectedSort !== 'market capitalization'
-                ? String(Number(Math.abs(d.value)).toFixed(2)) + '%'
+                ? String(Number(d.value).toFixed(2)) + '%'
+                : String(Number(d.market_cap / 1000000000000).toFixed(2)) +
+                  '조원'
+              : String(Number(d.value).toFixed(2)) + '%'
+          )
+
+        $g.append('text')
+          .attr('id', 'CoinName')
+          .attr('x', d => {
+            return scale(
+              selectedSort !== 'descending'
+                ? selectedSort !== 'market capitalization'
+                  ? Math.abs(d.value)
+                  : d.market_cap
+                : Math.abs(d.value)
+            )
+          })
+          .attr('y', barHeight / 2)
+          .attr('text-anchor', 'start')
+          .attr('dominant-baseline', 'middle')
+          .style('font-size', `${barHeight * 0.6}px`)
+          .text(d => d.ticker.split('-')[1])
+        return $g
+      },
+      update => {
+        update // 차트들
+          .transition()
+          .duration(durationPeriod)
+          .attr(
+            'transform',
+            (d, i) => `translate(0,  ${i * (barHeight + barMargin)} )`
+          )
+        update
+          .select('rect')
+          .transition()
+          .duration(durationPeriod)
+          .attr('width', d => {
+            return scale(
+              selectedSort !== 'descending'
+                ? selectedSort !== 'market capitalization'
+                  ? Math.abs(d.value)
+                  : d.market_cap
+                : Math.abs(d.value)
+            )
+          })
+          .attr('height', barHeight)
+          .style('fill', (d, i) => {
+            if (d.value > 0) return colorQuantizeScale(min, max, d.value)
+            else if (d.value === 0) return 'gray'
+            else return colorQuantizeScale(min, max, d.value)
+          })
+        update
+          .select('text')
+          .attr('x', d => {
+            return (
+              scale(
+                selectedSort !== 'descending'
+                  ? selectedSort !== 'market capitalization'
+                    ? Math.abs(d.value)
+                    : Number(d.market_cap)
+                  : Math.abs(d.value)
+              ) / 2
+            )
+          })
+          .attr('y', barHeight / 2)
+          .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'middle')
+          .style('font-size', `${barHeight * 0.6}px`)
+          .text(d =>
+            selectedSort !== 'descending' && selectedSort !== 'ascending'
+              ? selectedSort !== 'market capitalization'
+                ? String(Number(d.value).toFixed(2)) + '%'
                 : String(Number(d.market_cap / 1000000000000).toFixed(2)) +
                   '조원'
               : String(Number(d.value).toFixed(2)) + '%'
@@ -206,7 +220,7 @@ const updateChart = (
         update
           .select('#CoinName')
           .transition()
-          .duration(1000)
+          .duration(durationPeriod)
           .attr('x', d => {
             return scale(
               selectedSort !== 'descending'
@@ -230,6 +244,7 @@ const updateChart = (
 }
 //------------------------------Component------------------------------
 export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
+  durationPeriod,
   candleCount,
   data,
   Market,
@@ -242,7 +257,15 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   const [changeRate, setchangeRate] = React.useState<CoinRateType>(data) //선택된 코인 값만 보유
 
   React.useEffect(() => {
-    updateChart(chartSvg, changeRate, width, height, candleCount, selectedSort)
+    updateChart(
+      durationPeriod,
+      chartSvg,
+      changeRate,
+      width,
+      height,
+      candleCount,
+      selectedSort
+    )
   }, [width, height, changeRate, candleCount, selectedSort]) // 창크기에 따른 차트크기 조절
 
   React.useEffect(() => {
