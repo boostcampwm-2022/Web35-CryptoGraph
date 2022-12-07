@@ -1,23 +1,20 @@
 import * as d3 from 'd3'
 import * as React from 'react'
-import {
-  CoinRateContentType,
-  CoinRateType,
-  EmptyObject
-} from '@/types/ChartTypes'
+import { CoinRateContentType, CoinRateType } from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
-import useInterval from '@/hooks/useInterval'
-import { updateTreeData } from '@/components/Treechart/getCoinData'
-const COIN_INTERVAL_RATE = 3000
+import { colorQuantizeScale } from '@/utils/chartManager'
+
 //------------------------------interface------------------------------
 interface RunningChartProps {
+  durationPeriod: number
   candleCount: number
   data: CoinRateType //선택된 코인 리스트
   Market: string[]
+  selectedSort: string
 }
 
-//------------------------------initChart------------------------------
-const initChart = (
+//------------------------------setChartContainerSize------------------------------
+const setChartContainerSize = (
   svgRef: React.RefObject<SVGSVGElement>,
   width: number,
   height: number
@@ -29,41 +26,69 @@ const initChart = (
 
 //------------------------------updateChart------------------------------
 const updateChart = (
+  durationPeriod: number,
   svgRef: React.RefObject<SVGSVGElement>,
   data: CoinRateType,
   width: number,
   height: number,
-  candleCount: number
+  candleCount: number,
+  selectedSort: string
 ) => {
   if (!data || !svgRef) {
     return
   }
-  //ArrayDataValue : 기존 Object<object>이던 data를 data.value, 즉 실시간변동 퍼센테이지 값만 추출해서 Array<object>로 변경
-  const ArrayDataValue: (EmptyObject | CoinRateContentType)[] = [
-    ...Object.values<EmptyObject | CoinRateContentType>(data)
-  ]
-    .sort((a, b) => b.value - a.value) // 변동 퍼센트 오름차순 정렬
-    .slice(0, candleCount)
-  const [min, max] = [
-    d3.min(ArrayDataValue, d => d.value),
-    d3.max(ArrayDataValue, d => d.value)
-  ]
-  if (!min || !max) {
-    return
-  }
 
-  const BARMARGIN = height / candleCount / 10 //바 사이사이 마진값
-  const barHeight = height / candleCount - BARMARGIN //각각의 수평 바 y 높이
+  //ArrayDataValue : 기존 Object<object>이던 data를 data.value, 즉 실시간변동 퍼센테이지 값만 추출해서 Array<object>로 변경
+  const ArrayDataValue: CoinRateContentType[] = [
+    ...Object.values<CoinRateContentType>(data)
+  ].sort((a, b) => {
+    if (selectedSort === 'descending') {
+      return d3.descending(a.value, b.value) // 내림차순
+    }
+    if (selectedSort === 'ascending') {
+      return d3.ascending(a.value, b.value) // 오름차순
+    }
+    if (selectedSort === 'absolute') {
+      return d3.descending(Math.abs(a.value), Math.abs(b.value)) // 절댓값
+    }
+    return d3.ascending(a.cmc_rank, b.cmc_rank) //시가총액
+  })
+  const min =
+    selectedSort !== 'descending'
+      ? selectedSort === 'market capitalization'
+        ? (d3.min(ArrayDataValue, d => d.market_cap) as number)
+        : (d3.min(ArrayDataValue, d => Math.abs(d.value)) as number)
+      : (d3.min(ArrayDataValue, d => d.value) as number)
+  const max =
+    selectedSort !== 'descending'
+      ? selectedSort === 'market capitalization'
+        ? (d3.max(ArrayDataValue, d => d.market_cap) as number)
+        : (d3.max(ArrayDataValue, d => Math.abs(d.value)) as number)
+      : (d3.max(ArrayDataValue, d => d.value) as number)
+  const threshold =
+    Math.max(Math.abs(min), max) <= 66
+      ? Math.max(Math.abs(min), max) <= 33
+        ? 33
+        : 66
+      : Math.max(Math.abs(min), max, 100) // 66보다 큰 경우는 시가총액 or 66% 이상
+  const domainRange = [0, threshold]
+
+  const barMargin = height / 10 / 5 //바 사이사이 마진값
+  const barHeight = Math.max(
+    Math.min(height / candleCount, height / 15),
+    height / 20
+  ) //각각의 수평 바 y 높이
+  setChartContainerSize(svgRef, width, (barHeight + barMargin) * candleCount)
 
   const scale = d3
     .scaleLinear()
-    .domain([min, max])
+    .domain(domainRange)
     .range([100, width - 100])
 
   const svgChart = d3
     .select('#running-chart')
     .attr('width', width)
-    .attr('height', height)
+    .attr('height', (barHeight + barMargin) * candleCount)
 
   svgChart
     .selectAll<SVGSVGElement, CoinRateContentType>('g')
@@ -71,83 +96,145 @@ const updateChart = (
     .join(
       enter => {
         const $g = enter.append('g')
-        $g.attr('transform', function (d, i) {
-          return 'translate(0,' + i * barHeight + ')'
-        })
+        $g.attr(
+          'transform',
+          (d, i) => 'translate(0,' + i * (barHeight + barMargin) + ')'
+        )
           .transition()
           .duration(1000)
-          .attr('transform', (d, i) => 'translate(0,' + i * barHeight + ')')
           .style('opacity', 1)
 
         $g.append('rect')
           .attr('width', function (d) {
-            return scale(d.value)
-          })
-          .attr('height', barHeight - BARMARGIN)
-          .style('fill', (d, i) => {
-            const personelColor = Math.floor(Math.random() * 16 ** 6).toString(
-              16
+            return scale(
+              selectedSort !== 'descending'
+                ? selectedSort !== 'market capitalization'
+                  ? Math.abs(d.value)
+                  : d.market_cap
+                : Math.abs(d.value)
             )
-            return `#${personelColor}`
+          })
+          .attr('height', barHeight)
+          .style('fill', (d, i) => {
+            if (d.value > 0) return colorQuantizeScale(min, max, d.value)
+            else if (d.value === 0) return 'gray'
+            else {
+              return colorQuantizeScale(min, max, d.value)
+            }
           })
 
         $g.append('text')
-          .attr('x', function (d) {
-            return scale(d.value) / 2
+          .attr('x', d => {
+            return (
+              scale(
+                selectedSort !== 'descending'
+                  ? selectedSort !== 'market capitalization'
+                    ? Math.abs(d.value)
+                    : Number(d.market_cap)
+                  : Math.abs(d.value)
+              ) / 2
+            )
           })
           .attr('y', barHeight / 2)
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'middle')
           .style('font-size', `${barHeight * 0.6}px`)
-          .text('0.00%')
+          .text(d =>
+            selectedSort !== 'descending' && selectedSort !== 'ascending'
+              ? selectedSort !== 'market capitalization'
+                ? String(Number(d.value).toFixed(2)) + '%'
+                : String(Number(d.market_cap / 1000000000000).toFixed(2)) + '조'
+              : String(Number(d.value).toFixed(2)) + '%'
+          )
 
         $g.append('text')
           .attr('id', 'CoinName')
-          .attr('x', function (d) {
-            return scale(d.value)
+          .attr('x', d => {
+            return scale(
+              selectedSort !== 'descending'
+                ? selectedSort !== 'market capitalization'
+                  ? Math.abs(d.value)
+                  : d.market_cap
+                : Math.abs(d.value)
+            )
           })
           .attr('y', barHeight / 2)
-          .style('font-size', `${barHeight * 0.6}px`)
           .attr('text-anchor', 'start')
           .attr('dominant-baseline', 'middle')
-          .text('loading...')
+          .style('font-size', `${barHeight * 0.6}px`)
+          .text(d => d.ticker.split('-')[1])
         return $g
       },
       update => {
         update // 차트들
           .transition()
-          .duration(1000)
-          .attr('transform', (d, i) => `translate(0,  ${i * barHeight} )`)
+          .duration(durationPeriod)
+          .attr(
+            'transform',
+            (d, i) => `translate(0,  ${i * (barHeight + barMargin)} )`
+          )
         update
           .select('rect')
           .transition()
-          .duration(1000)
-          .attr('width', d => scale(d.value))
-          .attr('height', barHeight - BARMARGIN)
-
+          .duration(durationPeriod)
+          .attr('width', d => {
+            return scale(
+              selectedSort !== 'descending'
+                ? selectedSort !== 'market capitalization'
+                  ? Math.abs(d.value)
+                  : d.market_cap
+                : Math.abs(d.value)
+            )
+          })
+          .attr('height', barHeight)
+          .style('fill', (d, i) => {
+            if (d.value > 0) return colorQuantizeScale(min, max, d.value)
+            else if (d.value === 0) return 'gray'
+            else return colorQuantizeScale(min, max, d.value)
+          })
         update
           .select('text')
-          .transition()
-          .duration(1000)
-          .attr('x', function (d) {
-            return scale(d.value) / 2
+          .attr('x', d => {
+            return (
+              scale(
+                selectedSort !== 'descending'
+                  ? selectedSort !== 'market capitalization'
+                    ? Math.abs(d.value)
+                    : Number(d.market_cap)
+                  : Math.abs(d.value)
+              ) / 2
+            )
           })
           .attr('y', barHeight / 2)
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'middle')
           .style('font-size', `${barHeight * 0.6}px`)
-          .text(d => `${d.value}%`)
+          .text(d =>
+            selectedSort !== 'descending' && selectedSort !== 'ascending'
+              ? selectedSort !== 'market capitalization'
+                ? String(Number(d.value).toFixed(2)) + '%'
+                : String(Number(d.market_cap / 1000000000000).toFixed(2)) + '조'
+              : String(Number(d.value).toFixed(2)) + '%'
+          )
 
         update
           .select('#CoinName')
           .transition()
-          .duration(1000)
-          .attr('x', d => scale(d.value))
+          .duration(durationPeriod)
+          .attr('x', d => {
+            return scale(
+              selectedSort !== 'descending'
+                ? selectedSort !== 'market capitalization'
+                  ? Math.abs(d.value)
+                  : d.market_cap
+                : Math.abs(d.value)
+            )
+          })
           .attr('y', barHeight / 2)
           .attr('text-anchor', 'start')
           .attr('dominant-baseline', 'middle')
           .style('font-size', `${barHeight * 0.6}px`)
-          .text(d => d.name)
+          .text(d => d.ticker.split('-')[1])
         return update
       },
       exit => {
@@ -157,9 +244,11 @@ const updateChart = (
 }
 //------------------------------Component------------------------------
 export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
+  durationPeriod,
   candleCount,
   data,
-  Market
+  Market,
+  selectedSort
 }) => {
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
   const chartSvg = React.useRef(null)
@@ -168,12 +257,16 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   const [changeRate, setchangeRate] = React.useState<CoinRateType>(data) //선택된 코인 값만 보유
 
   React.useEffect(() => {
-    initChart(chartSvg, width, height)
-  }, [width, height]) // 창크기에 따른 차트크기 조절
-
-  React.useEffect(() => {
-    updateChart(chartSvg, changeRate, width, height, candleCount)
-  }, [width, height, changeRate, candleCount]) // 창크기에 따른 차트크기 조절
+    updateChart(
+      durationPeriod,
+      chartSvg,
+      changeRate,
+      width,
+      height,
+      candleCount,
+      selectedSort
+    )
+  }, [width, height, changeRate, candleCount, selectedSort]) // 창크기에 따른 차트크기 조절
 
   React.useEffect(() => {
     if (!coinRate || !Market[0]) return
@@ -182,7 +275,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       newCoinData['KRW-' + tick] = coinRate['KRW-' + tick]
     }
     setchangeRate(newCoinData)
-  }, [data, Market])
+  }, [data, Market, coinRate])
 
   return (
     <div
@@ -191,7 +284,8 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       style={{
         display: 'flex',
         width: '100%',
-        height: '100%'
+        height: '90%',
+        overflow: 'auto'
       }}
     >
       <svg id="chart-container" ref={chartSvg}>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import { styled, useTheme } from '@mui/material/styles'
 import CoinSelectController from '@/components/CoinSelectController'
@@ -9,6 +9,8 @@ import ChartSelectController from '@/components/ChartSelectController'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import SortSelectController from '@/components/SortSelectController'
+
 import { useMediaQuery } from '@mui/material'
 import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
 import TabContainer from '@/components/TabContainer'
@@ -27,9 +29,17 @@ export default function Home({
   const [selectedMarket, setSelectedMarket] = useState<string[]>(
     data.map(coin => coin.name)
   ) //선택된 market 컨트롤
+  const [selectedSort, setSelectedSort] = useState<string>('descending')
   const coinData = useRealTimeCoinListData(data)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
+  useEffect(() => {
+    if (selectedChart === 'RunningChart') {
+      setSelectedSort('descending')
+    } else {
+      setSelectedSort('change rate')
+    }
+  }, [selectedChart])
   return (
     <HomeContainer>
       {isMobile ? (
@@ -40,6 +50,12 @@ export default function Home({
                 selected={selectedChart}
                 selectedSetter={setSelectedChart}
                 tabLabelInfo={'차트 선택'}
+              />
+              <SortSelectController
+                selectedSort={selectedSort}
+                selectedSortSetter={setSelectedSort}
+                selectedChart={selectedChart}
+                tabLabelInfo={'정렬 기준'}
               />
               <CoinSelectController
                 selectedCoinList={selectedMarket}
@@ -59,6 +75,11 @@ export default function Home({
             selected={selectedChart}
             selectedSetter={setSelectedChart}
           />
+          <SortSelectController
+            selectedSort={selectedSort}
+            selectedSortSetter={setSelectedSort}
+            selectedChart={selectedChart}
+          />
           <Box sx={{ width: '100%', height: '60%' }}>
             <CoinSelectController
               selectedCoinList={selectedMarket}
@@ -74,12 +95,18 @@ export default function Home({
         <ChartContainer>
           {selectedChart === 'RunningChart' ? (
             <RunningChart
-              candleCount={20}
+              candleCount={selectedMarket.length}
+              durationPeriod={500}
               data={coinData}
               Market={selectedMarket}
+              selectedSort={selectedSort}
             />
           ) : (
-            <TreeChart data={coinData} Market={selectedMarket} />
+            <TreeChart
+              data={coinData}
+              Market={selectedMarket}
+              selectedSort={selectedSort}
+            />
           )}
         </ChartContainer>
       ) : (

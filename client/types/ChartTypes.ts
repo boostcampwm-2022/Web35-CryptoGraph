@@ -15,6 +15,7 @@ export interface CandleData {
   trade_volume: number
   candle_date_time_kst: string
   timestamp: number
+  candle_acc_trade_price: number
   trade_timestamp: number
 }
 export const ChartTypeArr = ['TreeChart', 'RunningChart'] as const
@@ -82,31 +83,20 @@ export interface TreeMapData {
   trade_volume: number
 }
 
-export interface ActionType {
-  type: string
-  coinRate: CoinRateType
-}
-
-export type EmptyObject = Record<string, never>
-
 export interface CoinRateType {
   [key: string]: CoinRateContentType
 }
 
 export interface CoinRateContentType {
   name: string
-  ticker?: string
+  ticker: string
   parent: string
+  market_cap: number
+  cmc_rank?: number
   value: number
 }
 
 export interface PointerPosition {
   positionX: number
   positionY: number
-}
-
-export interface tickerData {
-  market: string
-  korean_name: string
-  english_name: string
 }

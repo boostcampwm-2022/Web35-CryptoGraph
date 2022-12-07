@@ -16,12 +16,28 @@ import {
 import * as d3 from 'd3'
 import { makeDate } from './dateManager'
 import { CandleChartProps } from '@/components/Candlechart'
+import { blueColorScale, redColorScale } from '@/styles/colorScale'
 
 export function calculateCandlewidth(
   option: ChartRenderOption,
   chartXSize: number
 ): number {
   return chartXSize / option.renderCandleCount
+}
+export function getVolumeHeightScale(
+  data: CandleData[],
+  CHART_AREA_Y_SIZE: number
+) {
+  const [min, max] = [
+    d3.min(data, d => d.candle_acc_trade_price),
+    d3.max(data, d => d.candle_acc_trade_price)
+  ]
+  if (!min || !max) {
+    console.error(data, data.length)
+    console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
+    return undefined
+  }
+  return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 30])
 }
 export function getYAxisScale(data: CandleData[], CHART_AREA_Y_SIZE: number) {
   const [min, max] = [
@@ -335,4 +351,14 @@ export function goToFuture(props: CandleChartProps, windowSize: WindowSize) {
           windowSize.width - CHART_Y_AXIS_MARGIN
         )
   }
+}
+
+export const colorQuantizeScale = (min: number, max: number, value: number) => {
+  return value > 0
+    ? d3.scaleQuantize<string>().domain([min, max]).range(redColorScale)(
+        Math.abs(value)
+      )
+    : d3.scaleQuantize<string>().domain([min, max]).range(blueColorScale)(
+        Math.abs(value)
+      )
 }

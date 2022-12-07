@@ -65,7 +65,9 @@ export default function SearchInput() {
             //2.로직을 통과하면 해당 값으로 리다이렉트
             if (validateInputName(CoinNames, inputCoinName)) {
               const engCoinName = matchNameKRwithENG(CoinNames, inputCoinName)
-              //생각해볼점   router.push(`/detail/${engCoinName}`)
+              //생각해볼점
+              //window.history.pushState('', 'asdf', `/detail/${engCoinName}`)
+              //router.replace(`/detail/${engCoinName}`)
               window.location.href = `/detail/${engCoinName}`
             }
           }
