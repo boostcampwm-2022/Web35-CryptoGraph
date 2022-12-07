@@ -116,7 +116,15 @@ const updateChart = (
 
         $g.append('text')
           .attr('x', function (d) {
-            return scale(d.value) / 2
+            return (
+              scale(
+                selectedSort !== 'descending'
+                  ? selectedSort !== 'market capitalization'
+                    ? Math.abs(d.value)
+                    : Number(d.market_cap)
+                  : d.value
+              ) / 2
+            )
           })
           .attr('y', barHeight / 2)
           .attr('text-anchor', 'middle')
