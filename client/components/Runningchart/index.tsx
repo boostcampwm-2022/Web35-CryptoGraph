@@ -58,7 +58,7 @@ const updateChart = (
       ? selectedSort === 'market capitalization'
         ? (d3.min(ArrayDataValue, d => d.market_cap) as number)
         : (d3.min(ArrayDataValue, d => Math.abs(d.value)) as number)
-      : (d3.min(ArrayDataValue, d => Math.abs(d.value)) as number)
+      : (d3.min(ArrayDataValue, d => d.value) as number)
   const max =
     selectedSort !== 'descending'
       ? selectedSort === 'market capitalization'
@@ -66,16 +66,18 @@ const updateChart = (
         : (d3.max(ArrayDataValue, d => Math.abs(d.value)) as number)
       : (d3.max(ArrayDataValue, d => d.value) as number)
   const threshold =
-    Math.max(min, max) <= 66
-      ? Math.max(min, max) <= 33
+    Math.max(Math.abs(min), max) <= 66
+      ? Math.max(Math.abs(min), max) <= 33
         ? 33
         : 66
-      : Math.max(min, max, 100) // 66보다 큰 경우는 시가총액 or 66% 이상
-  const domainRange =
-    selectedSort !== 'descending' ? [0, threshold] : [min, threshold]
+      : Math.max(Math.abs(min), max, 100) // 66보다 큰 경우는 시가총액 or 66% 이상
+  const domainRange = [0, threshold]
 
   const barMargin = height / 10 / 5 //바 사이사이 마진값
-  const barHeight = height / 18 //각각의 수평 바 y 높이
+  const barHeight = Math.max(
+    Math.min(height / candleCount, height / 15),
+    height / 20
+  ) //각각의 수평 바 y 높이
   setChartContainerSize(svgRef, width, (barHeight + barMargin) * candleCount)
 
   const scale = d3
@@ -141,8 +143,7 @@ const updateChart = (
             selectedSort !== 'descending' && selectedSort !== 'ascending'
               ? selectedSort !== 'market capitalization'
                 ? String(Number(d.value).toFixed(2)) + '%'
-                : String(Number(d.market_cap / 1000000000000).toFixed(2)) +
-                  '조원'
+                : String(Number(d.market_cap / 1000000000000).toFixed(2)) + '조'
               : String(Number(d.value).toFixed(2)) + '%'
           )
 
@@ -212,8 +213,7 @@ const updateChart = (
             selectedSort !== 'descending' && selectedSort !== 'ascending'
               ? selectedSort !== 'market capitalization'
                 ? String(Number(d.value).toFixed(2)) + '%'
-                : String(Number(d.market_cap / 1000000000000).toFixed(2)) +
-                  '조원'
+                : String(Number(d.market_cap / 1000000000000).toFixed(2)) + '조'
               : String(Number(d.value).toFixed(2)) + '%'
           )
 
@@ -288,7 +288,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
         overflow: 'auto'
       }}
     >
-      <svg id="chart-container" overflow="auto" ref={chartSvg}>
+      <svg id="chart-container" ref={chartSvg}>
         <svg id="running-chart" />
       </svg>
     </div>

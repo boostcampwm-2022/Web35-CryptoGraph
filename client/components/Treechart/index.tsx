@@ -157,7 +157,7 @@ const updateChart = (
             const text =
               selectedSort === 'market capitalization'
                 ? String(Number(d.data.market_cap / 1000000000000).toFixed(2)) +
-                  '조원'
+                  '조'
                 : String(Number(d.data.value).toFixed(2)) + '%'
             return d.data.ticker?.split('-')[1] + '\n' + text
           })
