@@ -15,6 +15,7 @@ export interface CandleData {
   trade_volume: number
   candle_date_time_kst: string
   timestamp: number
+  candle_acc_trade_price: number
   trade_timestamp: number
 }
 export const ChartTypeArr = ['TreeChart', 'RunningChart'] as const

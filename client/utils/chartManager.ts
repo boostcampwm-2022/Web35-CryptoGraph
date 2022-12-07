@@ -23,6 +23,21 @@ export function calculateCandlewidth(
 ): number {
   return chartXSize / option.renderCandleCount
 }
+export function getVolumeHeightScale(
+  data: CandleData[],
+  CHART_AREA_Y_SIZE: number
+) {
+  const [min, max] = [
+    d3.min(data, d => d.candle_acc_trade_price),
+    d3.max(data, d => d.candle_acc_trade_price)
+  ]
+  if (!min || !max) {
+    console.error(data, data.length)
+    console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
+    return undefined
+  }
+  return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 30])
+}
 export function getYAxisScale(data: CandleData[], CHART_AREA_Y_SIZE: number) {
   const [min, max] = [
     d3.min(data, d => d.low_price),
