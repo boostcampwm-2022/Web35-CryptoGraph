@@ -145,7 +145,6 @@ export const getServerSideProps: GetServerSideProps<
       }
     }
   }
-  console.log(market, '으악')
   return {
     props: {
       market: market,
