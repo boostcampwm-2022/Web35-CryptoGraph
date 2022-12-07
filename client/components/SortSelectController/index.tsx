@@ -5,8 +5,9 @@ import Box from '@mui/material/Box'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
+import { TabProps } from '@/components/TabContainer'
 
-interface SortSelectControllerProps {
+interface SortSelectControllerProps extends TabProps {
   selectedSort: string
   selectedSortSetter: React.Dispatch<React.SetStateAction<string>>
   selectedChart: string

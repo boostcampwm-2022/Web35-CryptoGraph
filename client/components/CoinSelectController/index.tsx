@@ -5,18 +5,21 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
+import { ChartType } from '@/types/ChartTypes'
+import { TabProps } from '@mui/material'
 
 interface CoinChecked {
   [key: string]: boolean
 }
-interface ChartSelectControllerProps {
+interface CoinSelectControllerProps extends TabProps {
   selectedCoinList: string[]
   selectedCoinListSetter: React.Dispatch<React.SetStateAction<string[]>>
+  tabLabelInfo?: string
 }
 export default function CoinSelectController({
   selectedCoinList,
   selectedCoinListSetter
-}: ChartSelectControllerProps) {
+}: CoinSelectControllerProps) {
   const [coinList, setCoinList] = useState<MarketCapInfo[] | null>([])
   const [checked, setChecked] = useState<CoinChecked>({
     all: true

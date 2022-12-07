@@ -3,12 +3,12 @@ import styled from '@emotion/styled'
 import LinkButton from '@/components/LinkButton'
 import { ReactNode } from 'react'
 
-interface InfoContainerDesktopProps {
+interface InfoSidebarContainerProps {
   children: ReactNode
 }
-export default function InfoContainerDesktop({
+export default function InfoSidebarContainer({
   children
-}: InfoContainerDesktopProps) {
+}: InfoSidebarContainerProps) {
   return (
     <div style={{ width: '100%', height: '100%' }}>
       {React.Children.map(children, child => {
