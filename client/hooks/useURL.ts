@@ -10,7 +10,6 @@ export function useURL(startMarket: string): string {
       : router.query.market?.toUpperCase()
     if (!market) return
     setMarket(market)
-    console.log(market, '이게 라우터야')
   }, [router.query.market])
 
   return market
