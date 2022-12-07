@@ -2,6 +2,7 @@ import * as d3 from 'd3'
 import * as React from 'react'
 import { CoinRateContentType, CoinRateType } from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
+import { colorQuantizeScale } from '@/utils/chartManager'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
@@ -104,9 +105,11 @@ const updateChart = (
           })
           .attr('height', barHeight)
           .style('fill', (d, i) => {
-            if (d.value > 0) return 'red'
+            if (d.value > 0) return colorQuantizeScale(min, max, d.value)
             else if (d.value === 0) return 'gray'
-            else return 'blue'
+            else {
+              return colorQuantizeScale(min, max, d.value)
+            }
           })
 
         $g.append('text')
@@ -168,9 +171,9 @@ const updateChart = (
           })
           .attr('height', barHeight)
           .style('fill', (d, i) => {
-            if (d.value > 0) return 'red'
+            if (d.value > 0) return colorQuantizeScale(min, max, d.value)
             else if (d.value === 0) return 'gray'
-            else return 'blue'
+            else return colorQuantizeScale(min, max, d.value)
           })
         update
           .select('text')

@@ -16,6 +16,7 @@ import {
 import * as d3 from 'd3'
 import { makeDate } from './dateManager'
 import { CandleChartProps } from '@/components/Candlechart'
+import { blueColorScale, redColorScale } from '@/styles/colorScale'
 
 export function calculateCandlewidth(
   option: ChartRenderOption,
@@ -335,4 +336,14 @@ export function goToFuture(props: CandleChartProps, windowSize: WindowSize) {
           windowSize.width - CHART_Y_AXIS_MARGIN
         )
   }
+}
+
+export const colorQuantizeScale = (min: number, max: number, value: number) => {
+  return value > 0
+    ? d3.scaleQuantize<string>().domain([min, max]).range(redColorScale)(
+        Math.abs(value)
+      )
+    : d3.scaleQuantize<string>().domain([min, max]).range(blueColorScale)(
+        Math.abs(value)
+      )
 }
