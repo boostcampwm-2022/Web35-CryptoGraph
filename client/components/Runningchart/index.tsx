@@ -71,7 +71,6 @@ const updateChart = (
 
   const BARMARGIN = height / candleCount / 10 //바 사이사이 마진값
   const barHeight = height / candleCount - BARMARGIN //각각의 수평 바 y 높이
-  console.log(min, max)
   const threshold =
     Math.max(min, max) <= 66
       ? Math.max(min, max) <= 33
