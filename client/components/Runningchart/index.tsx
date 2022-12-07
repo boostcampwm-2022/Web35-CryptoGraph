@@ -107,11 +107,9 @@ const updateChart = (
         $g.append('rect')
           .attr('width', function (d) {
             return scale(
-              selectedSort !== 'descending'
-                ? selectedSort !== 'market capitalization'
-                  ? Math.abs(d.value)
-                  : d.market_cap
-                : Math.abs(d.value)
+              selectedSort !== 'market capitalization'
+                ? Math.abs(d.value)
+                : d.market_cap
             )
           })
           .attr('height', barHeight)
@@ -127,11 +125,9 @@ const updateChart = (
           .attr('x', d => {
             return (
               scale(
-                selectedSort !== 'descending'
-                  ? selectedSort !== 'market capitalization'
-                    ? Math.abs(d.value)
-                    : Number(d.market_cap)
-                  : Math.abs(d.value)
+                selectedSort !== 'market capitalization'
+                  ? Math.abs(d.value)
+                  : d.market_cap
               ) / 2
             )
           })
@@ -151,11 +147,9 @@ const updateChart = (
           .attr('id', 'CoinName')
           .attr('x', d => {
             return scale(
-              selectedSort !== 'descending'
-                ? selectedSort !== 'market capitalization'
-                  ? Math.abs(d.value)
-                  : d.market_cap
-                : Math.abs(d.value)
+              selectedSort !== 'market capitalization'
+                ? Math.abs(d.value)
+                : d.market_cap
             )
           })
           .attr('y', barHeight / 2)
@@ -179,11 +173,9 @@ const updateChart = (
           .duration(durationPeriod)
           .attr('width', d => {
             return scale(
-              selectedSort !== 'descending'
-                ? selectedSort !== 'market capitalization'
-                  ? Math.abs(d.value)
-                  : d.market_cap
-                : Math.abs(d.value)
+              selectedSort !== 'market capitalization'
+                ? Math.abs(d.value)
+                : d.market_cap
             )
           })
           .attr('height', barHeight)
@@ -197,11 +189,9 @@ const updateChart = (
           .attr('x', d => {
             return (
               scale(
-                selectedSort !== 'descending'
-                  ? selectedSort !== 'market capitalization'
-                    ? Math.abs(d.value)
-                    : Number(d.market_cap)
-                  : Math.abs(d.value)
+                selectedSort !== 'market capitalization'
+                  ? Math.abs(d.value)
+                  : d.market_cap
               ) / 2
             )
           })
@@ -223,11 +213,9 @@ const updateChart = (
           .duration(durationPeriod)
           .attr('x', d => {
             return scale(
-              selectedSort !== 'descending'
-                ? selectedSort !== 'market capitalization'
-                  ? Math.abs(d.value)
-                  : d.market_cap
-                : Math.abs(d.value)
+              selectedSort !== 'market capitalization'
+                ? Math.abs(d.value)
+                : d.market_cap
             )
           })
           .attr('y', barHeight / 2)
