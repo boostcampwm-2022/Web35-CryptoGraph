@@ -95,7 +95,7 @@ export default function Home({
         <ChartContainer>
           {selectedChart === 'RunningChart' ? (
             <RunningChart
-              candleCount={20}
+              candleCount={selectedMarket.length}
               data={coinData}
               Market={selectedMarket}
               selectedSort={selectedSort}
