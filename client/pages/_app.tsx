@@ -55,10 +55,10 @@ const ContainerHeightLimiter = styled('div')`
   width: 100%;
   height: 100%;
   ${props => props.theme.breakpoints.down('tablet')} {
-    padding-top: calc(64px + 16px);
+    padding-top: calc(64px + 8px);
   }
   ${props => props.theme.breakpoints.up('tablet')} {
-    padding-top: calc(96px + 16px);
+    padding-top: calc(96px + 8px);
     //매직 넘버 상수화 필요
   }
 `

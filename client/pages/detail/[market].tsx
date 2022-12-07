@@ -55,13 +55,15 @@ export default function Detail({
           selectedSetter={setCandlePeriod}
           coinPriceInfo={realtimePriceInfo[market]}
         />
-        <CandleChart
-          candlePeriod={candlePeriod}
-          candleData={realtimeCandleData}
-          candleDataSetter={setRealtimeCandleData}
-          option={chartRenderOption}
-          optionSetter={setRenderOption}
-        ></CandleChart>
+        <Box sx={{ height: '90%', paddingTop: '8px' }}>
+          <CandleChart
+            candlePeriod={candlePeriod}
+            candleData={realtimeCandleData}
+            candleDataSetter={setRealtimeCandleData}
+            option={chartRenderOption}
+            optionSetter={setRenderOption}
+          ></CandleChart>
+        </Box>
       </ChartAreaContainer>
       <InfoContainer>
         {isMobile ? (
@@ -157,6 +159,7 @@ export const getServerSideProps: GetServerSideProps<
 const HomeContainer = styled(Box)`
   display: flex;
   width: 100%;
+  height: 100%;
   max-width: 1920px;
   ${props => props.theme.breakpoints.down('tablet')} {
     align-items: center;
@@ -167,11 +170,11 @@ const HomeContainer = styled(Box)`
 const ChartAreaContainer = styled('div')`
   display: flex;
   box-sizing: content-box;
-  min-width: 300px;
   width: 100%;
+  height: 100%;
+  min-width: 350px;
   flex-direction: column;
   ${props => props.theme.breakpoints.up('tablet')} {
-    height: 90%; //분봉선택바가 10%이다.
     max-height: 1080px;
   }
 `
@@ -181,11 +184,9 @@ const InfoContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  // width %로 비율조절 가능한듯??
-  // chart와 info가 2:1의 비율
-  min-width: 300px;
-  width: 50%;
-  height: calc(100% - 48px);
+  width: 400px;
+  min-width: 400px;
+  height: 100%;
   ${props => props.theme.breakpoints.down('tablet')} {
     height: auto;
     margin: 0;

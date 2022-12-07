@@ -4,6 +4,20 @@ import {
 } from '@mui/material/styles'
 
 declare module '@mui/material/styles' {
+  interface Palette {
+    custom: CustomPaletteColor
+  }
+  interface PaletteOptions {
+    custom: CustomPaletteColorOptions
+  }
+  interface CustomPaletteColorOptions {
+    red?: string
+    blue?: string
+  }
+  interface CustomPaletteColor {
+    red?: string
+    blue?: string
+  }
   interface BreakpointOverrides {
     xs: false // removes the `xs` breakpoint
     sm: false
@@ -36,6 +50,10 @@ declare module '@mui/material/styles' {
       error: {
         main: string
       }
+      custom: {
+        red: string
+        blue: string
+      }
     }
     typography: {
       fontFamily: string
@@ -64,6 +82,10 @@ declare module '@mui/material/styles' {
       }
       error?: {
         main?: string
+      }
+      custom?: {
+        red?: string
+        blue?: string
       }
     }
     typography?: {

@@ -16,11 +16,11 @@ export default function CoinDetailedInfo({ market }: CoinDetailedInfoProps) {
   ) : (
     <Container>
       <Header>
-        <HeaderLogo
+        <Image
           src={coinMetaData.logo}
           alt="/logo-only-white.svg"
-          width={60}
-          height={60}
+          width={50}
+          height={50}
         />
         <HeaderContent>
           <div> {coinMetaData.name_kr}</div>
@@ -59,19 +59,21 @@ const Container = styled('div')`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
   box-sizing: border-box;
-  padding: 24px;
+  padding: 8px;
+  border: 1px solid #cac4d0;
+  border-radius: 20px;
+  font-size: 12px;
 `
 
 const Header = styled('div')`
   display: flex;
   flex-direction: row;
 `
-const HeaderLogo = styled(Image)``
 const HeaderContent = styled('div')`
   display: flex;
   margin-left: 10px;
+  font-size: 15px;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
@@ -79,11 +81,9 @@ const HeaderContent = styled('div')`
 
 const Body = styled('div')``
 const BodyHeader = styled('div')`
-  font-size: 1.1rem;
   font-weight: bold;
 `
 const BodyContentContainer = styled('div')`
-  height: 200px;
-  overflow-y: scroll;
+  height: auto;
 `
 const BodyContent = styled('div')``
