@@ -4,6 +4,7 @@ import { TabProps } from '@/components/TabContainer'
 import Image from 'next/image'
 import { CoinPrice } from '@/types/CoinPriceTypes'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 //코인 실시간 정보
 export default function RealTimeCoinPrice(props: TabProps) {
   return (
@@ -30,6 +31,7 @@ const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
   coinPrice
 }) => {
   const theme = useTheme()
+  const router = useRouter()
   const isMinus = coinPrice.signed_change_price <= 0
   const textColor =
     coinPrice.signed_change_price === 0
@@ -45,7 +47,7 @@ const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
           href=""
           onClick={e => {
             e.preventDefault()
-            window.location.href = `/detail/${coinPrice.name}`
+            router.replace(`/detail/${coinPrice.name}`)
           }}
         >
           <Typography sx={{ margin: 0, fontSize: '12px', fontWeight: 'bold' }}>
