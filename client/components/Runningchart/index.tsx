@@ -5,6 +5,7 @@ import { useWindowSize } from 'hooks/useWindowSize'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
+  durationPeriod: number
   candleCount: number
   data: CoinRateType //선택된 코인 리스트
   Market: string[]
@@ -24,6 +25,7 @@ const initChart = (
 
 //------------------------------updateChart------------------------------
 const updateChart = (
+  durationPeriod: number,
   svgRef: React.RefObject<SVGSVGElement>,
   data: CoinRateType,
   width: number,
@@ -81,8 +83,6 @@ const updateChart = (
     .select('#running-chart')
     .attr('width', width)
     .attr('height', height)
-
-  const durationPeriod = 500
 
   svgChart
     .selectAll<SVGSVGElement, CoinRateContentType>('g')
@@ -230,6 +230,7 @@ const updateChart = (
 }
 //------------------------------Component------------------------------
 export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
+  durationPeriod,
   candleCount,
   data,
   Market,
@@ -245,7 +246,15 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     initChart(chartSvg, width, height)
   }, [width, height]) // 창크기에 따른 차트크기 조절
   React.useEffect(() => {
-    updateChart(chartSvg, changeRate, width, height, candleCount, selectedSort)
+    updateChart(
+      durationPeriod,
+      chartSvg,
+      changeRate,
+      width,
+      height,
+      candleCount,
+      selectedSort
+    )
   }, [width, height, changeRate, candleCount, selectedSort]) // 창크기에 따른 차트크기 조절
 
   React.useEffect(() => {
