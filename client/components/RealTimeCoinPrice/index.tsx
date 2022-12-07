@@ -43,13 +43,7 @@ const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
     <CoinPriceDiv>
       <Image src={coinPrice.logo} alt="" width={40} height={40} />
       <div className="name">
-        <Link
-          href=""
-          onClick={e => {
-            e.preventDefault()
-            router.replace(`/detail/${coinPrice.name}`)
-          }}
-        >
+        <Link href={`/detail/${coinPrice.name}`}>
           <Typography sx={{ margin: 0, fontSize: '12px', fontWeight: 'bold' }}>
             {coinPrice.name_kr}
           </Typography>
