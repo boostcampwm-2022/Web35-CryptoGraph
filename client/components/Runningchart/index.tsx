@@ -71,12 +71,18 @@ const updateChart = (
 
   const BARMARGIN = height / candleCount / 10 //바 사이사이 마진값
   const barHeight = height / candleCount - BARMARGIN //각각의 수평 바 y 높이
-
+  console.log(min, max)
+  const threshold =
+    Math.max(min, max) <= 66
+      ? Math.max(min, max) <= 33
+        ? 33
+        : 66
+      : Math.max(min, max, 100) // 66보다 큰 경우는 시가총액 or 66% 이상
+  const domainRange =
+    selectedSort !== 'descending' ? [0, threshold] : [min, threshold]
   const scale = d3
     .scaleLinear()
-    .domain(
-      selectedSort !== 'descending' ? [0, Math.max(min, max)] : [min, max]
-    )
+    .domain(domainRange)
     .range([100, width - 100])
 
   const svgChart = d3
