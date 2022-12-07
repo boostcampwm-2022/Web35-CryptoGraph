@@ -192,7 +192,7 @@ const updateChart = (
           .text(d =>
             selectedSort !== 'descending' && selectedSort !== 'ascending'
               ? selectedSort !== 'market capitalization'
-                ? String(Number(Math.abs(d.value)).toFixed(2)) + '%'
+                ? String(Number(d.value).toFixed(2)) + '%'
                 : String(Number(d.market_cap / 1000000000000).toFixed(2)) +
                   '조원'
               : String(Number(d.value).toFixed(2)) + '%'
