@@ -9,7 +9,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { ChartPeriodList } from '@/types/ChartTypes'
 import { CoinPrice } from '@/types/CoinPriceTypes'
 import Image from 'next/image'
-import { Typography } from '@mui/material'
+import { Typography, useMediaQuery } from '@mui/material'
 
 interface ChartHeaderProps {
   selected: ChartPeriod
@@ -44,9 +44,17 @@ function HeaderCoinInfo(props: HeaderCoinPriceInfoProps) {
       : coinPrice.signed_change_price < 0
       ? theme.palette.custom.blue
       : theme.palette.custom.red
+  const isSmallDesktop = useMediaQuery(
+    theme.breakpoints.between('tablet', 'desktop')
+  )
   return (
     <HeaderCoinInfoContainer>
-      <Image src={coinPrice.logo} alt="" width={50} height={50} />
+      <Image
+        src={coinPrice.logo}
+        alt=""
+        width={isSmallDesktop ? 30 : 50}
+        height={isSmallDesktop ? 30 : 50}
+      />
       <div className="name">
         <span>
           <span className="big">{coinPrice.name_kr}</span>{' '}
@@ -54,10 +62,14 @@ function HeaderCoinInfo(props: HeaderCoinPriceInfoProps) {
         </span>
       </div>
       <div className="price">
-        <Typography sx={{ color: textColor }}>
+        <Typography
+          sx={{ color: textColor, fontSize: isSmallDesktop ? '8px' : '12px' }}
+        >
           {coinPrice.price.toLocaleString() + 'KRW'}
         </Typography>
-        <Typography sx={{ color: textColor }}>
+        <Typography
+          sx={{ color: textColor, fontSize: isSmallDesktop ? '8px' : '12px' }}
+        >
           {`${
             (isMinus ? '' : '+') +
             coinPrice.signed_change_price.toLocaleString() +
@@ -80,6 +92,10 @@ interface ChartPeriodSelectorProps {
   selectedSetter: Dispatch<SetStateAction<ChartPeriod>>
 }
 function ChartPeriodSelector(props: ChartPeriodSelectorProps) {
+  const theme = useTheme()
+  const isSmallDesktop = useMediaQuery(
+    theme.breakpoints.between('tablet', 'desktop')
+  )
   const handleChange = (event: SelectChangeEvent) => {
     props.selectedSetter(event.target.value as ChartPeriod)
     // as 사용을 지양해야하지만, 런타임 중에
@@ -87,8 +103,11 @@ function ChartPeriodSelector(props: ChartPeriodSelectorProps) {
     // 가능성이 없으므로 사용함.
   }
   return (
-    <Box sx={{ minWidth: 300 }}>
-      <FormControl fullWidth>
+    <Box sx={{ width: 200 }}>
+      <FormControl
+        sx={{ width: '100%', height: '100%' }}
+        size={isSmallDesktop ? 'small' : 'medium'}
+      >
         <InputLabel id="demo-simple-select-label">분봉 선택</InputLabel>
         <Select
           labelId="demo-simple-select-label"
@@ -141,11 +160,19 @@ const HeaderCoinInfoContainer = styled('div')`
       font-weight: 600;
     }
   }
-  & > div.price {
-    text-align: left;
-    font-size: 15px;
-    & p {
-      margin: 0;
+  ${props => props.theme.breakpoints.down('tablet')} {
+    width: 100%;
+    justify-content: center;
+  }
+  ${props => props.theme.breakpoints.between('tablet', 'desktop')} {
+    gap: 5px;
+    & > div.name {
+      & span {
+        font-size: 8px;
+      }
+      & .big {
+        font-size: 16px;
+      }
     }
   }
 `
