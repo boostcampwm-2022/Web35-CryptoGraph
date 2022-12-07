@@ -50,20 +50,18 @@ const updateChart = (
     }
     return d3.ascending(a.cmc_rank, b.cmc_rank) //시가총액
   })
-
   const min =
     selectedSort !== 'descending'
       ? selectedSort === 'market capitalization'
         ? (d3.min(ArrayDataValue, d => d.market_cap) as number)
         : (d3.min(ArrayDataValue, d => Math.abs(d.value)) as number)
-      : (d3.min(ArrayDataValue, d => d.value) as number)
+      : (d3.min(ArrayDataValue, d => Math.abs(d.value)) as number)
   const max =
     selectedSort !== 'descending'
       ? selectedSort === 'market capitalization'
         ? (d3.max(ArrayDataValue, d => d.market_cap) as number)
         : (d3.max(ArrayDataValue, d => Math.abs(d.value)) as number)
-      : (d3.max(ArrayDataValue, d => d.value) as number)
-
+      : (d3.max(ArrayDataValue, d => Math.abs(d.value)) as number)
   const barMargin = height / 10 / 5 //바 사이사이 마진값
   const barHeight = height / 18 //각각의 수평 바 y 높이
   setChartContainerSize(svgRef, width, (barHeight + barMargin) * candleCount)
@@ -71,7 +69,7 @@ const updateChart = (
   const scale = d3
     .scaleLinear()
     .domain(
-      selectedSort !== 'descending' ? [0, Math.max(min, max)] : [min, max]
+      selectedSort === 'descending' ? [min, max] : [0, Math.max(min, max)]
     )
     .range([100, width - 100])
 
