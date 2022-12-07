@@ -82,6 +82,8 @@ const updateChart = (
     .attr('width', width)
     .attr('height', height)
 
+  const durationPeriod = 500
+
   svgChart
     .selectAll<SVGSVGElement, CoinRateContentType>('g')
     .data(ArrayDataValue, d => d.name)
@@ -91,8 +93,6 @@ const updateChart = (
         $g.attr('transform', function (d, i) {
           return 'translate(0,' + i * barHeight + ')'
         })
-          .transition()
-          .duration(1000)
           .attr('transform', (d, i) => 'translate(0,' + i * barHeight + ')')
           .style('opacity', 1)
 
@@ -115,7 +115,7 @@ const updateChart = (
           })
 
         $g.append('text')
-          .attr('x', function (d) {
+          .attr('x', d => {
             return (
               scale(
                 selectedSort !== 'descending'
@@ -130,11 +130,18 @@ const updateChart = (
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'middle')
           .style('font-size', `${barHeight * 0.6}px`)
-          .text('0.00%')
+          .text(d =>
+            selectedSort !== 'descending' && selectedSort !== 'ascending'
+              ? selectedSort !== 'market capitalization'
+                ? String(Number(d.value).toFixed(2)) + '%'
+                : String(Number(d.market_cap / 1000000000000).toFixed(2)) +
+                  '조원'
+              : String(Number(d.value).toFixed(2)) + '%'
+          )
 
         $g.append('text')
           .attr('id', 'CoinName')
-          .attr('x', function (d) {
+          .attr('x', d => {
             return scale(
               selectedSort !== 'descending'
                 ? selectedSort !== 'market capitalization'
@@ -144,21 +151,21 @@ const updateChart = (
             )
           })
           .attr('y', barHeight / 2)
-          .style('font-size', `${barHeight * 0.6}px`)
           .attr('text-anchor', 'start')
           .attr('dominant-baseline', 'middle')
-          .text('loading...')
+          .style('font-size', `${barHeight * 0.6}px`)
+          .text(d => d.ticker.split('-')[1])
         return $g
       },
       update => {
         update // 차트들
           .transition()
-          .duration(1000)
+          .duration(durationPeriod)
           .attr('transform', (d, i) => `translate(0,  ${i * barHeight} )`)
         update
           .select('rect')
           .transition()
-          .duration(1000)
+          .duration(durationPeriod)
           .attr('width', d => {
             return scale(
               selectedSort !== 'descending'
@@ -172,8 +179,6 @@ const updateChart = (
 
         update
           .select('text')
-          .transition()
-          .duration(1000)
           .attr('x', d => {
             return (
               scale(
@@ -201,7 +206,7 @@ const updateChart = (
         update
           .select('#CoinName')
           .transition()
-          .duration(1000)
+          .duration(durationPeriod)
           .attr('x', d => {
             return scale(
               selectedSort !== 'descending'
@@ -239,7 +244,6 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   React.useEffect(() => {
     initChart(chartSvg, width, height)
   }, [width, height]) // 창크기에 따른 차트크기 조절
-
   React.useEffect(() => {
     updateChart(chartSvg, changeRate, width, height, candleCount, selectedSort)
   }, [width, height, changeRate, candleCount, selectedSort]) // 창크기에 따른 차트크기 조절
