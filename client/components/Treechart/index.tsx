@@ -44,6 +44,12 @@ const updateChart = (
     if (selectedSort === 'change rate(absolute)') {
       return d3.descending(Math.abs(a.data.value), Math.abs(b.data.value))
     }
+    if (selectedSort === 'trade price') {
+      return d3.descending(
+        a.data.acc_trade_price_24h,
+        b.data.acc_trade_price_24h
+      )
+    }
     return d3.ascending(a.data.cmc_rank, b.data.cmc_rank)
   }
 
@@ -57,6 +63,9 @@ const updateChart = (
         selectedSort === 'change rate(absolute)'
       ) {
         return Math.max(0.1, Math.abs(d.value))
+      }
+      if (selectedSort === 'trade price') {
+        return Math.max(0.1, Math.abs(d.acc_trade_price_24h))
       }
       return Math.max(0.1, Math.abs(d.market_cap))
     })
@@ -102,6 +111,7 @@ const updateChart = (
           })
           .attr('text-anchor', 'middle')
           .text(function (d) {
+            // 초기값 changerate 아니라면 수정해줘야함
             return (
               d.data.ticker?.split('-')[1] +
               '\n' +
@@ -155,10 +165,16 @@ const updateChart = (
           .attr('text-anchor', 'middle')
           .text(function (d) {
             const text =
-              selectedSort === 'market capitalization'
-                ? String(Number(d.data.market_cap / 1000000000000).toFixed(2)) +
-                  '조'
-                : String(Number(d.data.value).toFixed(2)) + '%'
+              selectedSort !== 'trade price'
+                ? selectedSort === 'market capitalization'
+                  ? String(
+                      Number(d.data.market_cap / 1000000000000).toFixed(2)
+                    ) + '조'
+                  : String(Number(d.data.value).toFixed(2)) + '%'
+                : String(
+                    // 거래량은
+                    Number(d.data.acc_trade_price_24h / 1000000000).toFixed(0)
+                  ) + '억'
             return d.data.ticker?.split('-')[1] + '\n' + text
           })
           .style('font-size', function (d) {
@@ -215,7 +231,14 @@ export default function TreeChart({
   selectedSort
 }: TreeChartProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
-    { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
+    {
+      name: 'Origin',
+      ticker: '',
+      acc_trade_price_24h: 0,
+      parent: '',
+      value: 0,
+      market_cap: 0
+    }
   ]) //coin의 등락률 값에 parentNode가 추가된 값
   const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값
   const chartSvg = useRef<SVGSVGElement>(null)
@@ -230,7 +253,14 @@ export default function TreeChart({
     // CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
     if (!coinRate || !Market) return
     const newCoinData: CoinRateContentType[] = [
-      { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
+      {
+        name: 'Origin',
+        ticker: '',
+        acc_trade_price_24h: 0,
+        parent: '',
+        value: 0,
+        market_cap: 0
+      }
     ]
     for (const tick of Market) {
       newCoinData.push(coinRate['KRW-' + tick])
