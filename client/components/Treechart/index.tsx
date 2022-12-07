@@ -1,18 +1,14 @@
 import * as d3 from 'd3'
 import { useState, useEffect, useRef } from 'react'
-import useInterval from '@/hooks/useInterval'
 import { useWindowSize } from '@/hooks/useWindowSize'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
-import { updateTreeData } from './getCoinData'
-import { MarketCapInfo } from '@/types/CoinDataTypes'
-
-const coinIntervalRate = 1000
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
   data: CoinRateContentType[],
   width: number,
-  height: number
+  height: number,
+  selectedSort: string
 ) => {
   if (!svgRef.current) return
   const chartContainer = d3.select<SVGSVGElement, CoinRateContentType>(
@@ -40,12 +36,28 @@ const updateChart = (
   const sort = (
     a: d3.HierarchyNode<CoinRateContentType>,
     b: d3.HierarchyNode<CoinRateContentType>
-  ) => d3.descending(a.value, b.value)
-  //const sort = (a, b) => d3.ascending(a.id, b.id)
+  ) => {
+    if (selectedSort === 'change rate') {
+      return d3.descending(a.data.value, b.data.value)
+    }
+    if (selectedSort === 'change rate(absolute)') {
+      return d3.descending(Math.abs(a.data.value), Math.abs(b.data.value))
+    }
+    return d3.ascending(a.data.cmc_rank, b.data.cmc_rank)
+  }
 
   root
     .sum(function (d): number {
-      return Math.abs(+d.value)
+      if (d.name === 'Origin') {
+        return 0
+      }
+      if (
+        selectedSort === 'change rate' ||
+        selectedSort === 'change rate(absolute)'
+      ) {
+        return Math.max(0.1, Math.abs(d.value))
+      }
+      return Math.max(0.1, Math.abs(d.market_cap))
     })
     .sort(sort)
 
@@ -73,10 +85,14 @@ const updateChart = (
             return d.y1 - d.y0
           })
           .attr('fill', function (d) {
-            return d.data.value > 0 ? 'red' : 'blue'
+            return d.data.value >= 0
+              ? d.data.value > 0
+                ? 'red'
+                : 'black'
+              : 'blue'
           })
           .attr('opacity', function (d) {
-            return treeMapvalueScale(Math.abs(d.data.value as number))
+            return treeMapvalueScale(Math.abs(d.data.value))
           })
           .style('stroke', 'black')
         $g.append('text')
@@ -89,7 +105,10 @@ const updateChart = (
           .attr('text-anchor', 'middle')
           .text(function (d) {
             return (
-              d.data.name + '\n' + String(Number(d.data.value).toFixed(2)) + '%'
+              d.data.ticker?.split('-')[1] +
+              '\n' +
+              String(Number(d.data.value).toFixed(2)) +
+              '%'
             )
           })
           .style('font-size', function (d) {
@@ -116,10 +135,14 @@ const updateChart = (
             return d.y1 - d.y0
           })
           .attr('fill', function (d) {
-            return d.data.value > 0 ? 'red' : 'blue'
+            return d.data.value >= 0
+              ? d.data.value > 0
+                ? 'red'
+                : 'black'
+              : 'blue'
           })
           .attr('opacity', function (d) {
-            return treeMapvalueScale(Math.abs(d.data.value as number))
+            return treeMapvalueScale(Math.abs(d.data.value))
           })
           .transition()
           .duration(500)
@@ -136,9 +159,12 @@ const updateChart = (
           })
           .attr('text-anchor', 'middle')
           .text(function (d) {
-            return (
-              d.data.name + '\n' + String(Number(d.data.value).toFixed(2)) + '%'
-            )
+            const text =
+              selectedSort === 'market capitalization'
+                ? String(Number(d.data.market_cap / 1000000000000).toFixed(2)) +
+                  '조원'
+                : String(Number(d.data.value).toFixed(2)) + '%'
+            return d.data.ticker?.split('-')[1] + '\n' + text
           })
           .style('font-size', function (d) {
             return `${(d.x1 - d.x0) / 9}px`
@@ -186,13 +212,15 @@ const initChart = (
 export interface TreeChartProps {
   data: CoinRateType
   Market?: string[] //선택된 코인 리스트
+  selectedSort: string
 }
 export default function TreeChart({
   data,
-  Market //= ['CELO', 'ETH', 'MFT', 'WEMIX']
+  Market, //= ['CELO', 'ETH', 'MFT', 'WEMIX']
+  selectedSort
 }: TreeChartProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
-    { name: 'Origin', parent: '', value: 0 }
+    { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
   ]) //coin의 등락률 값에 parentNode가 추가된 값
   const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값
   const chartSvg = useRef<SVGSVGElement>(null)
@@ -207,7 +235,7 @@ export default function TreeChart({
     // CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
     if (!coinRate || !Market) return
     const newCoinData: CoinRateContentType[] = [
-      { name: 'Origin', ticker: '', parent: '', value: 0 }
+      { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
     ]
     for (const tick of Market) {
       newCoinData.push(coinRate['KRW-' + tick])
@@ -215,8 +243,8 @@ export default function TreeChart({
     setChangeRate(newCoinData)
   }, [data, Market])
   useEffect(() => {
-    updateChart(chartSvg, changeRate, width, height)
-  }, [changeRate, width, height])
+    updateChart(chartSvg, changeRate, width, height, selectedSort)
+  }, [changeRate, width, height, selectedSort])
 
   return (
     <div

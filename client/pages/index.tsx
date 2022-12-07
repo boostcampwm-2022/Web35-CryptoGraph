@@ -1,48 +1,25 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
-import { styled } from '@mui/material/styles'
+import { styled, useTheme } from '@mui/material/styles'
 import CoinSelectController from '@/components/CoinSelectController'
-import TreeChart, { TreeChartProps } from '@/components/Treechart'
+import TreeChart from '@/components/Treechart'
 import { RunningChart } from '@/components/Runningchart'
 import { ChartType } from '@/types/ChartTypes'
 import ChartSelectController from '@/components/ChartSelectController'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
-import useInterval from '@/hooks/useInterval'
-import { updateTreeData } from '@/components/Treechart/getCoinData'
+import SortSelectController from '@/components/SortSelectController'
 
-const coinIntervalRate = 5000
-
-const getInitData = (data: MarketCapInfo[]): CoinRateType => {
-  //initData
-  const initData: CoinRateType = {}
-  data.forEach(coinData => {
-    const coinContent: CoinRateContentType = {
-      name: '',
-      ticker: '',
-      parent: '',
-      value: 0
-    }
-    coinContent.name = coinData.name_kr
-    coinContent.ticker = 'KRW-' + coinData.name
-    coinContent.parent = 'Origin'
-    coinContent.value = Number((coinData.signed_change_rate * 100).toFixed(2))
-    initData[coinContent.ticker] = coinContent
-  })
-
-  return initData
-}
+import { useMediaQuery } from '@mui/material'
+import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
+import TabContainer from '@/components/TabContainer'
+import CoinDetailedInfo from '@/components/CoinDetailedInfo'
+import { useRealTimeCoinListData } from '@/hooks/useRealTimeCoinListData'
 
 interface getDataProps {
   data: MarketCapInfo[]
   Market?: string[] //선택된 코인 리스트
-}
-
-const dataMarket = (data: MarketCapInfo[]): string[] => {
-  // initMarket
-  return data.map(coin => coin.name)
 }
 
 export default function Home({
@@ -50,30 +27,70 @@ export default function Home({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [selectedChart, setSelectedChart] = useState<ChartType>('RunningChart')
   const [selectedMarket, setSelectedMarket] = useState<string[]>(
-    dataMarket(data)
+    data.map(coin => coin.name)
   ) //선택된 market 컨트롤
-  const [coinData, setCoinData] = useState<CoinRateType>(getInitData(data))
-
-  useInterval(() => {
-    async function update() {
-      const updatedCoinRate = await updateTreeData(coinData)
-      setCoinData(updatedCoinRate)
+  const [selectedSort, setSelectedSort] = useState<string>('descending')
+  const coinData = useRealTimeCoinListData(data)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
+  useEffect(() => {
+    if (selectedChart === 'RunningChart') {
+      setSelectedSort('descending')
+    } else {
+      setSelectedSort('change rate')
     }
-    update()
-  }, coinIntervalRate)
-
+  }, [selectedChart])
   return (
     <HomeContainer>
-      <SideBarContainer>
-        <ChartSelectController
-          selected={selectedChart}
-          selectedSetter={setSelectedChart}
-        />
-        <CoinSelectController
-          selectedCoinList={selectedMarket}
-          selectedCoinListSetter={setSelectedMarket}
-        />
-      </SideBarContainer>
+      {isMobile ? (
+        <Box sx={{ position: 'absolute' }}>
+          <SwipeableTemporaryDrawer>
+            <TabContainer>
+              <ChartSelectController
+                selected={selectedChart}
+                selectedSetter={setSelectedChart}
+                tabLabelInfo={'차트 선택'}
+              />
+              <SortSelectController
+                selectedSort={selectedSort}
+                selectedSortSetter={setSelectedSort}
+                selectedChart={selectedChart}
+                tabLabelInfo={'정렬 기준'}
+              />
+              <CoinSelectController
+                selectedCoinList={selectedMarket}
+                selectedCoinListSetter={setSelectedMarket}
+                tabLabelInfo={'코인 선택'}
+              />
+              <CoinDetailedInfo
+                market="btc"
+                tabLabelInfo={'상세 정보'}
+              ></CoinDetailedInfo>
+            </TabContainer>
+          </SwipeableTemporaryDrawer>
+        </Box>
+      ) : (
+        <SideBarContainer>
+          <ChartSelectController
+            selected={selectedChart}
+            selectedSetter={setSelectedChart}
+          />
+          <SortSelectController
+            selectedSort={selectedSort}
+            selectedSortSetter={setSelectedSort}
+            selectedChart={selectedChart}
+          />
+          <Box sx={{ width: '100%', height: '60%' }}>
+            <CoinSelectController
+              selectedCoinList={selectedMarket}
+              selectedCoinListSetter={setSelectedMarket}
+            />
+          </Box>
+          <Box sx={{ width: '100%', height: '30%' }}>
+            <CoinDetailedInfo market="btc"></CoinDetailedInfo>
+          </Box>
+        </SideBarContainer>
+      )}
       {selectedMarket.length !== 0 ? (
         <ChartContainer>
           {selectedChart === 'RunningChart' ? (
@@ -81,9 +98,14 @@ export default function Home({
               candleCount={20}
               data={coinData}
               Market={selectedMarket}
+              selectedSort={selectedSort}
             />
           ) : (
-            <TreeChart data={coinData} Market={selectedMarket} />
+            <TreeChart
+              data={coinData}
+              Market={selectedMarket}
+              selectedSort={selectedSort}
+            />
           )}
         </ChartContainer>
       ) : (
@@ -119,6 +141,7 @@ const SideBarContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  padding: 0 1rem;
   align-items: center;
   width: 500px;
   height: 100%;
@@ -129,9 +152,9 @@ const SideBarContainer = styled(Box)`
 `
 const ChartContainer = styled(Box)`
   display: flex;
-  box-sizing: border-box;
+  box-sizing: content-box; //얘가 차트 크기를 고정해준다. 이유는 아직 모르겠다..
+  min-width: 300px;
   width: 100%;
   height: 100%;
-  border: 1px solid black;
-  border-radius: 32px;
+  flex-direction: column;
 `

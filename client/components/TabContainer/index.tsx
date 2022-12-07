@@ -9,7 +9,7 @@ export interface TabProps {
   tabLabelInfo?: string
   priceInfo?: CoinPriceObj
 }
-interface InfoContainerMobileProps {
+interface TabContainerProps {
   children: ReactNode
 }
 interface TabPanelProps {
@@ -27,7 +27,8 @@ function TabPanel({ children, value, index, ...other }: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box>{children}</Box>}
+      <Box>{children}</Box>
+      {/* {value === index && <Box>{children}</Box>} */}
     </div>
   )
 }
@@ -39,9 +40,7 @@ function a11yProps(index: number) {
   }
 }
 
-export default function InfoContainerMobile({
-  children
-}: InfoContainerMobileProps) {
+export default function TabContainer({ children }: TabContainerProps) {
   const [selectedTab, setSelectedTab] = React.useState<number>(0)
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue)

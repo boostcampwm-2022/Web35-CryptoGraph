@@ -95,8 +95,10 @@ export interface CoinRateType {
 
 export interface CoinRateContentType {
   name: string
-  ticker?: string
+  ticker: string
   parent: string
+  market_cap: number
+  cmc_rank?: number
   value: number
 }
 
