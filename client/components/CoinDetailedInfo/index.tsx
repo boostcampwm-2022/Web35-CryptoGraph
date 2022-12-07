@@ -85,6 +85,5 @@ const BodyHeader = styled('div')`
 `
 const BodyContentContainer = styled('div')`
   height: auto;
-  overflow-y: auto;
 `
 const BodyContent = styled('div')``
