@@ -65,7 +65,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
         isFetching.current = true
         //추가적인 candleData Fetch
         getCandleDataArray(
-          DEFAULT_CANDLE_PERIOD,
+          props.candlePeriod,
           props.option.marketType,
           DEFAULT_CANDLE_COUNT,
           makeDate(
