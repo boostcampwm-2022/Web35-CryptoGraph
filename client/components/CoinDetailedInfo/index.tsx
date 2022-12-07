@@ -63,6 +63,7 @@ const Container = styled('div')`
   padding: 8px;
   border: 1px solid #cac4d0;
   border-radius: 20px;
+  font-size: 12px;
 `
 
 const Header = styled('div')`
@@ -72,6 +73,7 @@ const Header = styled('div')`
 const HeaderContent = styled('div')`
   display: flex;
   margin-left: 10px;
+  font-size: 15px;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
@@ -79,7 +81,6 @@ const HeaderContent = styled('div')`
 
 const Body = styled('div')``
 const BodyHeader = styled('div')`
-  font-size: 1rem;
   font-weight: bold;
 `
 const BodyContentContainer = styled('div')`

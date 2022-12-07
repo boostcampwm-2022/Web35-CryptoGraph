@@ -3,6 +3,7 @@ import * as React from 'react'
 import { TabProps } from '@/components/TabContainer'
 import Image from 'next/image'
 import { CoinPrice } from '@/types/CoinPriceTypes'
+import Link from 'next/link'
 //코인 실시간 정보
 export default function RealTimeCoinPrice(props: TabProps) {
   return (
@@ -40,9 +41,17 @@ const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
     <CoinPriceDiv>
       <Image src={coinPrice.logo} alt="" width={40} height={40} />
       <div className="name">
-        <Typography sx={{ margin: 0, fontSize: '12px', fontWeight: 'bold' }}>
-          {coinPrice.name_kr}
-        </Typography>
+        <Link
+          href=""
+          onClick={e => {
+            e.preventDefault()
+            window.location.href = `/detail/${coinPrice.name}`
+          }}
+        >
+          <Typography sx={{ margin: 0, fontSize: '12px', fontWeight: 'bold' }}>
+            {coinPrice.name_kr}
+          </Typography>
+        </Link>
         <Typography sx={{ margin: 0, fontSize: '12px' }}>
           {coinPrice.name}
         </Typography>
@@ -104,7 +113,10 @@ const Header = styled('div')`
   padding-left: 40px;
   & > div.header {
     display: flex;
-    & > div {
+    & > div:first-child {
+      flex: 2;
+    }
+    & > div:nth-child(n + 2) {
       flex: 1;
     }
   }
@@ -138,6 +150,10 @@ const CoinPriceDiv = styled('div')`
   gap: 4px;
   align-items: center;
   text-align: right;
+  & a {
+    text-decoration: none;
+    color: black;
+  }
   & > div.name {
     flex: 2;
     text-align: left;
@@ -150,7 +166,7 @@ const CoinPriceDiv = styled('div')`
     flex: 1;
   }
   & > div.amount {
-    flex: 2;
+    flex: 1;
   }
 `
 
