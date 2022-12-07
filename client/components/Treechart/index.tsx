@@ -2,6 +2,7 @@ import * as d3 from 'd3'
 import { useState, useEffect, useRef } from 'react'
 import { useWindowSize } from '@/hooks/useWindowSize'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
+import { colorQuantizeScale } from '@/utils/chartManager'
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -87,12 +88,9 @@ const updateChart = (
           .attr('fill', function (d) {
             return d.data.value >= 0
               ? d.data.value > 0
-                ? 'red'
+                ? colorQuantizeScale(min, max, d.data.value)
                 : 'black'
-              : 'blue'
-          })
-          .attr('opacity', function (d) {
-            return treeMapvalueScale(Math.abs(d.data.value))
+              : colorQuantizeScale(min, max, d.data.value)
           })
           .style('stroke', 'black')
         $g.append('text')
@@ -137,12 +135,9 @@ const updateChart = (
           .attr('fill', function (d) {
             return d.data.value >= 0
               ? d.data.value > 0
-                ? 'red'
+                ? colorQuantizeScale(min, max, d.data.value)
                 : 'black'
-              : 'blue'
-          })
-          .attr('opacity', function (d) {
-            return treeMapvalueScale(Math.abs(d.data.value))
+              : colorQuantizeScale(min, max, d.data.value)
           })
           .transition()
           .duration(500)
@@ -162,7 +157,7 @@ const updateChart = (
             const text =
               selectedSort === 'market capitalization'
                 ? String(Number(d.data.market_cap / 1000000000000).toFixed(2)) +
-                  '조원'
+                  '조'
                 : String(Number(d.data.value).toFixed(2)) + '%'
             return d.data.ticker?.split('-')[1] + '\n' + text
           })
