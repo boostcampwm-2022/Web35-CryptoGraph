@@ -21,32 +21,11 @@ export const useRealTimeUpbitData = (
   const [realtimePriceInfo, setRealtimePriceInfo] =
     useState<CoinPriceObj>(priceInfo)
   const isInitialMount = useRef(true)
-  const fetchData = async () => {
-    const fetched: CandleData[] | null = await getCandleDataArray(
-      period,
-      market,
-      200
-    )
-    if (fetched === null) {
-      console.error('코인 쿼리 실패, 404에러')
-      return
-    }
-    setRealtimeCandleData(fetched)
-  }
+  const marketRef = useRef(market)
+  const periodRef = useRef(period)
 
   useEffect(() => {
-    const markets = Object.keys(priceInfo)
-      .map(code => `"KRW-${code}"`)
-      .join(',')
-    connectWS(markets)
-    return () => {
-      closeWS()
-    }
-  }, [priceInfo])
-
-  useEffect(() => {
-    if (!isInitialMount.current) fetchData() //첫 마운트면
-    else isInitialMount.current = false
+    connectWS(priceInfo)
     if (!socket) {
       console.error('분봉 설정 관련 error')
       return
@@ -58,25 +37,54 @@ export const useRealTimeUpbitData = (
       const d = JSON.parse(str_d)
       if (d.type == 'ticker') {
         const code = d.code.split('-')[1]
-        if (code === market) {
-          setRealtimeCandleData(prevData => updateData(prevData, d, period))
+        // console.log(marketRef.current, periodRef.current)
+        if (code === marketRef.current) {
+          setRealtimeCandleData(prevData =>
+            updateData(prevData, d, periodRef.current)
+          )
         }
         setRealtimePriceInfo(prev => updateRealTimePrice(prev, d, code))
       }
     }
+    return () => {
+      closeWS()
+    }
+  }, [])
+
+  useEffect(() => {
+    marketRef.current = market
+    periodRef.current = period
+    const fetchData = async () => {
+      const fetched: CandleData[] | null = await getCandleDataArray(
+        period,
+        market,
+        200
+      )
+      if (fetched === null) {
+        console.error('코인 쿼리 실패, 404에러')
+        return
+      }
+      setRealtimeCandleData(fetched)
+    }
+    if (!isInitialMount.current) fetchData() //첫 마운트면
+    else isInitialMount.current = false
   }, [market, period])
 
   return [realtimeCandleData, setRealtimeCandleData, realtimePriceInfo] //socket을 state해서 같이 뺀다. 변화감지 (끊길때) -> ui표시..
 }
 
-export function connectWS(markets: string) {
-  if (socket != undefined) {
+export function connectWS(priceInfo: CoinPriceObj) {
+  if (socket !== undefined) {
     socket.close()
   }
+
   socket = new WebSocket('wss://api.upbit.com/websocket/v1')
   socket.binaryType = 'arraybuffer'
 
   socket.onopen = function () {
+    const markets = Object.keys(priceInfo)
+      .map(code => `"KRW-${code}"`)
+      .join(',')
     filterRequest(`[{"ticket":"test"},{"type":"ticker","codes":[${markets}]}]`)
   }
   socket.onclose = function () {
@@ -86,7 +94,7 @@ export function connectWS(markets: string) {
 
 // 웹소켓 연결 해제
 function closeWS() {
-  if (socket != undefined) {
+  if (socket !== undefined) {
     socket.close()
     socket = undefined
   }
