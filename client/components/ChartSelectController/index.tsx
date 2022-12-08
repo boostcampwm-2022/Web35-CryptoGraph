@@ -18,8 +18,6 @@ const ChartPeriodSelectorContainer = styled('div')`
   height: 10%;
   background-color: #ffffff;
   box-sizing: border-box;
-  border: 1px solid #cac4d0;
-  border-radius: 20px;
   justify-content: center;
   align-items: center;
   margin-bottom: 20px;
