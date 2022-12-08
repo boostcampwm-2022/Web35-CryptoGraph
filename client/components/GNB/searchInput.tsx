@@ -31,8 +31,8 @@ export default function SearchInput() {
       const engCoinName = matchNameKRwithENG(CoinNames, inputCoinName)
       //생각해볼점
       //window.history.pushState('', 'asdf', `/detail/${engCoinName}`)
-      router.replace(`/detail/${engCoinName}`)
-      // window.location.href = `/detail/${engCoinName}`
+      // router.replace(`/detail/${engCoinName}`)
+      window.location.href = `/detail/${engCoinName}`
       // router.push(`/detail/${engCoinName}`)
     }
   }
