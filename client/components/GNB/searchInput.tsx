@@ -3,7 +3,6 @@ import TextField from '@mui/material/TextField'
 import Stack from '@mui/material/Stack'
 import Autocomplete from '@mui/material/Autocomplete'
 import SearchIcon from '@mui/icons-material/Search'
-import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { useRouter } from 'next/router'
@@ -25,12 +24,24 @@ export default function SearchInput() {
     }
     asyncGetCoinName()
   }, [])
+  function goToDetail(e: React.SyntheticEvent<Element, Event>, value: string) {
+    const inputCoinName = value
+    if (validateInputName(CoinNames, inputCoinName)) {
+      const engCoinName = matchNameKRwithENG(CoinNames, inputCoinName)
+      //생각해볼점
+      //window.history.pushState('', 'asdf', `/detail/${engCoinName}`)
+      router.replace(`/detail/${engCoinName}`)
+      // window.location.href = `/detail/${engCoinName}`
+      // router.push(`/detail/${engCoinName}`)
+    }
+  }
   return (
     <Stack spacing={2} sx={{ width: 300 }}>
       <Autocomplete
         freeSolo
         id="free-solo-2-demo"
         disableClearable
+        onChange={(e, value) => goToDetail(e, value)}
         options={
           CoinNames.length
             ? [
@@ -58,20 +69,6 @@ export default function SearchInput() {
             }}
           />
         )}
-        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-          const inputCoinName = (e.target as HTMLInputElement).value
-          if (e.key === 'Enter') {
-            //1.입력값이 db에 있는지 검증하는 로직
-            //2.로직을 통과하면 해당 값으로 리다이렉트
-            if (validateInputName(CoinNames, inputCoinName)) {
-              const engCoinName = matchNameKRwithENG(CoinNames, inputCoinName)
-              //생각해볼점
-              //window.history.pushState('', 'asdf', `/detail/${engCoinName}`)
-              //router.replace(`/detail/${engCoinName}`)
-              window.location.href = `/detail/${engCoinName}`
-            }
-          }
-        }}
       />
     </Stack>
   )
