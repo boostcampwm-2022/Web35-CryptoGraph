@@ -42,15 +42,28 @@ export const DatePeriod: ChartPeriodItered<number> = {
 }
 
 export const ChartPeriodList = Object.keys(DatePeriod)
-export interface ChartRenderOption {
+// export interface ChartRenderOption {
+//   marketType: string
+//   DomElementStartIndex: number
+//   fetchCandleCount: number
+//   renderStartDataIndex: number
+//   renderCandleCount: number
+//   translateX: number
+//   isVolumeVislble: boolean
+//   isMovingAverageVisible: boolean
+// }
+
+export interface CandleChartOption {
   marketType: string
-  DomElementStartIndex: number
-  fetchCandleCount: number
+  candlePeriod: ChartPeriod
+  isVolumeVisible: boolean
+  isMovingAverageVisible: boolean
+}
+
+export interface CandleChartRenderOption {
   renderStartDataIndex: number
   renderCandleCount: number
   translateX: number
-  isVolumeVislble: boolean
-  isMovingAverageVisible: boolean
 }
 
 //treeChart

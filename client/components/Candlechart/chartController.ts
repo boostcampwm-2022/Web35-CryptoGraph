@@ -13,7 +13,7 @@ import { WindowSize } from '@/hooks/useWindowSize'
 import {
   CandleData,
   ChartPeriod,
-  ChartRenderOption,
+  CandleChartRenderOption,
   PointerPosition
 } from '@/types/ChartTypes'
 import {
@@ -30,7 +30,7 @@ import { D3DragEvent } from 'd3'
 
 export function initCandleChart(
   svgRef: React.RefObject<SVGSVGElement>,
-  optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>,
+  optionSetter: React.Dispatch<React.SetStateAction<CandleChartRenderOption>>,
   pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerPosition>>,
   windowSize: WindowSize
 ) {
@@ -41,7 +41,7 @@ export function initCandleChart(
 export function updateCandleChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
-  option: ChartRenderOption,
+  option: CandleChartRenderOption,
   pointerInfo: PointerPosition,
   windowSize: WindowSize,
   candlePeriod: ChartPeriod
@@ -190,7 +190,7 @@ export function initCandleChartSVG(
 
 export function addEventsToChart(
   svgRef: React.RefObject<SVGSVGElement>,
-  optionSetter: React.Dispatch<React.SetStateAction<ChartRenderOption>>,
+  optionSetter: React.Dispatch<React.SetStateAction<CandleChartRenderOption>>,
   pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerPosition>>,
   windowSize: WindowSize
 ) {
@@ -208,7 +208,7 @@ export function addEventsToChart(
         .on(
           'drag',
           (event: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
-            optionSetter((prev: ChartRenderOption) => {
+            optionSetter((prev: CandleChartRenderOption) => {
               const movedCandle = Math.max(
                 Math.floor(
                   (prev.translateX + event.dx) /
@@ -234,7 +234,7 @@ export function addEventsToChart(
     )
     .on('wheel', (e: WheelEvent) => {
       e.preventDefault()
-      optionSetter((prev: ChartRenderOption) => {
+      optionSetter((prev: CandleChartRenderOption) => {
         const newRenderCandleCount = Math.min(
           Math.max(
             prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1), //휠이벤트 e.deltaY가 확대면 -1 축소면 +1

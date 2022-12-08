@@ -4,10 +4,10 @@ import TabContainer from '@/components/TabContainer'
 import InfoSidebarContainer from '@/components/InfoSidebarContainer'
 import ChartHeader from '@/components/ChartHeader'
 import {
-  DEFAULT_CANDLE_PERIOD,
-  DEFAULT_CANDLER_CHART_RENDER_OPTION
+  DEFAULT_CANDLE_CHART_OPTION,
+  DEFAULT_CANDLE_PERIOD
 } from '@/constants/ChartConstants'
-import { CandleData, ChartPeriod, ChartRenderOption } from '@/types/ChartTypes'
+import { CandleChartOption, CandleData, ChartPeriod } from '@/types/ChartTypes'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { CandleChart } from '@/components/Candlechart'
@@ -26,42 +26,49 @@ export default function Detail({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const theme = useTheme()
   const marketParsedInURL = useURL(market)
+  const [candleChartOption, setCandleChartOption] = useState<CandleChartOption>(
+    {
+      ...DEFAULT_CANDLE_CHART_OPTION,
+      marketType: market
+    }
+  )
+  // const [marketType, setMarketType] = useState<string>(market)
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
 
-  const [chartRenderOption, setRenderOption] = useState<ChartRenderOption>({
-    ...DEFAULT_CANDLER_CHART_RENDER_OPTION,
-    marketType: market
-  })
+  // const [chartRenderOption, setRenderOption] = useState<ChartRenderOption>({
+  //   ...DEFAULT_CANDLER_CHART_RENDER_OPTION,
+  //   marketType: market
+  // })
+  // useEffect(() => {
+  //   setRenderOption(prev => {
+  //     return { ...prev, marketType: marketParsedInURL }
+  //   })
+  // }, [marketParsedInURL])
+
   useEffect(() => {
-    setRenderOption(prev => {
-      return { ...prev, marketType: marketParsedInURL }
+    setCandleChartOption(prev => {
+      return { ...prev, marketType: market }
     })
-  }, [marketParsedInURL])
-  const [candlePeriod, setCandlePeriod] = useState<ChartPeriod>(
-    DEFAULT_CANDLE_PERIOD
-  )
+  }, [market])
+  // const [candlePeriod, setCandlePeriod] = useState<ChartPeriod>(
+  //   DEFAULT_CANDLE_PERIOD
+  // )
   const [realtimeCandleData, setRealtimeCandleData, realtimePriceInfo] =
-    useRealTimeUpbitData(
-      candlePeriod,
-      chartRenderOption.marketType,
-      candleData,
-      priceInfo
-    )
+    // useRealTimeUpbitData(candlePeriod, marketType, candleData, priceInfo)
+    useRealTimeUpbitData(candleChartOption, candleData, priceInfo)
   return (
     <HomeContainer>
       <ChartAreaContainer>
         <ChartHeader
-          selected={candlePeriod}
-          selectedSetter={setCandlePeriod}
+          chartOption={candleChartOption}
+          chartOptionSetter={setCandleChartOption}
           coinPriceInfo={realtimePriceInfo[market]}
         />
         <Box sx={{ height: '90%', paddingTop: '8px' }}>
           <CandleChart
-            candlePeriod={candlePeriod}
+            chartOption={candleChartOption}
             candleData={realtimeCandleData}
             candleDataSetter={setRealtimeCandleData}
-            option={chartRenderOption}
-            optionSetter={setRenderOption}
           ></CandleChart>
         </Box>
       </ChartAreaContainer>

@@ -1,6 +1,7 @@
 import {
   ChartPeriod,
-  ChartRenderOption,
+  CandleChartOption,
+  CandleChartRenderOption,
   PointerPosition
 } from '@/types/ChartTypes'
 
@@ -12,15 +13,16 @@ export const DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT = 200
 export const DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT = 600
 export const DEFAULT_CANDLE_RENDER_COUNT = 30
 export const DEFAULT_CANDLE_PERIOD: ChartPeriod = 'minutes/1'
-export const DEFAULT_CANDLER_CHART_RENDER_OPTION: ChartRenderOption = {
-  marketType: 'BTC',
-  isMovingAverageVisible: false,
-  isVolumeVislble: false,
-  DomElementStartIndex: 0,
-  fetchCandleCount: DEFAULT_CANDLE_COUNT,
+export const DEFAULT_CANDLE_CHART_RENDER_OPTION: CandleChartRenderOption = {
   renderStartDataIndex: 0,
   renderCandleCount: DEFAULT_CANDLE_RENDER_COUNT,
   translateX: 0
+}
+export const DEFAULT_CANDLE_CHART_OPTION: CandleChartOption = {
+  marketType: 'BTC',
+  isMovingAverageVisible: false,
+  isVolumeVisible: false,
+  candlePeriod: DEFAULT_CANDLE_PERIOD
 }
 
 export const MIN_CANDLE_COUNT = 5
