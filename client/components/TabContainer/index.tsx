@@ -10,7 +10,9 @@ export interface TabProps {
   priceInfo?: CoinPriceObj
 }
 interface TabContainerProps {
-  children: ReactNode
+  selectedTab: number
+  setSelectedTab: React.Dispatch<React.SetStateAction<number>>
+  children: React.ReactNode
 }
 interface TabPanelProps {
   children?: React.ReactNode
@@ -40,8 +42,12 @@ function a11yProps(index: number) {
   }
 }
 
-export default function TabContainer({ children }: TabContainerProps) {
-  const [selectedTab, setSelectedTab] = React.useState<number>(0)
+export default function TabContainer({
+  selectedTab,
+  setSelectedTab,
+  children
+}: TabContainerProps) {
+  // const [selectedTab, setSelectedTab] = React.useState<number>(0)
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue)
   }
@@ -61,7 +67,7 @@ export default function TabContainer({ children }: TabContainerProps) {
             }
             return (
               <Tab
-                label={child.props.tabLabelInfo || 'default'}
+                label={child.props.tabLabelInfo || '상세정보'}
                 {...a11yProps(index)}
               />
             )

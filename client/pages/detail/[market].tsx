@@ -27,7 +27,7 @@ export default function Detail({
   const theme = useTheme()
   const marketParsedInURL = useURL(market)
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
-
+  const [selectedTab, setSelectedTab] = useState<number>(0)
   const [chartRenderOption, setRenderOption] = useState<ChartRenderOption>({
     ...DEFAULT_CANDLER_CHART_RENDER_OPTION,
     marketType: market
@@ -74,7 +74,10 @@ export default function Detail({
               width: '100%'
             }}
           >
-            <TabContainer>
+            <TabContainer
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            >
               <CoinDetailedInfo market={market} tabLabelInfo={'코인 디테일'} />
               <RealTimeCoinPrice
                 tabLabelInfo={'실시간 코인 정보'}

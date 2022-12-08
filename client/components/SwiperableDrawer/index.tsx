@@ -1,17 +1,20 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import SwipeableDrawer from '@mui/material/SwipeableDrawer'
-
 import Fab from '@mui/material/Fab'
 import NavigationIcon from '@mui/icons-material/Navigation'
 interface SwipeableTemporaryDrawerProps {
+  isDrawerOpened: boolean
+  setIsDrawerOpened: React.Dispatch<React.SetStateAction<boolean>>
   children: React.ReactNode
 }
 
 export default function SwipeableTemporaryDrawer({
+  isDrawerOpened,
+  setIsDrawerOpened,
   children
 }: SwipeableTemporaryDrawerProps) {
-  const [state, setState] = React.useState(false)
+  // const [isDrawerOpened, setIsDrawerOpened] = React.useState(false)
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -23,7 +26,7 @@ export default function SwipeableTemporaryDrawer({
       ) {
         return
       }
-      setState(open)
+      setIsDrawerOpened(open)
     }
 
   return (
@@ -41,11 +44,11 @@ export default function SwipeableTemporaryDrawer({
       </Fab>
       <SwipeableDrawer
         anchor={'bottom'}
-        open={state}
+        open={isDrawerOpened}
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
       >
-        <Box sx={{ maxHeight: '50vh' }}>{children}</Box>
+        <Box sx={{ minHeight: '30vh', maxHeight: '50vh' }}>{children}</Box>
       </SwipeableDrawer>
     </div>
   )

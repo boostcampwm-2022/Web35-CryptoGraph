@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useWindowSize } from '@/hooks/useWindowSize'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
 import { colorQuantizeScale } from '@/utils/chartManager'
+import { throttle } from 'lodash'
 import { convertUnit } from '@/utils/chartManager'
 
 const updateChart = (
@@ -10,7 +11,8 @@ const updateChart = (
   data: CoinRateContentType[],
   width: number,
   height: number,
-  selectedSort: string
+  selectedSort: string,
+  nodeOnclickHandler: (market: string) => void
 ) => {
   if (!svgRef.current) return
   const chartContainer = d3.select<SVGSVGElement, CoinRateContentType>(
@@ -79,6 +81,9 @@ const updateChart = (
       enter => {
         const $g = enter.append('g')
         $g.append('rect')
+          .on('click', function (this, e, d) {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
           .attr('x', function (d) {
             return d.x0
           })
@@ -188,8 +193,8 @@ const initChart = (
 ) => {
   const zoom = d3
     .zoom<SVGSVGElement, CoinRateContentType>()
-    .on('zoom', handleZoom)
-    .scaleExtent([1, 5]) //scale 제한
+    .on('zoom', throttle(handleZoom, 50))
+    .scaleExtent([1, 30]) //scale 제한
     .translateExtent([
       [0, 0], // top-left-corner 좌표
       [width, height] //bottom-right-corner 좌표
@@ -216,11 +221,13 @@ export interface TreeChartProps {
   data: CoinRateType
   Market?: string[] //선택된 코인 리스트
   selectedSort: string
+  modalOpenHandler: (market: string) => void
 }
 export default function TreeChart({
   data,
   Market, //= ['CELO', 'ETH', 'MFT', 'WEMIX']
-  selectedSort
+  selectedSort,
+  modalOpenHandler
 }: TreeChartProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     {
@@ -232,7 +239,6 @@ export default function TreeChart({
       market_cap: 0
     }
   ]) //coin의 등락률 값에 parentNode가 추가된 값
-  const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerSvg)
@@ -243,7 +249,7 @@ export default function TreeChart({
 
   useEffect(() => {
     // CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
-    if (!coinRate || !Market) return
+    if (!data || !Market) return
     const newCoinData: CoinRateContentType[] = [
       {
         name: 'Origin',
@@ -255,13 +261,20 @@ export default function TreeChart({
       }
     ]
     for (const tick of Market) {
-      newCoinData.push(coinRate['KRW-' + tick])
+      newCoinData.push(data['KRW-' + tick])
     }
     setChangeRate(newCoinData)
   }, [data, Market])
   useEffect(() => {
-    updateChart(chartSvg, changeRate, width, height, selectedSort)
-  }, [changeRate, width, height, selectedSort])
+    updateChart(
+      chartSvg,
+      changeRate,
+      width,
+      height,
+      selectedSort,
+      modalOpenHandler
+    )
+  }, [changeRate, width, height, selectedSort, modalOpenHandler])
 
   return (
     <div
