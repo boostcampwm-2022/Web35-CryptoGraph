@@ -67,7 +67,7 @@ export default function TabContainer({
             }
             return (
               <Tab
-                label={child.props.tabLabelInfo || 'default'}
+                label={child.props.tabLabelInfo || '상세정보'}
                 {...a11yProps(index)}
               />
             )
