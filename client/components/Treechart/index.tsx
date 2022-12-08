@@ -95,10 +95,10 @@ const updateChart = (
             return d.data.value >= 0
               ? d.data.value > 0
                 ? colorQuantizeScale(max, d.data.value)
-                : 'black'
+                : 'gray'
               : colorQuantizeScale(min, d.data.value)
           })
-          .style('stroke', 'black')
+          .style('stroke', 'gray')
         $g.append('text')
           .attr('x', function (d) {
             return d.x0 + Math.abs(d.x1 - d.x0) / 2
@@ -143,12 +143,12 @@ const updateChart = (
             return d.data.value >= 0
               ? d.data.value > 0
                 ? colorQuantizeScale(max, d.data.value)
-                : 'black'
+                : 'gray'
               : colorQuantizeScale(min, d.data.value)
           })
           .transition()
           .duration(500)
-          .style('stroke', 'black')
+          .style('stroke', 'gray')
         update
           .select('text')
           .transition()
