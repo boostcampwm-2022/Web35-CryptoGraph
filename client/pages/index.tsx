@@ -16,7 +16,8 @@ import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
 import TabContainer from '@/components/TabContainer'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
 import { useRealTimeCoinListData } from '@/hooks/useRealTimeCoinListData'
-
+import MuiModal from '@/components/Modal'
+import LinkButton from '@/components/LinkButton'
 interface getDataProps {
   data: MarketCapInfo[]
   Market?: string[] //선택된 코인 리스트
@@ -25,12 +26,14 @@ interface getDataProps {
 export default function Home({
   data
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [selectedChart, setSelectedChart] = useState<ChartType>('RunningChart')
+  const [selectedChart, setSelectedChart] = useState<ChartType>('TreeChart')
   const [selectedMarketList, setSelectedMarketList] = useState<string[]>(
     data.map(coin => coin.name)
   ) //선택된 market 컨트롤
   const [selectedMarket, setSelectedMarket] = useState<string>('btc')
-  const [selectedSort, setSelectedSort] = useState<string>('descending')
+  const [selectedSort, setSelectedSort] = useState<string>(
+    'market capitalization'
+  )
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [isDrawerOpened, setIsDrawerOpened] = useState<boolean>(false)
   const [isModalOpened, setIsModalOpened] = useState<boolean>(false)
@@ -41,9 +44,23 @@ export default function Home({
     if (selectedChart === 'RunningChart') {
       setSelectedSort('descending')
     } else {
-      setSelectedSort('change rate')
+      setSelectedSort('market capitalization')
     }
   }, [selectedChart])
+  const chartNodeHandler = (market: string) => {
+    isMobile
+      ? (() => {
+          setIsDrawerOpened(true)
+          setSelectedMarket(market)
+          setSelectedTab(3)
+        })()
+      : (() => {
+          setIsModalOpened(true)
+          setSelectedMarket(market)
+        })()
+    //모달, drawer, 탭컨테이너의 상태를 모두 page에서 관리해야한다.
+    //전역상태관리 있었으면 좋았을지도?
+  }
   return (
     <HomeContainer>
       {isMobile ? (
@@ -72,10 +89,16 @@ export default function Home({
                 selectedCoinListSetter={setSelectedMarketList}
                 tabLabelInfo={'코인 선택'}
               />
-              <CoinDetailedInfo
-                market={selectedMarket}
-                tabLabelInfo={'상세 정보'}
-              ></CoinDetailedInfo>
+              <Box>
+                <CoinDetailedInfo
+                  market={selectedMarket}
+                  tabLabelInfo={'상세 정보'}
+                ></CoinDetailedInfo>
+                <LinkButton
+                  goto={`detail/${selectedMarket}`}
+                  content={`${selectedMarket}(으)로 바로가기`}
+                />
+              </Box>
             </TabContainer>
           </SwipeableTemporaryDrawer>
         </Box>
@@ -90,15 +113,22 @@ export default function Home({
             selectedSortSetter={setSelectedSort}
             selectedChart={selectedChart}
           />
-          <Box sx={{ width: '100%', height: '60%' }}>
+          <Box sx={{ width: '100%', height: '80%' }}>
             <CoinSelectController
               selectedCoinList={selectedMarketList}
               selectedCoinListSetter={setSelectedMarketList}
             />
           </Box>
-          <Box sx={{ width: '100%', height: '30%' }}>
-            <CoinDetailedInfo market="btc"></CoinDetailedInfo>
-          </Box>
+          <MuiModal
+            isModalOpened={isModalOpened}
+            setIsModalOpened={setIsModalOpened}
+          >
+            <CoinDetailedInfo market={selectedMarket}></CoinDetailedInfo>
+            <LinkButton
+              goto={`detail/${selectedMarket}`}
+              content={`${selectedMarket}으로 바로가기`}
+            />
+          </MuiModal>
         </SideBarContainer>
       )}
       {selectedMarketList.length !== 0 ? (
@@ -110,23 +140,14 @@ export default function Home({
               data={coinData}
               Market={selectedMarketList}
               selectedSort={selectedSort}
+              modalOpenHandler={chartNodeHandler}
             />
           ) : (
             <TreeChart
               data={coinData}
               Market={selectedMarketList}
               selectedSort={selectedSort}
-              modalOpenHandler={(market: string) => {
-                isMobile
-                  ? (() => {
-                      setIsDrawerOpened(true)
-                      setSelectedMarket(market)
-                      setSelectedTab(3)
-                    })()
-                  : console.log(market, '데탑') //모달을 열어준다.
-                //모달, drawer, 탭컨테이너의 상태를 모두 page에서 관리해야한다.
-                //전역상태관리 있었으면 좋았을지도?
-              }}
+              modalOpenHandler={chartNodeHandler}
             />
           )}
         </ChartContainer>
@@ -165,7 +186,8 @@ const SideBarContainer = styled(Box)`
   box-sizing: border-box;
   padding: 0 1rem;
   align-items: center;
-  width: 500px;
+  min-width: 330px;
+  max-width: 330px;
   height: 100%;
   ${props => props.theme.breakpoints.down('tablet')} {
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)

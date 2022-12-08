@@ -11,6 +11,7 @@ interface RunningChartProps {
   data: CoinRateType //선택된 코인 리스트
   Market: string[]
   selectedSort: string
+  modalOpenHandler: (market: string) => void
 }
 
 //------------------------------setChartContainerSize------------------------------
@@ -32,7 +33,8 @@ const updateChart = (
   width: number,
   height: number,
   candleCount: number,
-  selectedSort: string
+  selectedSort: string,
+  nodeOnclickHandler: (market: string) => void
 ) => {
   if (!data || !svgRef) {
     return
@@ -115,7 +117,10 @@ const updateChart = (
             )
           })
           .attr('height', barHeight)
-          .style('fill', (d, i) => {
+          .on('click', function (this, e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          })
+          .style('fill', d => {
             if (d.value > 0) return colorQuantizeScale(min, max, d.value)
             else if (d.value === 0) return 'gray'
             else {
@@ -248,12 +253,12 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   candleCount,
   data,
   Market,
-  selectedSort
+  selectedSort,
+  modalOpenHandler
 }) => {
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
   const chartSvg = React.useRef(null)
   const { width, height } = useWindowSize(chartContainerRef)
-  const [coinRate, setCoinRate] = React.useState<CoinRateType>(data) //coin의 등락률 값, 모든 코인 값 보유
   const [changeRate, setchangeRate] = React.useState<CoinRateType>(data) //선택된 코인 값만 보유
 
   React.useEffect(() => {
@@ -264,18 +269,27 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       width,
       height,
       candleCount,
-      selectedSort
+      selectedSort,
+      modalOpenHandler
     )
-  }, [width, height, changeRate, candleCount, selectedSort]) // 창크기에 따른 차트크기 조절
+  }, [
+    width,
+    height,
+    changeRate,
+    candleCount,
+    selectedSort,
+    durationPeriod,
+    modalOpenHandler
+  ]) // 창크기에 따른 차트크기 조절
 
   React.useEffect(() => {
-    if (!coinRate || !Market[0]) return
+    if (!data || !Market[0]) return
     const newCoinData: CoinRateType = {}
     for (const tick of Market) {
-      newCoinData['KRW-' + tick] = coinRate['KRW-' + tick]
+      newCoinData['KRW-' + tick] = data['KRW-' + tick]
     }
     setchangeRate(newCoinData)
-  }, [data, Market, coinRate])
+  }, [data, Market])
 
   return (
     <div
@@ -284,7 +298,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       style={{
         display: 'flex',
         width: '100%',
-        height: '90%',
+        height: '98%',
         overflow: 'auto'
       }}
     >
