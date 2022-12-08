@@ -22,10 +22,6 @@ const updateChart = (
     d3.min(data, d => Math.abs(d.value)) as number,
     d3.max(data, d => d.value) as number
   ]
-  const treeMapvalueScale = d3
-    .scaleLinear()
-    .domain([min, max])
-    .range([0.5, 1.5])
   const root: d3.HierarchyNode<CoinRateContentType> = d3
     .stratify<CoinRateContentType>()
     .id(function (d): string {

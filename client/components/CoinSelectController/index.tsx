@@ -7,6 +7,12 @@ import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { ChartType } from '@/types/ChartTypes'
 import { TabProps } from '@mui/material'
 import SearchCoin from './searchCoin'
+import MakeCoinDict from './setCoinDict'
+//import { validateInputName } from '/root/final/crypto/client/utils/inputBarManager'
+
+interface dict<T> {
+  [key: string]: T
+}
 
 interface CoinChecked {
   [key: string]: boolean
@@ -27,6 +33,10 @@ export default function CoinSelectController({
   const [checked, setChecked] = useState<CoinChecked>({
     all: true
   })
+  const [inputCoinName, setInputCoinName] = useState('')
+  const [CoinDict, setCoinDict] = useState<dict<Array<string>>>(
+    MakeCoinDict(data)
+  )
   useEffect(() => {
     setCoinList(data)
   }, [])
@@ -81,13 +91,26 @@ export default function CoinSelectController({
           </HeaderSelectBox>
         </HeaderSelectCoin>
         <HeaderSearchCoin>
-          <SearchCoin coinNames={data} />
+          <SearchCoin
+            coinNames={data}
+            inputCoinName={inputCoinName}
+            setInputCoinNameSetter={setInputCoinName}
+          />
         </HeaderSearchCoin>
       </Header>
       <Body>
         {coinList?.map((coin: MarketCapInfo, index) => {
           return (
-            <SelectCoinInnerLayer key={index}>
+            <SelectCoinInnerLayer
+              key={index}
+              style={
+                inputCoinName
+                  ? CoinDict[inputCoinName]?.includes(coin.name)
+                    ? { display: 'flex' }
+                    : { display: 'none' }
+                  : {}
+              }
+            >
               <Image src={coin.logo} alt="" width={44} height={44} />
               <SelectCoinInnerFont>{coin.name_kr}</SelectCoinInnerFont>
               <Checkbox
