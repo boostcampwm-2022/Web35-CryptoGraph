@@ -51,8 +51,29 @@ export function translateCandleChart(
   translateX: number
 ) {
   const chartArea = d3.select(svgRef.current).select('svg#chart-area')
+  const $xAxis = d3.select(svgRef.current).select('g#x-axis')
   chartArea.selectAll('g').attr('transform', `translate(${translateX})`)
+  if (!$xAxis.attr('transform')) {
+    return
+  }
+  $xAxis.attr(
+    'transform',
+    $xAxis.attr('transform').replace(/\(([0-9.\-]*),/, `(${translateX},`)
+  )
   return
+}
+
+function translateByX(transformAttr: string, translateX: number) {
+  if (!transformAttr) {
+    return ''
+  }
+  const reg = /\(([0-9.\-]*),([0-9.\-]*)\)/
+  const matchedArr = transformAttr.match(reg)
+  if (matchedArr === null || !matchedArr[1] || !matchedArr[2]) {
+    return ''
+  }
+  const prevTranslateX = Number(matchedArr[1])
+  return `translate(${prevTranslateX + translateX},${matchedArr[2]})`
 }
 
 export function updateCandleChart(
@@ -61,7 +82,8 @@ export function updateCandleChart(
   option: CandleChartRenderOption,
   pointerInfo: PointerPosition,
   windowSize: WindowSize,
-  candlePeriod: ChartPeriod
+  candlePeriod: ChartPeriod,
+  translateX: number
 ) {
   const chartContainerXsize = windowSize.width
   const chartContainerYsize = windowSize.height
@@ -88,7 +110,8 @@ export function updateCandleChart(
     yAxisScale,
     chartAreaXsize,
     chartAreaYsize,
-    candleWidth
+    candleWidth,
+    translateX
   ) // axis를 업데이트한다.
 
   // 볼륨 스케일 함수, 추후 볼륨 추가시 해금예정
@@ -128,9 +151,21 @@ export function updateCandleChart(
         $g = placeVolumeRect($g, chartAreaXsize, candleWidth, yAxisScale) */
         // 거래량, 개발예정, 성능 문제로 보류
         $g.append('line')
-        $g = placeCandleLine($g, chartAreaXsize, candleWidth, yAxisScale)
+        $g = placeCandleLine(
+          $g,
+          chartAreaXsize,
+          candleWidth,
+          yAxisScale,
+          xAxisScale
+        )
         $g.append('rect').classed('candleRect', true)
-        $g = placeCandleRect($g, chartAreaXsize, candleWidth, yAxisScale)
+        $g = placeCandleRect(
+          $g,
+          chartAreaXsize,
+          candleWidth,
+          yAxisScale,
+          xAxisScale
+        )
         return $g
       },
       update => {
@@ -145,7 +180,11 @@ export function updateCandleChart(
                   yAxisScale(d.trade_price) - yAxisScale(d.opening_price)
                 )
           )
-          .attr('x', (d, i) => chartAreaXsize - candleWidth * (i + 0.8))
+          .attr(
+            'x',
+            (d, i) =>
+              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth * 0.8
+          )
           .attr('y', d =>
             Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
           )
@@ -158,11 +197,13 @@ export function updateCandleChart(
           .select('line')
           .attr(
             'x1',
-            (d, i) => chartAreaXsize + candleWidth / 2 - candleWidth * (i + 1)
+            (d, i) =>
+              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
           )
           .attr(
             'x2',
-            (d, i) => chartAreaXsize + candleWidth / 2 - candleWidth * (i + 1)
+            (d, i) =>
+              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
           )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
@@ -307,7 +348,8 @@ function UpdateAxis(
   yAxisScale: d3.ScaleLinear<number, number, never>,
   chartAreaXsize: number,
   chartAreaYsize: number,
-  candleWidth: number
+  candleWidth: number,
+  translateX: number
 ) {
   chartContainer
     .select<SVGSVGElement>('g#y-axis')
@@ -321,7 +363,7 @@ function UpdateAxis(
     })
   chartContainer
     .select<SVGSVGElement>('g#x-axis')
-    .attr('transform', `translate(0,${chartAreaYsize})`)
+    .attr('transform', `translate(${translateX},${chartAreaYsize})`)
     .call(
       d3
         .axisBottom(xAxisScale)
@@ -341,16 +383,17 @@ function placeCandleLine(
   $g: d3.Selection<SVGGElement, CandleData, d3.BaseType, unknown>,
   chartAreaXsize: number,
   candleWidth: number,
-  yAxisScale: d3.ScaleLinear<number, number, never>
+  yAxisScale: d3.ScaleLinear<number, number, never>,
+  xAxisScale: d3.ScaleTime<number, number, never>
 ) {
   $g.select('line')
     .attr(
       'x1',
-      (d, i) => chartAreaXsize + candleWidth / 2 - candleWidth * (i + 1)
+      (d, i) => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
     )
     .attr(
       'x2',
-      (d, i) => chartAreaXsize + candleWidth / 2 - candleWidth * (i + 1)
+      (d, i) => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
     )
     .attr('y1', d => yAxisScale(d.low_price))
     .attr('y2', d => yAxisScale(d.high_price))
@@ -362,14 +405,18 @@ function placeCandleRect(
   $g: d3.Selection<SVGGElement, CandleData, d3.BaseType, unknown>,
   chartAreaXsize: number,
   candleWidth: number,
-  yAxisScale: d3.ScaleLinear<number, number, never>
+  yAxisScale: d3.ScaleLinear<number, number, never>,
+  xAxisScale: d3.ScaleTime<number, number, never>
 ) {
   $g.select('rect')
     .attr('width', candleWidth * 0.6)
     .attr('height', d =>
       Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price))
     )
-    .attr('x', (d, i) => chartAreaXsize - candleWidth * (i + 0.8))
+    .attr(
+      'x',
+      (d, i) => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth * 0.8
+    )
     .attr('y', d =>
       Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
     )

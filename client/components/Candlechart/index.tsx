@@ -128,7 +128,8 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       option,
       pointerInfo,
       windowSize,
-      props.chartOption.candlePeriod
+      props.chartOption.candlePeriod,
+      translateX
     )
     // }, [props, option, pointerInfo, windowSize])
   }, [props, option, windowSize])
