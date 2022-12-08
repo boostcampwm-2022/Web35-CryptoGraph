@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles'
 import { Container, useMediaQuery, useTheme } from '@mui/material'
 import SearchInput from './searchInput'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 const GNBContainer = styled('div')`
   position: fixed;
@@ -40,7 +41,9 @@ export default function GNB() {
         }}
       >
         {isMobile ? (
-          <Link href="/">
+          //Router.push / Router.replace / Link태그 사용시 메인페이지->메인페이지 새로고침 불가능
+          //ex)코인선택 기능을 여러번 사용하고 트리맵화면에서 logo아이콘 클릭시 다시 기본세팅 (코인세팅 전부 , 러닝차트 descending) 되지않음
+          <a href="/">
             <Image
               style={{ paddingRight: '16px' }}
               src="/logo-only-white.svg"
@@ -48,11 +51,17 @@ export default function GNB() {
               width={40}
               height={40}
             />
-          </Link>
+          </a>
         ) : (
-          <Link href="/">
-            <Image src="/logo-white.svg" alt="" width={200} height={48} />
-          </Link>
+          <a href="/">
+            <Image
+              // onClick={goToMainRoute} <= 해당방법 사용하면 마우스 갖다댔을때 누를수있음을 표시하는 마우스 아이콘 변화가 일어나지않음
+              src="/logo-white.svg"
+              alt=""
+              width={200}
+              height={48}
+            />
+          </a>
         )}
         <SearchInput />
       </Container>
