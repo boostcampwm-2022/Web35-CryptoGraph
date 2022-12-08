@@ -93,7 +93,7 @@ export default function CoinSelectController({
         <HeaderSelectCoin>
           <HeaderTitle>코인선택</HeaderTitle>
           <HeaderSelectBox>
-            <HeaderSelectBoxContent>전부 [선택/해제]</HeaderSelectBoxContent>
+            <HeaderSelectBoxContent>전체 [선택/해제]</HeaderSelectBoxContent>
             <Checkbox
               checked={checked.all}
               onChange={coinCheckAll}
