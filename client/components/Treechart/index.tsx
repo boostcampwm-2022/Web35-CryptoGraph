@@ -88,9 +88,9 @@ const updateChart = (
           .attr('fill', function (d) {
             return d.data.value >= 0
               ? d.data.value > 0
-                ? colorQuantizeScale(min, max, d.data.value)
+                ? colorQuantizeScale(max, d.data.value)
                 : 'black'
-              : colorQuantizeScale(min, max, d.data.value)
+              : colorQuantizeScale(min, d.data.value)
           })
           .style('stroke', 'black')
         $g.append('text')
@@ -135,9 +135,9 @@ const updateChart = (
           .attr('fill', function (d) {
             return d.data.value >= 0
               ? d.data.value > 0
-                ? colorQuantizeScale(min, max, d.data.value)
+                ? colorQuantizeScale(max, d.data.value)
                 : 'black'
-              : colorQuantizeScale(min, max, d.data.value)
+              : colorQuantizeScale(min, d.data.value)
           })
           .transition()
           .duration(500)
