@@ -62,10 +62,7 @@ export default function Home({
                 selectedCoinListSetter={setSelectedMarket}
                 tabLabelInfo={'코인 선택'}
               />
-              <CoinDetailedInfo
-                market="btc"
-                tabLabelInfo={'상세 정보'}
-              ></CoinDetailedInfo>
+              <CoinDetailedInfo market="btc" tabLabelInfo={'상세 정보'} />
             </TabContainer>
           </SwipeableTemporaryDrawer>
         </Box>

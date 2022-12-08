@@ -3,7 +3,6 @@ import TextField from '@mui/material/TextField'
 import Stack from '@mui/material/Stack'
 import Autocomplete from '@mui/material/Autocomplete'
 import SearchIcon from '@mui/icons-material/Search'
-import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { useRouter } from 'next/router'
@@ -26,7 +25,7 @@ export default function SearchInput() {
     asyncGetCoinName()
   }, [])
   return (
-    <Stack spacing={2} sx={{ width: 300 }}>
+    <Stack spacing={2} sx={{ width: 400 }}>
       <Autocomplete
         freeSolo
         id="free-solo-2-demo"
