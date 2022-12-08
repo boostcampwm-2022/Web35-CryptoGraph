@@ -25,7 +25,7 @@ export default function SearchInput() {
     asyncGetCoinName()
   }, [])
   return (
-    <Stack spacing={2} sx={{ width: 300 }}>
+    <Stack spacing={2} sx={{ width: 400 }}>
       <Autocomplete
         freeSolo
         id="free-solo-2-demo"
