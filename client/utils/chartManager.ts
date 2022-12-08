@@ -5,7 +5,9 @@ import {
   CHART_FONT_SIZE,
   DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT,
   DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-  CHART_Y_AXIS_MARGIN
+  CHART_Y_AXIS_MARGIN,
+  DEFAULT_CANDLE_COUNT,
+  DEFAULT_RENDER_START_INDEX
 } from '@/constants/ChartConstants'
 import { DatePeriod } from '@/types/ChartTypes'
 import { WindowSize } from 'hooks/useWindowSize'
@@ -20,12 +22,12 @@ import { makeDate } from './dateManager'
 import { CandleChartProps } from '@/components/Candlechart'
 import { blueColorScale, redColorScale } from '@/styles/colorScale'
 
-export function calculateCandlewidth(
-  option: CandleChartRenderOption,
-  chartXSize: number
-): number {
-  return Math.ceil(chartXSize / option.renderCandleCount)
-}
+// export function calculateCandlewidth(
+//   option: CandleChartRenderOption,
+//   chartXSize: number
+// ): number {
+//   return Math.ceil(chartXSize / option.renderCandleCount)
+// }
 export function getVolumeHeightScale(
   data: CandleData[],
   CHART_AREA_Y_SIZE: number
@@ -69,7 +71,7 @@ export function getXAxisScale(
   candlePeriod: ChartPeriod
 ) {
   // const offSetX = getOffSetX(option, chartAreaXsize)
-  const candleWidth = calculateCandlewidth(option, chartAreaXsize)
+  // const candleWidth = calculateCandlewidth(option, chartAreaXsize)
   return d3
     .scaleTime()
     .domain([
@@ -84,7 +86,7 @@ export function getXAxisScale(
       )
     ])
     .range([
-      chartAreaXsize - (option.renderCandleCount + 1) * candleWidth,
+      chartAreaXsize - (option.renderCandleCount + 1) * option.candleWidth,
       chartAreaXsize
     ])
 }
@@ -306,8 +308,30 @@ export function checkNeedFetch(
 ) {
   return (
     candleData.length <
-    option.renderStartDataIndex + option.renderCandleCount + 200
+    option.renderStartDataIndex + option.renderCandleCount * 2
   )
+}
+
+export function getRenderOption(
+  width: number,
+  prev?: CandleChartRenderOption
+): CandleChartRenderOption {
+  const candleWidth = prev
+    ? prev.candleWidth
+    : Math.ceil(width / DEFAULT_CANDLE_COUNT)
+  const renderCandleCount = prev
+    ? Math.ceil(width / prev.candleWidth)
+    : DEFAULT_CANDLE_COUNT
+  const renderStartDataIndex = prev
+    ? prev.renderStartDataIndex
+    : DEFAULT_RENDER_START_INDEX
+  return {
+    candleWidth,
+    minCandleWidth: 4,
+    maxCandleWidth: 100,
+    renderStartDataIndex,
+    renderCandleCount
+  }
 }
 
 // export function checkNeedPastFetch(

@@ -63,7 +63,9 @@ export interface CandleChartOption {
 export interface CandleChartRenderOption {
   renderStartDataIndex: number
   renderCandleCount: number
-  translateX: number
+  minCandleWidth: number
+  maxCandleWidth: number
+  candleWidth: number
 }
 
 //treeChart

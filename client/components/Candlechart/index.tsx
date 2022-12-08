@@ -5,16 +5,24 @@ import {
   CandleData,
   PointerPosition
 } from '@/types/ChartTypes'
-import { checkNeedFetch } from '@/utils/chartManager'
+import {
+  // calculateCandlewidth,
+  checkNeedFetch,
+  getRenderOption
+} from '@/utils/chartManager'
 import {
   DEFAULT_POINTER_POSITION,
   DEFAULT_CANDLE_COUNT,
-  DEFAULT_CANDLE_CHART_RENDER_OPTION
+  MAX_FETCH_CANDLE_COUNT
 } from '@/constants/ChartConstants'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { useWindowSize } from 'hooks/useWindowSize'
 import { styled } from '@mui/material'
-import { initCandleChart, updateCandleChart } from './chartController'
+import {
+  initCandleChart,
+  translateCandleChart,
+  updateCandleChart
+} from './chartController'
 export interface CandleChartProps {
   // candlePeriod: ChartPeriod
   chartOption: CandleChartOption
@@ -27,9 +35,11 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const windowSize = useWindowSize(chartContainerRef)
-  const [option, optionSetter] = useState<CandleChartRenderOption>({
-    ...DEFAULT_CANDLE_CHART_RENDER_OPTION
-  })
+  // 렌더링에 관여하는 모든 속성들
+  const [option, setOption] = useState<CandleChartRenderOption>(
+    getRenderOption(windowSize.width)
+  )
+  // 캔들유닛들이 얼마나 translate되어있는지 분리
   const [translateX, setTranslateX] = useState<number>(0)
   const [pointerInfo, setPointerInfo] = useState<PointerPosition>(
     DEFAULT_POINTER_POSITION
@@ -44,29 +54,72 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   // }, [props.marketType])
 
   useEffect(() => {
-    initCandleChart(chartSvg, optionSetter, setPointerInfo, windowSize)
-  }, [windowSize, optionSetter])
+    initCandleChart(
+      chartSvg,
+      setTranslateX,
+      setOption,
+      setPointerInfo,
+      windowSize
+    )
+    setOption(prev => {
+      return getRenderOption(windowSize.width, prev)
+    })
+  }, [windowSize])
 
   useEffect(() => {
+    // const candleWidth = Math.ceil(windowSize.width / option.renderCandleCount)
+    if (translateX < 0) {
+      if (option.renderStartDataIndex === 0) {
+        setTranslateX(0)
+        return
+      }
+      setTranslateX(prev => option.candleWidth + (prev % option.candleWidth))
+      setOption(prev => {
+        const newOption = { ...prev }
+        newOption.renderStartDataIndex = Math.max(
+          newOption.renderStartDataIndex +
+            Math.floor(translateX / option.candleWidth),
+          0
+        )
+        return newOption
+      })
+      return
+    }
+    if (translateX >= option.candleWidth) {
+      setTranslateX(prev => prev % option.candleWidth)
+      setOption(prev => {
+        const newOption = { ...prev }
+        newOption.renderStartDataIndex += Math.floor(
+          translateX / option.candleWidth
+        )
+        return newOption
+      })
+      return
+    }
+    translateCandleChart(chartSvg, translateX)
+  }, [translateX, windowSize, option])
+
+  useEffect(() => {
+    if (isFetching.current) {
+      return
+    }
     const needFetch = checkNeedFetch(props.candleData, option)
     if (needFetch) {
-      if (!isFetching.current) {
-        isFetching.current = true
-        getCandleDataArray(
-          props.chartOption.candlePeriod,
-          props.chartOption.marketType,
-          DEFAULT_CANDLE_COUNT,
-          props.candleData[props.candleData.length - 1].timestamp
-        ).then(res => {
-          //fetch완료된 newData를 기존 data와 병합
-          if (res === null) {
-            console.error('코인 쿼리 실패, 404에러')
-            return
-          }
-          isFetching.current = false
-          props.candleDataSetter(prev => [...prev, ...res])
-        })
-      }
+      isFetching.current = true
+      getCandleDataArray(
+        props.chartOption.candlePeriod,
+        props.chartOption.marketType,
+        MAX_FETCH_CANDLE_COUNT,
+        props.candleData[props.candleData.length - 1].timestamp
+      ).then(res => {
+        //fetch완료된 newData를 기존 data와 병합
+        if (res === null) {
+          console.error('코인 쿼리 실패, 404에러')
+          return
+        }
+        isFetching.current = false
+        props.candleDataSetter(prev => [...prev, ...res])
+      })
       return
     }
     updateCandleChart(
@@ -77,7 +130,8 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       windowSize,
       props.chartOption.candlePeriod
     )
-  }, [props, option, pointerInfo, windowSize])
+    // }, [props, option, pointerInfo, windowSize])
+  }, [props, option, windowSize])
 
   return (
     <ChartContainer>
