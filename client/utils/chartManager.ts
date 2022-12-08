@@ -353,12 +353,10 @@ export function goToFuture(props: CandleChartProps, windowSize: WindowSize) {
   }
 }
 
-export const colorQuantizeScale = (min: number, max: number, value: number) => {
+export const colorQuantizeScale = (max: number, value: number) => {
   return value > 0
-    ? d3.scaleQuantize<string>().domain([min, max]).range(redColorScale)(
-        Math.abs(value)
-      )
-    : d3.scaleQuantize<string>().domain([min, max]).range(blueColorScale)(
+    ? d3.scaleQuantize<string>().domain([0, max]).range(redColorScale)(value)
+    : d3.scaleQuantize<string>().domain([0, max]).range(blueColorScale)(
         Math.abs(value)
       )
 }
