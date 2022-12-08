@@ -29,6 +29,7 @@ const GNBContainer = styled('div')`
 export default function GNB() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
+  const router = useRouter()
   return (
     <GNBContainer>
       <Container
@@ -41,9 +42,9 @@ export default function GNB() {
         }}
       >
         {isMobile ? (
-          //Router.push / Router.replace / Link태그 사용시 메인페이지->메인페이지 새로고침 불가능
+          //Router.push / Router.replace / Link태그 사용시 메인페이지->메인페이지 새로고침 불가능 => reload로 해결
           //ex)코인선택 기능을 여러번 사용하고 트리맵화면에서 logo아이콘 클릭시 다시 기본세팅 (코인세팅 전부 , 러닝차트 descending) 되지않음
-          <a href="/">
+          <Link href="/" onClick={() => router.reload()}>
             <Image
               style={{ paddingRight: '16px' }}
               src="/logo-only-white.svg"
@@ -51,17 +52,11 @@ export default function GNB() {
               width={40}
               height={40}
             />
-          </a>
+          </Link>
         ) : (
-          <a href="/">
-            <Image
-              // onClick={goToMainRoute} <= 해당방법 사용하면 마우스 갖다댔을때 누를수있음을 표시하는 마우스 아이콘 변화가 일어나지않음
-              src="/logo-white.svg"
-              alt=""
-              width={200}
-              height={48}
-            />
-          </a>
+          <Link href="/" onClick={() => router.reload()}>
+            <Image src="/logo-white.svg" alt="" width={200} height={48} />
+          </Link>
         )}
         <SearchInput />
       </Container>
