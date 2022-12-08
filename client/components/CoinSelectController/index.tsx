@@ -4,11 +4,9 @@ import Checkbox from '@mui/material/Checkbox'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
-import { ChartType } from '@/types/ChartTypes'
 import { TabProps } from '@mui/material'
 import SearchCoin from './searchCoin'
 import MakeCoinDict from './setCoinDict'
-//import { validateInputName } from '/root/final/crypto/client/utils/inputBarManager'
 
 interface dict<T> {
   [key: string]: T
@@ -34,7 +32,7 @@ export default function CoinSelectController({
     all: true
   })
   const [inputCoinName, setInputCoinName] = useState('')
-  const [CoinDict, setCoinDict] = useState<dict<Array<string>>>(
+  const [coinDict, setCoinDict] = useState<dict<Array<string>>>(
     MakeCoinDict(data)
   )
   useEffect(() => {
@@ -61,9 +59,22 @@ export default function CoinSelectController({
   }, [checked])
 
   const coinCheckAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    for (const coin in checked) {
-      checked[coin] = event.target.checked
+    if (checked['all']) {
+      for (const coin in checked) {
+        checked[coin] = event.target.checked
+      }
+    } else {
+      for (const coin in checked) {
+        if (
+          coin !== 'all' &&
+          inputCoinName &&
+          !coinDict[inputCoinName].includes(coin)
+        )
+          continue
+        checked[coin] = event.target.checked
+      }
     }
+
     setChecked({
       ...checked
     })
@@ -105,7 +116,7 @@ export default function CoinSelectController({
               key={index}
               style={
                 inputCoinName
-                  ? CoinDict[inputCoinName]?.includes(coin.name)
+                  ? coinDict[inputCoinName]?.includes(coin.name)
                     ? { display: 'flex' }
                     : { display: 'none' }
                   : {}
