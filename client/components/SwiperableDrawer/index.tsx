@@ -48,7 +48,7 @@ export default function SwipeableTemporaryDrawer({
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
       >
-        <Box sx={{ maxHeight: '50vh' }}>{children}</Box>
+        <Box sx={{ minHeight: '30vh', maxHeight: '50vh' }}>{children}</Box>
       </SwipeableDrawer>
     </div>
   )
