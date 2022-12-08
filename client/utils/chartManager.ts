@@ -7,11 +7,13 @@ import {
   DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
   CHART_Y_AXIS_MARGIN
 } from '@/constants/ChartConstants'
+import { DatePeriod } from '@/types/ChartTypes'
 import { WindowSize } from 'hooks/useWindowSize'
 import {
   ChartRenderOption,
   CandleData,
-  PointerPosition
+  PointerPosition,
+  ChartPeriod
 } from '@/types/ChartTypes'
 import * as d3 from 'd3'
 import { makeDate } from './dateManager'
@@ -22,7 +24,7 @@ export function calculateCandlewidth(
   option: ChartRenderOption,
   chartXSize: number
 ): number {
-  return chartXSize / option.renderCandleCount
+  return Math.ceil(chartXSize / option.renderCandleCount)
 }
 export function getVolumeHeightScale(
   data: CandleData[],
@@ -55,28 +57,36 @@ export function getOffSetX(
   renderOpt: ChartRenderOption,
   chartAreaXsize: number
 ) {
-  // CHART_AREA_X_SIZE 외부 변수사용
-  // renderOpt에 CHART관련 속성 추가 어떨지???
   const candleWidth = calculateCandlewidth(renderOpt, chartAreaXsize)
   return renderOpt.translateX % candleWidth
 }
-// renderOpt period으로 60 대체
+
+// scale함수 updateChart에서만 호출
 export function getXAxisScale(
   option: ChartRenderOption,
   data: CandleData[],
-  chartAreaXsize: number
+  chartAreaXsize: number,
+  candlePeriod: ChartPeriod
 ) {
-  const offSetX = getOffSetX(option, chartAreaXsize)
+  // const offSetX = getOffSetX(option, chartAreaXsize)
   const candleWidth = calculateCandlewidth(option, chartAreaXsize)
-  const index = option.renderStartDataIndex + option.renderCandleCount
   return d3
     .scaleTime()
     .domain([
-      //데이터는 End가 최신 데이터이기 때문에, 순서를 반대로 해야 시간순서대로 들어온다?
-      makeDate(data[index].timestamp - 60 * 1000, 60),
-      makeDate(data[option.renderStartDataIndex].timestamp, 60)
+      makeDate(
+        data[option.renderStartDataIndex].timestamp -
+          DatePeriod[candlePeriod] * (option.renderCandleCount + 1) * 1000,
+        DatePeriod[candlePeriod]
+      ),
+      makeDate(
+        data[option.renderStartDataIndex].timestamp,
+        DatePeriod[candlePeriod]
+      )
     ])
-    .range([-(candleWidth - offSetX), chartAreaXsize + offSetX])
+    .range([
+      chartAreaXsize - (option.renderCandleCount + 1) * candleWidth,
+      chartAreaXsize
+    ])
 }
 
 export function updateCurrentPrice(
@@ -288,6 +298,17 @@ export function handleMouseEvent(
   }
   pointerPositionSetter({ positionX: -1, positionY: -1 })
 }
+
+export function checkNeedFetch(
+  candleData: CandleData[],
+  option: ChartRenderOption
+) {
+  return (
+    candleData.length <
+    option.renderStartDataIndex + option.renderCandleCount + 200
+  )
+}
+
 export function checkNeedPastFetch(
   candleData: CandleData[],
   option: ChartRenderOption

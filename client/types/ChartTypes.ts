@@ -20,7 +20,7 @@ export interface CandleData {
 }
 export const ChartTypeArr = ['TreeChart', 'RunningChart'] as const
 export type ChartType = typeof ChartTypeArr[number]
-type ChartPeriodItered<T> = {
+export type ChartPeriodItered<T> = {
   [K in ChartPeriod]: T
 }
 export type ChartPeriod =
@@ -31,7 +31,6 @@ export type ChartPeriod =
   | 'minutes/240'
   | 'days'
   | 'weeks'
-
 export const DatePeriod: ChartPeriodItered<number> = {
   'minutes/1': 60,
   'minutes/3': 180,
@@ -41,6 +40,7 @@ export const DatePeriod: ChartPeriodItered<number> = {
   days: 86400,
   weeks: 604800
 }
+
 export const ChartPeriodList = Object.keys(DatePeriod)
 export interface ChartRenderOption {
   marketType: string
