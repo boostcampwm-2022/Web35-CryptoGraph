@@ -4,6 +4,7 @@ import { useWindowSize } from '@/hooks/useWindowSize'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
 import { colorQuantizeScale } from '@/utils/chartManager'
 import { throttle } from 'lodash'
+import { convertUnit } from '@/utils/chartManager'
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -24,7 +25,6 @@ const updateChart = (
     d3.min(data, d => Math.abs(d.value)) as number,
     d3.max(data, d => d.value) as number
   ]
-
   const root: d3.HierarchyNode<CoinRateContentType> = d3
     .stratify<CoinRateContentType>()
     .id(function (d): string {
@@ -43,6 +43,12 @@ const updateChart = (
     if (selectedSort === 'change rate(absolute)') {
       return d3.descending(Math.abs(a.data.value), Math.abs(b.data.value))
     }
+    if (selectedSort === 'trade price') {
+      return d3.descending(
+        a.data.acc_trade_price_24h,
+        b.data.acc_trade_price_24h
+      )
+    }
     return d3.ascending(a.data.cmc_rank, b.data.cmc_rank)
   }
 
@@ -56,6 +62,9 @@ const updateChart = (
         selectedSort === 'change rate(absolute)'
       ) {
         return Math.max(0.1, Math.abs(d.value))
+      }
+      if (selectedSort === 'trade price') {
+        return Math.max(0.1, Math.abs(d.acc_trade_price_24h))
       }
       return Math.max(0.1, Math.abs(d.market_cap))
     })
@@ -90,11 +99,11 @@ const updateChart = (
           .attr('fill', function (d) {
             return d.data.value >= 0
               ? d.data.value > 0
-                ? colorQuantizeScale(min, max, d.data.value)
-                : 'black'
-              : colorQuantizeScale(min, max, d.data.value)
+                ? colorQuantizeScale(max, d.data.value)
+                : 'gray'
+              : colorQuantizeScale(min, d.data.value)
           })
-          .style('stroke', 'black')
+          .style('stroke', 'gray')
         $g.append('text')
           .attr('x', function (d) {
             return d.x0 + Math.abs(d.x1 - d.x0) / 2
@@ -104,6 +113,7 @@ const updateChart = (
           })
           .attr('text-anchor', 'middle')
           .text(function (d) {
+            // 초기값 changerate 아니라면 수정해줘야함
             return (
               d.data.ticker?.split('-')[1] +
               '\n' +
@@ -137,13 +147,13 @@ const updateChart = (
           .attr('fill', function (d) {
             return d.data.value >= 0
               ? d.data.value > 0
-                ? colorQuantizeScale(min, max, d.data.value)
-                : 'black'
-              : colorQuantizeScale(min, max, d.data.value)
+                ? colorQuantizeScale(max, d.data.value)
+                : 'gray'
+              : colorQuantizeScale(min, d.data.value)
           })
           .transition()
           .duration(500)
-          .style('stroke', 'black')
+          .style('stroke', 'gray')
         update
           .select('text')
           .transition()
@@ -157,10 +167,11 @@ const updateChart = (
           .attr('text-anchor', 'middle')
           .text(function (d) {
             const text =
-              selectedSort === 'market capitalization'
-                ? String(Number(d.data.market_cap / 1000000000000).toFixed(2)) +
-                  '조'
-                : String(Number(d.data.value).toFixed(2)) + '%'
+              selectedSort !== 'trade price'
+                ? selectedSort === 'market capitalization'
+                  ? convertUnit(Number(d.data.market_cap))
+                  : String(Number(d.data.value).toFixed(2)) + '%'
+                : convertUnit(Number(d.data.acc_trade_price_24h))
             return d.data.ticker?.split('-')[1] + '\n' + text
           })
           .style('font-size', function (d) {
@@ -219,7 +230,14 @@ export default function TreeChart({
   modalOpenHandler
 }: TreeChartProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
-    { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
+    {
+      name: 'Origin',
+      ticker: '',
+      acc_trade_price_24h: 0,
+      parent: '',
+      value: 0,
+      market_cap: 0
+    }
   ]) //coin의 등락률 값에 parentNode가 추가된 값
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
@@ -233,7 +251,14 @@ export default function TreeChart({
     // CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
     if (!data || !Market) return
     const newCoinData: CoinRateContentType[] = [
-      { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
+      {
+        name: 'Origin',
+        ticker: '',
+        acc_trade_price_24h: 0,
+        parent: '',
+        value: 0,
+        market_cap: 0
+      }
     ]
     for (const tick of Market) {
       newCoinData.push(data['KRW-' + tick])

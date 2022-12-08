@@ -3,6 +3,7 @@ import * as React from 'react'
 import { CoinRateContentType, CoinRateType } from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
 import { colorQuantizeScale } from '@/utils/chartManager'
+import { convertUnit } from '@/utils/chartManager'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
@@ -44,35 +45,39 @@ const updateChart = (
   const ArrayDataValue: CoinRateContentType[] = [
     ...Object.values<CoinRateContentType>(data)
   ].sort((a, b) => {
-    if (selectedSort === 'descending') {
-      return d3.descending(a.value, b.value) // 내림차순
+    switch (selectedSort) {
+      case 'descending':
+        return d3.descending(a.value, b.value) // 내림차순
+      case 'ascending':
+        return d3.ascending(a.value, b.value) // 오름차순
+      case 'absolute':
+        return d3.descending(Math.abs(a.value), Math.abs(b.value)) // 절댓값
+      case 'trade price':
+        return d3.descending(a.acc_trade_price_24h, b.acc_trade_price_24h) // 거래량
+      default:
+        return d3.descending(a.market_cap, b.market_cap) //시가총액
     }
-    if (selectedSort === 'ascending') {
-      return d3.ascending(a.value, b.value) // 오름차순
-    }
-    if (selectedSort === 'absolute') {
-      return d3.descending(Math.abs(a.value), Math.abs(b.value)) // 절댓값
-    }
-    return d3.ascending(a.cmc_rank, b.cmc_rank) //시가총액
   })
-  const min =
-    selectedSort !== 'descending'
-      ? selectedSort === 'market capitalization'
-        ? (d3.min(ArrayDataValue, d => d.market_cap) as number)
-        : (d3.min(ArrayDataValue, d => Math.abs(d.value)) as number)
-      : (d3.min(ArrayDataValue, d => d.value) as number)
-  const max =
-    selectedSort !== 'descending'
-      ? selectedSort === 'market capitalization'
-        ? (d3.max(ArrayDataValue, d => d.market_cap) as number)
-        : (d3.max(ArrayDataValue, d => Math.abs(d.value)) as number)
-      : (d3.max(ArrayDataValue, d => d.value) as number)
-  const threshold =
-    Math.max(Math.abs(min), max) <= 66
-      ? Math.max(Math.abs(min), max) <= 33
-        ? 33
-        : 66
-      : Math.max(Math.abs(min), max, 100) // 66보다 큰 경우는 시가총액 or 66% 이상
+  const max = (() => {
+    switch (selectedSort) {
+      case 'descending':
+        return d3.max(ArrayDataValue, d => Math.abs(d.value)) // 내림차순
+      case 'ascending':
+        return d3.max(ArrayDataValue, d => Math.abs(d.value)) // 오름차순
+      case 'absolute':
+        return d3.max(ArrayDataValue, d => Math.abs(d.value)) // 절댓값
+      case 'trade price':
+        return d3.max(ArrayDataValue, d => d.acc_trade_price_24h) // 거래량
+      default:
+        return d3.max(ArrayDataValue, d => d.market_cap) //시가총액
+    }
+  })()
+
+  if (!max) {
+    console.error('정상적인 등락률 데이터가 아닙니다.')
+    return
+  }
+  const threshold = max <= 66 ? (max <= 33 ? 33 : 66) : Math.max(max, 100) // 66보다 큰 경우는 시가총액 or 66% 이상
   const domainRange = [0, threshold]
 
   const barMargin = height / 10 / 5 //바 사이사이 마진값
@@ -108,12 +113,13 @@ const updateChart = (
 
         $g.append('rect')
           .attr('width', function (d) {
+            // console.log(d.acc_trade_price_24h)
             return scale(
-              selectedSort !== 'descending'
+              selectedSort !== 'trade price'
                 ? selectedSort !== 'market capitalization'
                   ? Math.abs(d.value)
                   : d.market_cap
-                : Math.abs(d.value)
+                : d.acc_trade_price_24h
             )
           })
           .attr('height', barHeight)
@@ -121,10 +127,10 @@ const updateChart = (
             nodeOnclickHandler(d.ticker.split('-')[1])
           })
           .style('fill', d => {
-            if (d.value > 0) return colorQuantizeScale(min, max, d.value)
+            if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
             else {
-              return colorQuantizeScale(min, max, d.value)
+              return colorQuantizeScale(max, d.value)
             }
           })
 
@@ -132,11 +138,11 @@ const updateChart = (
           .attr('x', d => {
             return (
               scale(
-                selectedSort !== 'descending'
+                selectedSort !== 'trade price'
                   ? selectedSort !== 'market capitalization'
                     ? Math.abs(d.value)
-                    : Number(d.market_cap)
-                  : Math.abs(d.value)
+                    : d.market_cap
+                  : d.acc_trade_price_24h
               ) / 2
             )
           })
@@ -145,22 +151,22 @@ const updateChart = (
           .attr('dominant-baseline', 'middle')
           .style('font-size', `${barHeight * 0.6}px`)
           .text(d =>
-            selectedSort !== 'descending' && selectedSort !== 'ascending'
-              ? selectedSort !== 'market capitalization'
-                ? String(Number(d.value).toFixed(2)) + '%'
-                : String(Number(d.market_cap / 1000000000000).toFixed(2)) + '조'
-              : String(Number(d.value).toFixed(2)) + '%'
+            selectedSort !== 'trade price'
+              ? selectedSort === 'market capitalization'
+                ? convertUnit(Number(d.market_cap))
+                : String(Number(d.value).toFixed(2)) + '%'
+              : convertUnit(Number(d.acc_trade_price_24h))
           )
 
         $g.append('text')
           .attr('id', 'CoinName')
           .attr('x', d => {
             return scale(
-              selectedSort !== 'descending'
+              selectedSort !== 'trade price'
                 ? selectedSort !== 'market capitalization'
                   ? Math.abs(d.value)
                   : d.market_cap
-                : Math.abs(d.value)
+                : d.acc_trade_price_24h
             )
           })
           .attr('y', barHeight / 2)
@@ -184,29 +190,29 @@ const updateChart = (
           .duration(durationPeriod)
           .attr('width', d => {
             return scale(
-              selectedSort !== 'descending'
+              selectedSort !== 'trade price'
                 ? selectedSort !== 'market capitalization'
                   ? Math.abs(d.value)
                   : d.market_cap
-                : Math.abs(d.value)
+                : d.acc_trade_price_24h
             )
           })
           .attr('height', barHeight)
           .style('fill', (d, i) => {
-            if (d.value > 0) return colorQuantizeScale(min, max, d.value)
+            if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
-            else return colorQuantizeScale(min, max, d.value)
+            else return colorQuantizeScale(max, d.value)
           })
         update
           .select('text')
           .attr('x', d => {
             return (
               scale(
-                selectedSort !== 'descending'
+                selectedSort !== 'trade price'
                   ? selectedSort !== 'market capitalization'
                     ? Math.abs(d.value)
-                    : Number(d.market_cap)
-                  : Math.abs(d.value)
+                    : d.market_cap
+                  : d.acc_trade_price_24h
               ) / 2
             )
           })
@@ -215,11 +221,11 @@ const updateChart = (
           .attr('dominant-baseline', 'middle')
           .style('font-size', `${barHeight * 0.6}px`)
           .text(d =>
-            selectedSort !== 'descending' && selectedSort !== 'ascending'
-              ? selectedSort !== 'market capitalization'
-                ? String(Number(d.value).toFixed(2)) + '%'
-                : String(Number(d.market_cap / 1000000000000).toFixed(2)) + '조'
-              : String(Number(d.value).toFixed(2)) + '%'
+            selectedSort !== 'trade price'
+              ? selectedSort === 'market capitalization'
+                ? convertUnit(Number(d.market_cap))
+                : String(Number(d.value).toFixed(2)) + '%'
+              : convertUnit(Number(d.acc_trade_price_24h))
           )
 
         update
@@ -228,11 +234,11 @@ const updateChart = (
           .duration(durationPeriod)
           .attr('x', d => {
             return scale(
-              selectedSort !== 'descending'
+              selectedSort !== 'trade price'
                 ? selectedSort !== 'market capitalization'
                   ? Math.abs(d.value)
                   : d.market_cap
-                : Math.abs(d.value)
+                : d.acc_trade_price_24h
             )
           })
           .attr('y', barHeight / 2)

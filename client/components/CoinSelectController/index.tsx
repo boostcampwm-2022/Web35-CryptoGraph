@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
-import { ChartType } from '@/types/ChartTypes'
 import { TabProps } from '@mui/material'
 
 interface CoinChecked {

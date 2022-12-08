@@ -353,12 +353,17 @@ export function goToFuture(props: CandleChartProps, windowSize: WindowSize) {
   }
 }
 
-export const colorQuantizeScale = (min: number, max: number, value: number) => {
+export const colorQuantizeScale = (max: number, value: number) => {
   return value > 0
-    ? d3.scaleQuantize<string>().domain([min, max]).range(redColorScale)(
+    ? d3.scaleQuantize<string>().domain([0, max]).range(redColorScale)(value)
+    : d3.scaleQuantize<string>().domain([0, max]).range(blueColorScale)(
         Math.abs(value)
       )
-    : d3.scaleQuantize<string>().domain([min, max]).range(blueColorScale)(
-        Math.abs(value)
-      )
+}
+
+export const convertUnit = (unit : number) => {
+  if (unit >= 1000000000000) {
+    return (unit / 1000000000000).toFixed(2) + '조'
+  }
+  return (unit / 1000000000).toFixed(0) + '억'
 }
