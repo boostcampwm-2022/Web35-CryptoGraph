@@ -106,6 +106,11 @@ export default function Home({
               data={coinData}
               Market={selectedMarket}
               selectedSort={selectedSort}
+              modalOpenHandler={(market: string) => {
+                isMobile
+                  ? console.log(market, '모바일')
+                  : console.log(market, '데탑')
+              }}
             />
           )}
         </ChartContainer>

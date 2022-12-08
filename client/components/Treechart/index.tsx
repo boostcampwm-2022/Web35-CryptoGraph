@@ -9,7 +9,8 @@ const updateChart = (
   data: CoinRateContentType[],
   width: number,
   height: number,
-  selectedSort: string
+  selectedSort: string,
+  nodeOnclickHandler: (market: string) => void
 ) => {
   if (!svgRef.current) return
   const chartContainer = d3.select<SVGSVGElement, CoinRateContentType>(
@@ -22,6 +23,7 @@ const updateChart = (
     d3.min(data, d => Math.abs(d.value)) as number,
     d3.max(data, d => d.value) as number
   ]
+
   const root: d3.HierarchyNode<CoinRateContentType> = d3
     .stratify<CoinRateContentType>()
     .id(function (d): string {
@@ -69,6 +71,9 @@ const updateChart = (
       enter => {
         const $g = enter.append('g')
         $g.append('rect')
+          .on('click', function (this, e, d) {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
           .attr('x', function (d) {
             return d.x0
           })
@@ -204,11 +209,13 @@ export interface TreeChartProps {
   data: CoinRateType
   Market?: string[] //선택된 코인 리스트
   selectedSort: string
+  modalOpenHandler: (market: string) => void
 }
 export default function TreeChart({
   data,
   Market, //= ['CELO', 'ETH', 'MFT', 'WEMIX']
-  selectedSort
+  selectedSort,
+  modalOpenHandler
 }: TreeChartProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
@@ -233,8 +240,15 @@ export default function TreeChart({
     setChangeRate(newCoinData)
   }, [data, Market])
   useEffect(() => {
-    updateChart(chartSvg, changeRate, width, height, selectedSort)
-  }, [changeRate, width, height, selectedSort])
+    updateChart(
+      chartSvg,
+      changeRate,
+      width,
+      height,
+      selectedSort,
+      modalOpenHandler
+    )
+  }, [changeRate, width, height, selectedSort, modalOpenHandler])
 
   return (
     <div
