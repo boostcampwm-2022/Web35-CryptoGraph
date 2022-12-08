@@ -60,6 +60,7 @@ export default function Home({
               <CoinSelectController
                 selectedCoinList={selectedMarket}
                 selectedCoinListSetter={setSelectedMarket}
+                data={data}
                 tabLabelInfo={'코인 선택'}
               />
               <CoinDetailedInfo
@@ -84,6 +85,7 @@ export default function Home({
             <CoinSelectController
               selectedCoinList={selectedMarket}
               selectedCoinListSetter={setSelectedMarket}
+              data={data}
             />
           </Box>
           <Box sx={{ width: '100%', height: '30%' }}>

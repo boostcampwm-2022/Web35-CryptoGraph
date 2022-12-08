@@ -3,10 +3,10 @@ import { styled } from '@mui/material/styles'
 import Checkbox from '@mui/material/Checkbox'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { ChartType } from '@/types/ChartTypes'
 import { TabProps } from '@mui/material'
+import SearchCoin from './searchCoin'
 
 interface CoinChecked {
   [key: string]: boolean
@@ -14,21 +14,21 @@ interface CoinChecked {
 interface CoinSelectControllerProps extends TabProps {
   selectedCoinList: string[]
   selectedCoinListSetter: React.Dispatch<React.SetStateAction<string[]>>
+  data: MarketCapInfo[]
   tabLabelInfo?: string
 }
+
 export default function CoinSelectController({
   selectedCoinList,
-  selectedCoinListSetter
+  selectedCoinListSetter,
+  data
 }: CoinSelectControllerProps) {
   const [coinList, setCoinList] = useState<MarketCapInfo[] | null>([])
   const [checked, setChecked] = useState<CoinChecked>({
     all: true
   })
-
   useEffect(() => {
-    getMarketCapInfo().then(data => {
-      setCoinList(data)
-    })
+    setCoinList(data)
   }, [])
 
   useEffect(() => {
@@ -65,14 +65,24 @@ export default function CoinSelectController({
       [event.target.name]: event.target.checked
     })
   }
+
   return (
     <Container>
       <Header>
-        <HeaderTitle>코인선택</HeaderTitle>
-        <HeaderSelectBox>
-          <HeaderSelectBoxContent>전부 [선택/해제]</HeaderSelectBoxContent>
-          <Checkbox checked={checked.all} onChange={coinCheckAll} name="all" />
-        </HeaderSelectBox>
+        <HeaderSelectCoin>
+          <HeaderTitle>코인선택</HeaderTitle>
+          <HeaderSelectBox>
+            <HeaderSelectBoxContent>전부 [선택/해제]</HeaderSelectBoxContent>
+            <Checkbox
+              checked={checked.all}
+              onChange={coinCheckAll}
+              name="all"
+            />
+          </HeaderSelectBox>
+        </HeaderSelectCoin>
+        <HeaderSearchCoin>
+          <SearchCoin coinNames={data} />
+        </HeaderSearchCoin>
       </Header>
       <Body>
         {coinList?.map((coin: MarketCapInfo, index) => {
@@ -103,9 +113,18 @@ const Container = styled('div')`
   height: 100%;
 `
 const Header = styled('div')`
+  padding: 1rem;
+  align-items: center;
+`
+const HeaderSelectCoin = styled('div')`
   display: flex;
   justify-content: space-between;
   padding: 1rem;
+  align-items: center;
+`
+const HeaderSearchCoin = styled('div')`
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 `
 const Body = styled('div')`

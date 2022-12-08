@@ -3,7 +3,6 @@ import TextField from '@mui/material/TextField'
 import Stack from '@mui/material/Stack'
 import Autocomplete from '@mui/material/Autocomplete'
 import SearchIcon from '@mui/icons-material/Search'
-import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { useRouter } from 'next/router'
@@ -65,9 +64,7 @@ export default function SearchInput() {
             //2.로직을 통과하면 해당 값으로 리다이렉트
             if (validateInputName(CoinNames, inputCoinName)) {
               const engCoinName = matchNameKRwithENG(CoinNames, inputCoinName)
-              //생각해볼점
-              //window.history.pushState('', 'asdf', `/detail/${engCoinName}`)
-              //router.replace(`/detail/${engCoinName}`)
+              //생각해볼점   router.push(`/detail/${engCoinName}`)
               window.location.href = `/detail/${engCoinName}`
             }
           }
