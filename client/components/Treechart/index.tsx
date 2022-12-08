@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useWindowSize } from '@/hooks/useWindowSize'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
 import { colorQuantizeScale } from '@/utils/chartManager'
+import { convertUnit } from '@/utils/chartManager'
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -163,14 +164,9 @@ const updateChart = (
             const text =
               selectedSort !== 'trade price'
                 ? selectedSort === 'market capitalization'
-                  ? String(
-                      Number(d.data.market_cap / 1000000000000).toFixed(2)
-                    ) + '조'
+                  ? convertUnit(Number(d.data.market_cap))
                   : String(Number(d.data.value).toFixed(2)) + '%'
-                : String(
-                    // 거래량은
-                    Number(d.data.acc_trade_price_24h / 1000000000).toFixed(0)
-                  ) + '억'
+                : convertUnit(Number(d.data.acc_trade_price_24h))
             return d.data.ticker?.split('-')[1] + '\n' + text
           })
           .style('font-size', function (d) {

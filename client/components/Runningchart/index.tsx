@@ -3,6 +3,7 @@ import * as React from 'react'
 import { CoinRateContentType, CoinRateType } from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
 import { colorQuantizeScale } from '@/utils/chartManager'
+import { convertUnit } from '@/utils/chartManager'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
@@ -148,11 +149,10 @@ const updateChart = (
           .style('font-size', `${barHeight * 0.6}px`)
           .text(d =>
             selectedSort !== 'trade price'
-              ? selectedSort !== 'market capitalization'
-                ? String(Number(d.value).toFixed(2)) + '%'
-                : String(Number(d.market_cap / 1000000000000).toFixed(2)) + '조'
-              : String(Number(d.acc_trade_price_24h / 1000000000).toFixed(0)) +
-                '억'
+              ? selectedSort === 'market capitalization'
+                ? convertUnit(Number(d.market_cap))
+                : String(Number(d.value).toFixed(2)) + '%'
+              : convertUnit(Number(d.acc_trade_price_24h))
           )
 
         $g.append('text')
@@ -219,11 +219,10 @@ const updateChart = (
           .style('font-size', `${barHeight * 0.6}px`)
           .text(d =>
             selectedSort !== 'trade price'
-              ? selectedSort !== 'market capitalization'
-                ? String(Number(d.value).toFixed(2)) + '%'
-                : String(Number(d.market_cap / 1000000000000).toFixed(2)) + '조'
-              : String(Number(d.acc_trade_price_24h / 1000000000).toFixed(0)) +
-                '억'
+              ? selectedSort === 'market capitalization'
+                ? convertUnit(Number(d.market_cap))
+                : String(Number(d.value).toFixed(2)) + '%'
+              : convertUnit(Number(d.acc_trade_price_24h))
           )
 
         update
