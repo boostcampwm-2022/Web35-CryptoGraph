@@ -22,10 +22,6 @@ const updateChart = (
     d3.min(data, d => Math.abs(d.value)) as number,
     d3.max(data, d => d.value) as number
   ]
-  const treeMapvalueScale = d3
-    .scaleLinear()
-    .domain([min, max])
-    .range([0.5, 1.5])
   const root: d3.HierarchyNode<CoinRateContentType> = d3
     .stratify<CoinRateContentType>()
     .id(function (d): string {
@@ -217,7 +213,6 @@ export default function TreeChart({
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
   ]) //coin의 등락률 값에 parentNode가 추가된 값
-  const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerSvg)
@@ -228,12 +223,12 @@ export default function TreeChart({
 
   useEffect(() => {
     // CoinRate에 코인 등락률이 업데이트되면 ChangeRate에 전달
-    if (!coinRate || !Market) return
+    if (!data || !Market) return
     const newCoinData: CoinRateContentType[] = [
       { name: 'Origin', ticker: '', parent: '', value: 0, market_cap: 0 }
     ]
     for (const tick of Market) {
-      newCoinData.push(coinRate['KRW-' + tick])
+      newCoinData.push(data['KRW-' + tick])
     }
     setChangeRate(newCoinData)
   }, [data, Market])
