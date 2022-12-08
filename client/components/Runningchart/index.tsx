@@ -43,42 +43,39 @@ const updateChart = (
   const ArrayDataValue: CoinRateContentType[] = [
     ...Object.values<CoinRateContentType>(data)
   ].sort((a, b) => {
-    if (selectedSort === 'descending') {
-      return d3.descending(a.value, b.value) // 내림차순
+    switch (selectedSort) {
+      case 'descending':
+        return d3.descending(a.value, b.value) // 내림차순
+      case 'ascending':
+        return d3.ascending(a.value, b.value) // 오름차순
+      case 'absolute':
+        return d3.descending(Math.abs(a.value), Math.abs(b.value)) // 절댓값
+      case 'trade price':
+        return d3.descending(a.acc_trade_price_24h, b.acc_trade_price_24h) // 거래량
+      default:
+        return d3.descending(a.market_cap, b.market_cap) //시가총액
     }
-    if (selectedSort === 'ascending') {
-      return d3.ascending(a.value, b.value) // 오름차순
-    }
-    if (selectedSort === 'absolute') {
-      return d3.descending(Math.abs(a.value), Math.abs(b.value)) // 절댓값
-    }
-    if (selectedSort === 'trade price') {
-      return d3.descending(a.acc_trade_price_24h, b.acc_trade_price_24h) // 거래량
-    }
-    return d3.ascending(a.market_cap, b.market_cap) //시가총액
   })
-  const min =
-    selectedSort !== 'trade price'
-      ? selectedSort !== 'descending'
-        ? selectedSort === 'market capitalization'
-          ? (d3.min(ArrayDataValue, d => d.market_cap) as number)
-          : (d3.min(ArrayDataValue, d => Math.abs(d.value)) as number)
-        : (d3.min(ArrayDataValue, d => d.value) as number)
-      : (d3.min(ArrayDataValue, d => d.acc_trade_price_24h) as number)
-  const max =
-    selectedSort !== 'trade price'
-      ? selectedSort !== 'descending'
-        ? selectedSort === 'market capitalization'
-          ? (d3.max(ArrayDataValue, d => d.market_cap) as number)
-          : (d3.max(ArrayDataValue, d => Math.abs(d.value)) as number)
-        : (d3.max(ArrayDataValue, d => d.value) as number)
-      : (d3.max(ArrayDataValue, d => d.acc_trade_price_24h) as number)
-  const threshold =
-    Math.max(Math.abs(min), max) <= 66
-      ? Math.max(Math.abs(min), max) <= 33
-        ? 33
-        : 66
-      : Math.max(Math.abs(min), max, 100) // 66보다 큰 경우는 시가총액 or 66% 이상
+  const max = (() => {
+    switch (selectedSort) {
+      case 'descending':
+        return d3.max(ArrayDataValue, d => Math.abs(d.value)) // 내림차순
+      case 'ascending':
+        return d3.max(ArrayDataValue, d => Math.abs(d.value)) // 오름차순
+      case 'absolute':
+        return d3.max(ArrayDataValue, d => Math.abs(d.value)) // 절댓값
+      case 'trade price':
+        return d3.max(ArrayDataValue, d => d.acc_trade_price_24h) // 거래량
+      default:
+        return d3.max(ArrayDataValue, d => d.market_cap) //시가총액
+    }
+  })()
+
+  if (!max) {
+    console.error('정상적인 등락률 데이터가 아닙니다.')
+    return
+  }
+  const threshold = max <= 66 ? (max <= 33 ? 33 : 66) : Math.max(max, 100) // 66보다 큰 경우는 시가총액 or 66% 이상
   const domainRange = [0, threshold]
 
   const barMargin = height / 10 / 5 //바 사이사이 마진값
@@ -114,6 +111,7 @@ const updateChart = (
 
         $g.append('rect')
           .attr('width', function (d) {
+            // console.log(d.acc_trade_price_24h)
             return scale(
               selectedSort !== 'trade price'
                 ? selectedSort !== 'market capitalization'
@@ -124,10 +122,10 @@ const updateChart = (
           })
           .attr('height', barHeight)
           .style('fill', (d, i) => {
-            if (d.value > 0) return colorQuantizeScale(min, max, d.value)
+            if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
             else {
-              return colorQuantizeScale(min, max, d.value)
+              return colorQuantizeScale(max, d.value)
             }
           })
 
@@ -196,9 +194,9 @@ const updateChart = (
           })
           .attr('height', barHeight)
           .style('fill', (d, i) => {
-            if (d.value > 0) return colorQuantizeScale(min, max, d.value)
+            if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
-            else return colorQuantizeScale(min, max, d.value)
+            else return colorQuantizeScale(max, d.value)
           })
         update
           .select('text')
