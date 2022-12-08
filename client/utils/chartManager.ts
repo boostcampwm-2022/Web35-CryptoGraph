@@ -362,3 +362,10 @@ export const colorQuantizeScale = (min: number, max: number, value: number) => {
         Math.abs(value)
       )
 }
+
+export const convertUnit = (unit : number) => {
+  if (unit >= 1000000000000) {
+    return (unit / 1000000000000).toFixed(2) + '조'
+  }
+  return (unit / 1000000000).toFixed(0) + '억'
+}

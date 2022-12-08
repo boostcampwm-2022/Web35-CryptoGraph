@@ -24,13 +24,15 @@ export default function SortSelectController({
   const treeSortTypeArr = [
     'change rate',
     'change rate(absolute)',
-    'market capitalization'
+    'market capitalization',
+    'trade price'
   ]
   const runningSortTypeArr = [
     'ascending',
     'descending',
     'absolute',
-    'market capitalization'
+    'market capitalization',
+    'trade price'
   ]
   return (
     <SortSelectorContainer>
