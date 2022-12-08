@@ -1,6 +1,5 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Modal from '@mui/material/Modal'
 
 const style = {
@@ -14,22 +13,27 @@ const style = {
   boxShadow: 24,
   p: 4
 }
-
-export default function BasicModal() {
-  const [open, setOpen] = React.useState(false)
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+interface MuiModalProps {
+  isModalOpened: boolean
+  setIsModalOpened: React.Dispatch<React.SetStateAction<boolean>>
+  children: React.ReactNode
+}
+export default function MuiModal({
+  isModalOpened,
+  setIsModalOpened,
+  children
+}: MuiModalProps) {
+  const handleClose = () => setIsModalOpened(false)
 
   return (
     <div>
-      <Button onClick={handleOpen}>Open modal</Button>
       <Modal
-        open={open}
+        open={isModalOpened}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}></Box>
+        <Box sx={style}>{children}</Box>
       </Modal>
     </div>
   )
