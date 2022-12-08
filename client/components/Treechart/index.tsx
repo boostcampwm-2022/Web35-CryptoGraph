@@ -194,7 +194,7 @@ const initChart = (
   const zoom = d3
     .zoom<SVGSVGElement, CoinRateContentType>()
     .on('zoom', throttle(handleZoom, 50))
-    .scaleExtent([1, 5]) //scale 제한
+    .scaleExtent([1, 30]) //scale 제한
     .translateExtent([
       [0, 0], // top-left-corner 좌표
       [width, height] //bottom-right-corner 좌표
