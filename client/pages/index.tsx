@@ -26,10 +26,14 @@ export default function Home({
   data
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [selectedChart, setSelectedChart] = useState<ChartType>('RunningChart')
-  const [selectedMarket, setSelectedMarket] = useState<string[]>(
+  const [selectedMarketList, setSelectedMarketList] = useState<string[]>(
     data.map(coin => coin.name)
   ) //선택된 market 컨트롤
+  const [selectedMarket, setSelectedMarket] = useState<string>('btc')
   const [selectedSort, setSelectedSort] = useState<string>('descending')
+  const [selectedTab, setSelectedTab] = useState<number>(0)
+  const [isDrawerOpened, setIsDrawerOpened] = useState<boolean>(false)
+  const [isModalOpened, setIsModalOpened] = useState<boolean>(false)
   const coinData = useRealTimeCoinListData(data)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
@@ -44,8 +48,14 @@ export default function Home({
     <HomeContainer>
       {isMobile ? (
         <Box sx={{ position: 'absolute' }}>
-          <SwipeableTemporaryDrawer>
-            <TabContainer>
+          <SwipeableTemporaryDrawer
+            isDrawerOpened={isDrawerOpened}
+            setIsDrawerOpened={setIsDrawerOpened}
+          >
+            <TabContainer
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            >
               <ChartSelectController
                 selected={selectedChart}
                 selectedSetter={setSelectedChart}
@@ -58,12 +68,12 @@ export default function Home({
                 tabLabelInfo={'정렬 기준'}
               />
               <CoinSelectController
-                selectedCoinList={selectedMarket}
-                selectedCoinListSetter={setSelectedMarket}
+                selectedCoinList={selectedMarketList}
+                selectedCoinListSetter={setSelectedMarketList}
                 tabLabelInfo={'코인 선택'}
               />
               <CoinDetailedInfo
-                market="btc"
+                market={selectedMarket}
                 tabLabelInfo={'상세 정보'}
               ></CoinDetailedInfo>
             </TabContainer>
@@ -82,8 +92,8 @@ export default function Home({
           />
           <Box sx={{ width: '100%', height: '60%' }}>
             <CoinSelectController
-              selectedCoinList={selectedMarket}
-              selectedCoinListSetter={setSelectedMarket}
+              selectedCoinList={selectedMarketList}
+              selectedCoinListSetter={setSelectedMarketList}
             />
           </Box>
           <Box sx={{ width: '100%', height: '30%' }}>
@@ -91,25 +101,31 @@ export default function Home({
           </Box>
         </SideBarContainer>
       )}
-      {selectedMarket.length !== 0 ? (
+      {selectedMarketList.length !== 0 ? (
         <ChartContainer>
           {selectedChart === 'RunningChart' ? (
             <RunningChart
-              candleCount={selectedMarket.length}
+              candleCount={selectedMarketList.length}
               durationPeriod={500}
               data={coinData}
-              Market={selectedMarket}
+              Market={selectedMarketList}
               selectedSort={selectedSort}
             />
           ) : (
             <TreeChart
               data={coinData}
-              Market={selectedMarket}
+              Market={selectedMarketList}
               selectedSort={selectedSort}
               modalOpenHandler={(market: string) => {
                 isMobile
-                  ? console.log(market, '모바일')
-                  : console.log(market, '데탑')
+                  ? (() => {
+                      setIsDrawerOpened(true)
+                      setSelectedMarket(market)
+                      setSelectedTab(3)
+                    })()
+                  : console.log(market, '데탑') //모달을 열어준다.
+                //모달, drawer, 탭컨테이너의 상태를 모두 page에서 관리해야한다.
+                //전역상태관리 있었으면 좋았을지도?
               }}
             />
           )}
