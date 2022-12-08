@@ -13,6 +13,7 @@ export default function SearchInput() {
   // express서버를 키고 작동해야 제대로 받아올 수 있습니다.
   const [CoinNames, setCoinNames] = React.useState<MarketCapInfo[]>([])
   const router = useRouter()
+  const inputRef = React.useRef<HTMLInputElement>()
   React.useEffect(() => {
     async function asyncGetCoinName() {
       const data: MarketCapInfo[] | null = await getMarketCapInfo()
@@ -24,7 +25,7 @@ export default function SearchInput() {
     }
     asyncGetCoinName()
   }, [])
-  function goToDetail(e: React.SyntheticEvent<Element, Event>, value: string) {
+  function goToDetail(value: string) {
     const inputCoinName = value
     if (validateInputName(CoinNames, inputCoinName)) {
       const engCoinName = matchNameKRwithENG(CoinNames, inputCoinName)
@@ -41,7 +42,7 @@ export default function SearchInput() {
         freeSolo
         id="free-solo-2-demo"
         disableClearable
-        onChange={(e, value) => goToDetail(e, value)}
+        onChange={(e, value) => goToDetail(value)}
         options={
           CoinNames.length
             ? [
@@ -52,6 +53,7 @@ export default function SearchInput() {
         }
         renderInput={params => (
           <TextField
+            inputRef={inputRef}
             sx={{ marginLeft: 'auto' }}
             {...params}
             InputProps={{
@@ -65,7 +67,17 @@ export default function SearchInput() {
                 gap: 2
               },
               placeholder: '검색어를 입력하세요',
-              endAdornment: <SearchIcon sx={{ opacity: 0.2 }} />
+              endAdornment: (
+                <a
+                  href=""
+                  onClick={e => {
+                    e.preventDefault()
+                    if (inputRef.current) goToDetail(inputRef.current.value)
+                  }}
+                >
+                  <SearchIcon sx={{ opacity: 0.2 }} />
+                </a>
+              )
             }}
           />
         )}
