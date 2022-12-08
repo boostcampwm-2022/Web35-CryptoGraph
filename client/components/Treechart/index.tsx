@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useWindowSize } from '@/hooks/useWindowSize'
 import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
 import { colorQuantizeScale } from '@/utils/chartManager'
+import { throttle } from 'lodash'
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -181,7 +182,7 @@ const initChart = (
 ) => {
   const zoom = d3
     .zoom<SVGSVGElement, CoinRateContentType>()
-    .on('zoom', handleZoom)
+    .on('zoom', throttle(handleZoom, 50))
     .scaleExtent([1, 5]) //scale 제한
     .translateExtent([
       [0, 0], // top-left-corner 좌표
