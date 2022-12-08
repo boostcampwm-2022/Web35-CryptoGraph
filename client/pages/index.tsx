@@ -26,14 +26,12 @@ interface getDataProps {
 export default function Home({
   data
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [selectedChart, setSelectedChart] = useState<ChartType>('TreeChart')
+  const [selectedChart, setSelectedChart] = useState<ChartType>('RunningChart')
   const [selectedMarketList, setSelectedMarketList] = useState<string[]>(
     data.map(coin => coin.name)
   ) //선택된 market 컨트롤
   const [selectedMarket, setSelectedMarket] = useState<string>('btc')
-  const [selectedSort, setSelectedSort] = useState<string>(
-    'market capitalization'
-  )
+  const [selectedSort, setSelectedSort] = useState<string>('descending')
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [isDrawerOpened, setIsDrawerOpened] = useState<boolean>(false)
   const [isModalOpened, setIsModalOpened] = useState<boolean>(false)
@@ -44,7 +42,7 @@ export default function Home({
     if (selectedChart === 'RunningChart') {
       setSelectedSort('descending')
     } else {
-      setSelectedSort('market capitalization')
+      setSelectedSort('change rate')
     }
   }, [selectedChart])
   const chartNodeHandler = (market: string) => {
