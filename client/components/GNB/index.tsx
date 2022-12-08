@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { styled } from '@mui/material/styles'
 import { Container, useMediaQuery, useTheme } from '@mui/material'
 import SearchInput from './searchInput'
+import Link from 'next/link'
 
 const GNBContainer = styled('div')`
   position: fixed;
@@ -34,13 +35,24 @@ export default function GNB() {
         id="GNBcontainer"
         sx={{
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
+          paddingLeft: '16px'
         }}
       >
         {isMobile ? (
-          <Image src="/logo-only-white.svg" alt="" width={40} height={40} />
+          <Link href="/">
+            <Image
+              style={{ paddingRight: '16px' }}
+              src="/logo-only-white.svg"
+              alt=""
+              width={40}
+              height={40}
+            />
+          </Link>
         ) : (
-          <Image src="/logo-white.svg" alt="" width={200} height={48} />
+          <Link href="/">
+            <Image src="/logo-white.svg" alt="" width={200} height={48} />
+          </Link>
         )}
         <SearchInput />
       </Container>
