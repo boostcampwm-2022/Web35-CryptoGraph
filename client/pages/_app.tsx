@@ -15,16 +15,7 @@ const clientSideEmotionCache = createEmotionCache()
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
-const GlobalStyle = css`
-  html {
-    font-size: 1rem;
-  }
-  html,
-  body,
-  div#__next {
-    height: 100%;
-  }
-`
+
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
   return (
@@ -49,6 +40,17 @@ export default function MyApp(props: MyAppProps) {
     </CacheProvider>
   )
 }
+
+const GlobalStyle = css`
+  html {
+    font-size: 1rem;
+  }
+  html,
+  body,
+  div#__next {
+    height: 100%;
+  }
+`
 
 const ContainerHeightLimiter = styled('div')`
   display: flex;

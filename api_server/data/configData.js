@@ -47,7 +47,8 @@ async function getCoinInfo() {
     const coinInfo = result[code];
     const id = coinInfo.id;
     const metaData = coinMetaDatas[id];
-    coinInfo.website = metaData.urls.website.length === 0 ? "" : metaData.urls.website[0];
+    coinInfo.website =
+      metaData.urls.website.length === 0 ? "" : metaData.urls.website[0];
     coinInfo.logo = metaData.logo;
     coinInfo.description = metaData.description;
   }
@@ -60,7 +61,9 @@ function getTime() {
   const utcCurr = curr.getTime() + curr.getTimezoneOffset() * 60 * 1000;
   const diffFromKst = 9 * 60 * 60 * 1000;
   const kstCurr = new Date(utcCurr + diffFromKst);
-  const dateString = `${kstCurr.getMonth() + 1}/${kstCurr.getDate()} ${kstCurr.getHours()}시`;
+  const dateString = `${
+    kstCurr.getMonth() + 1
+  }/${kstCurr.getDate()} ${kstCurr.getHours()}시`;
   return dateString;
 }
 
@@ -97,6 +100,7 @@ async function getMarketCapInfos(coinInfos) {
     return {
       name: code,
       name_kr: coinInfos[code].name_kr,
+      name_es: coinInfos[code].name,
       cmc_rank: coinInfos[code].cmc_rank,
       logo: coinInfos[code].logo,
       market_cap: coinInfos[code].market_cap,

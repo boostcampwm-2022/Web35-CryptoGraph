@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { TabProps } from '@mui/material'
 import SearchCoin from './searchCoin'
-import MakeCoinDict from './setCoinDict'
+import MakeCoinDict from './MakeCoinDict'
 
 interface dict<T> {
   [key: string]: T
