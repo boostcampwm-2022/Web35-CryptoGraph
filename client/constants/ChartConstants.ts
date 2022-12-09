@@ -2,7 +2,7 @@ import {
   ChartPeriod,
   CandleChartOption,
   CandleChartRenderOption,
-  PointerPosition
+  PointerData
 } from '@/types/ChartTypes'
 
 export const CHART_Y_AXIS_MARGIN = 70
@@ -27,13 +27,16 @@ export const DEFAULT_CANDLE_CHART_OPTION: CandleChartOption = {
 
 export const MIN_CANDLE_COUNT = 5
 
-export const DEFAULT_POINTER_POSITION: PointerPosition = {
+export const DEFAULT_POINTER_DATA: PointerData = {
   positionX: -1,
-  positionY: -1
+  positionY: -1,
+  data: null
 }
 
 export const CANDLE_COLOR_RED = '#D24F45'
 export const CANDLE_COLOR_BLUE = '#1D61C4'
 export const CANDLE_CHART_GRID_COLOR = '#EEEFEE'
 export const CANDLE_CHART_POINTER_LINE_COLOR = '#999999'
-export const CHART_FONT_SIZE = `0.7rem`
+export const CHART_FONT_SIZE = `12px`
+export const CHART_AXIS_RECT_WIDTH = 70
+export const CHART_AXIS_RECT_HEIGHT = 16

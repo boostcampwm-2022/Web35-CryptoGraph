@@ -3,15 +3,16 @@ import {
   CandleChartOption,
   CandleChartRenderOption,
   CandleData,
-  PointerPosition
+  PointerData
 } from '@/types/ChartTypes'
 import {
   // calculateCandlewidth,
   checkNeedFetch,
-  getRenderOption
+  getRenderOption,
+  updatePointerUI
 } from '@/utils/chartManager'
 import {
-  DEFAULT_POINTER_POSITION,
+  DEFAULT_POINTER_DATA,
   DEFAULT_CANDLE_COUNT,
   MAX_FETCH_CANDLE_COUNT
 } from '@/constants/ChartConstants'
@@ -41,9 +42,8 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   )
   // 캔들유닛들이 얼마나 translate되어있는지 분리
   const [translateX, setTranslateX] = useState<number>(0)
-  const [pointerInfo, setPointerInfo] = useState<PointerPosition>(
-    DEFAULT_POINTER_POSITION
-  )
+  const [pointerInfo, setPointerInfo] =
+    useState<PointerData>(DEFAULT_POINTER_DATA)
   const isFetching = useRef(false)
 
   // useEffect(() => {
@@ -62,9 +62,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       setPointerInfo,
       windowSize
     )
-    setOption(prev => {
-      return getRenderOption(windowSize.width, prev)
-    })
+    setOption(getRenderOption(windowSize.width))
   }, [windowSize])
 
   // translateX의 변경에 따라 기존의 문서요소들을 이동만 시킨다.
@@ -106,7 +104,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   useEffect(() => {
     const needFetch = checkNeedFetch(props.candleData, option)
     if (needFetch) {
-      // console.log('fetching at ', props.candleData.length, isFetching.current)
+      console.log('fetching at ', props.candleData.length, isFetching.current)
       if (!isFetching.current) {
         isFetching.current = true
         getCandleDataArray(
@@ -120,21 +118,21 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
             console.error('코인 쿼리 실패, 404에러')
             return
           }
-          // console.log(
-          //   props.candleData[props.candleData.length - 1].candle_date_time_kst
-          // )
-          // console.log(res[0].candle_date_time_kst)
+          console.log(
+            props.candleData[props.candleData.length - 1].candle_date_time_kst
+          )
+          console.log(res[0].candle_date_time_kst)
           isFetching.current = false
           props.candleDataSetter(prev => {
             const lastDate = new Date(
               prev[prev.length - 1].candle_date_time_kst
             )
             const newDate = new Date(res[0].candle_date_time_kst)
-            // console.log(lastDate, newDate)
+            console.log(lastDate, newDate)
             if (newDate <= lastDate) {
               return [...prev, ...res]
             }
-            return [...prev]
+            return [...prev, ...res]
           })
         })
       }
@@ -151,6 +149,16 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
     )
     // }, [props, option, pointerInfo, windowSize])
   }, [props, option, windowSize])
+
+  useEffect(() => {
+    updatePointerUI(
+      pointerInfo,
+      option,
+      props.candleData,
+      windowSize,
+      props.chartOption.candlePeriod
+    )
+  }, [pointerInfo, windowSize, option, props])
 
   return (
     <ChartContainer>

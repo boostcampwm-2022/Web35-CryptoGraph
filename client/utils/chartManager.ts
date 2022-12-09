@@ -7,14 +7,18 @@ import {
   DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
   CHART_Y_AXIS_MARGIN,
   DEFAULT_CANDLE_COUNT,
-  DEFAULT_RENDER_START_INDEX
+  DEFAULT_RENDER_START_INDEX,
+  CHART_X_AXIS_MARGIN,
+  CHART_AXIS_RECT_WIDTH,
+  CHART_AXIS_RECT_HEIGHT,
+  CANDLE_CHART_GRID_COLOR
 } from '@/constants/ChartConstants'
 import { DatePeriod } from '@/types/ChartTypes'
 import { WindowSize } from 'hooks/useWindowSize'
 import {
   CandleChartRenderOption,
   CandleData,
-  PointerPosition,
+  PointerData,
   ChartPeriod
 } from '@/types/ChartTypes'
 import * as d3 from 'd3'
@@ -123,19 +127,28 @@ export function updateCurrentPrice(
 
 // svg#mouse-pointer-UI자식요소에 격자구선 선 join
 export function updatePointerUI(
-  pointerInfo: PointerPosition,
-  yAxisScale: d3.ScaleLinear<number, number, never>,
+  pointerInfo: PointerData,
   renderOpt: CandleChartRenderOption,
   data: CandleData[],
-  chartAreaXsize: number,
-  chartAreaYsize: number
+  windowSize: WindowSize,
+  chartPeriod: ChartPeriod
 ) {
-  const { priceText, color } = getPriceInfo(
-    pointerInfo.positionX,
-    renderOpt,
-    data,
-    chartAreaXsize
+  const [chartAreaXsize, chartAreaYsize] = [
+    windowSize.width - CHART_Y_AXIS_MARGIN,
+    windowSize.height - CHART_X_AXIS_MARGIN
+  ]
+  const { priceText, color } = getPriceInfo(pointerInfo)
+  const yAxisScale = getYAxisScale(
+    data.slice(
+      renderOpt.renderStartDataIndex,
+      renderOpt.renderStartDataIndex + renderOpt.renderCandleCount
+    ),
+    chartAreaYsize
   )
+  if (!yAxisScale) {
+    return
+  }
+  const xAxisScale = getXAxisScale(renderOpt, data, chartAreaXsize, chartPeriod)
   d3.select('text#price-info')
     .attr('fill', color ? color : 'black')
     .attr('font-size', CHART_FONT_SIZE)
@@ -151,19 +164,28 @@ export function updatePointerUI(
             getPathDAttr(d, i, chartAreaXsize, chartAreaYsize)
           )
           .attr('stroke', CANDLE_CHART_POINTER_LINE_COLOR)
+        $g.append('rect')
+          .attr('width', CHART_AXIS_RECT_WIDTH)
+          .attr('height', CHART_AXIS_RECT_HEIGHT)
+          .attr('fill', CANDLE_CHART_POINTER_LINE_COLOR)
+          .attr('transform', (d, i) =>
+            getRectTransform(d, i, chartAreaXsize, chartAreaYsize)
+          )
+
         $g.append('text')
           .attr('fill', 'black')
           .attr('font-size', CHART_FONT_SIZE)
           .attr('transform', (d, i) =>
             getTextTransform(d, i, chartAreaXsize, chartAreaYsize)
           )
+          .attr('font-weight', '600')
           .text((d, i) => {
             if (i === 0) {
-              return getTimeText(d, renderOpt, data, chartAreaXsize)
+              return getTimeText(pointerInfo.data)
             }
             return Math.round(yAxisScale.invert(d)).toLocaleString()
           })
-          .attr('text-anchor', (d, i) => (i === 0 ? 'middle' : 'start'))
+          .attr('text-anchor', 'middle')
           .attr('dominant-baseline', (d, i) => (i === 0 ? 'hanging' : 'middle'))
         return $g
       },
@@ -174,13 +196,21 @@ export function updatePointerUI(
             getPathDAttr(d, i, chartAreaXsize, chartAreaYsize)
           )
         update
+          .select('rect')
+          .attr('width', CHART_AXIS_RECT_WIDTH)
+          .attr('height', CHART_AXIS_RECT_HEIGHT)
+          // .attr('fill', 'grey')
+          .attr('transform', (d, i) =>
+            getRectTransform(d, i, chartAreaXsize, chartAreaYsize)
+          )
+        update
           .select('text')
           .attr('transform', (d, i) =>
             getTextTransform(d, i, chartAreaXsize, chartAreaYsize)
           )
           .text((d, i) => {
             if (i === 0) {
-              return getTimeText(d, renderOpt, data, chartAreaXsize)
+              return getTimeText(pointerInfo.data)
             }
             return Math.round(yAxisScale.invert(d)).toLocaleString()
           })
@@ -194,62 +224,78 @@ export function updatePointerUI(
 
 // text위치 정보 반환
 function getTextTransform(
-  d: number,
+  pointerXY: number,
   i: number,
-  chartAreaXsize: number,
-  chartAreaYsize: number
+  chartAreaXSize: number,
+  chartAreaYSize: number
 ) {
-  return i === 0
-    ? `translate(${d},${chartAreaYsize + 3})`
-    : `translate(${chartAreaXsize + 3}, ${d})`
+  if (i === 0) {
+    let textX = pointerXY - CHART_AXIS_RECT_WIDTH / 2
+    textX = Math.max(Math.min(textX, chartAreaXSize - CHART_AXIS_RECT_WIDTH), 0)
+    return `translate(${textX + CHART_AXIS_RECT_WIDTH / 2},${
+      chartAreaYSize + 3
+    })`
+  }
+  let textY = pointerXY - CHART_AXIS_RECT_HEIGHT / 2
+  textY = Math.max(Math.min(chartAreaYSize - CHART_AXIS_RECT_HEIGHT, textY), 0)
+  return `translate(${chartAreaXSize + CHART_AXIS_RECT_WIDTH / 2},${
+    textY + CHART_AXIS_RECT_HEIGHT / 2
+  })`
+}
+
+// rect위치정보 반환
+function getRectTransform(
+  pointerXY: number,
+  i: number,
+  chartAreaXSize: number,
+  chartAreaYSize: number
+) {
+  if (i === 0) {
+    let rectX = pointerXY - CHART_AXIS_RECT_WIDTH / 2
+    rectX = Math.max(Math.min(rectX, chartAreaXSize - CHART_AXIS_RECT_WIDTH), 0)
+    return `translate(${rectX},${chartAreaYSize})`
+  }
+  let rectY = pointerXY - CHART_AXIS_RECT_HEIGHT / 2
+  rectY = Math.max(Math.min(chartAreaYSize - CHART_AXIS_RECT_HEIGHT, rectY), 0)
+  return `translate(${chartAreaXSize},${rectY})`
 }
 
 // 시간정보 텍스트 반환
-// 가격은 yAxisSclae로 변환하면 되는데 xAxisScale은 적용할 수 없음
-function getTimeText(
-  positionX: number,
-  renderOpt: CandleChartRenderOption,
-  data: CandleData[],
-  chartAreaXsize: number
-) {
-  const timeString =
-    data[getDataIndexFromPosX(positionX, renderOpt, chartAreaXsize)]
-      .candle_date_time_kst
+function getTimeText(unitData: CandleData | null) {
+  if (unitData === null) {
+    return ''
+  }
+  const timeString = unitData.candle_date_time_kst
   return `${timeString.substring(5, 10)} ${timeString.substring(11, 16)}`
 }
 
 // 마우스 포인터 x좌표와 renderOpt를 이용해 몇번째 데이터인지 인덱스 반환
-function getDataIndexFromPosX(
-  positionX: number,
-  renderOpt: CandleChartRenderOption,
-  chartAreaXsize: number
-) {
-  return 0
-  // const offSetX = renderOpt.translateX + (chartAreaXsize - positionX)
-  // const candleWidth = calculateCandlewidth(renderOpt, chartAreaXsize)
-  // return Math.floor(offSetX / candleWidth) < 0
-  //   ? 0
-  //   : Math.floor(offSetX / candleWidth)
-  //이거 가끔 음수를 return하는데?
-}
+// function getDataIndexFromPosX(
+//   positionX: number,
+//   renderOpt: CandleChartRenderOption,
+//   chartAreaXsize: number
+// ) {
+//   return 0
+//   // const offSetX = renderOpt.translateX + (chartAreaXsize - positionX)
+//   // const candleWidth = calculateCandlewidth(renderOpt, chartAreaXsize)
+//   // return Math.floor(offSetX / candleWidth) < 0
+//   //   ? 0
+//   //   : Math.floor(offSetX / candleWidth)
+//   //이거 가끔 음수를 return하는데?
+// }
 
 // 마우스 포인터가 가리키는 위치의 분봉데이터를 찾아 렌더링될 가격정보를 반환
-function getPriceInfo(
-  positionX: number,
-  renderOpt: CandleChartRenderOption,
-  data: CandleData[],
-  chartAreaXsize: number
-) {
-  if (positionX < 0) {
+function getPriceInfo(pointerInfo: PointerData) {
+  if (pointerInfo.positionX < 0) {
     return { priceText: '' }
   }
 
-  const index = getDataIndexFromPosX(positionX, renderOpt, chartAreaXsize)
-  if (index < 0) {
+  // const index = getDataIndexFromPosX(positionX, renderOpt, chartAreaXsize)
+  if (pointerInfo.data === null) {
     console.error('예외상황')
     return { priceText: '' }
   }
-  const candleUnitData = data[index]
+  const candleUnitData = pointerInfo.data
   return {
     priceText: [
       `고가: ${candleUnitData.high_price}`,
@@ -276,30 +322,33 @@ function getPathDAttr(
     : `M0 ${d} L${chartAreaXsize} ${d}`
 }
 
-function transPointerInfoToArray(pointerInfo: PointerPosition) {
+function transPointerInfoToArray(pointerInfo: PointerData) {
   return [pointerInfo.positionX, pointerInfo.positionY].filter(el => el !== -1)
 }
 
 // 마우스 이벤트 핸들러 포인터의 위치를 파악하고 pointerPosition을 갱신한다.
 export function handleMouseEvent(
   event: MouseEvent,
-  pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerPosition>>,
+  pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerData>>,
   chartAreaXsize: number,
   chartAreaYsize: number
 ) {
+  const $rect = d3.select(event.target as SVGRectElement)
+  const data = $rect.data().length > 0 ? $rect.data()[0] : null
   if (
-    event.offsetX >= 0 &&
-    event.offsetY >= 0 &&
-    event.offsetX <= chartAreaXsize &&
-    event.offsetY <= chartAreaYsize
+    event.offsetX > 1 &&
+    event.offsetY > 1 &&
+    event.offsetX < chartAreaXsize - 1 &&
+    event.offsetY < chartAreaYsize - 1
   ) {
     pointerPositionSetter({
       positionX: event.offsetX,
-      positionY: event.offsetY
+      positionY: event.offsetY,
+      data: data as CandleData
     })
     return
   }
-  pointerPositionSetter({ positionX: -1, positionY: -1 })
+  pointerPositionSetter({ positionX: -1, positionY: -1, data: null })
 }
 
 export function checkNeedFetch(

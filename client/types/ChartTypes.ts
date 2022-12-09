@@ -111,7 +111,8 @@ export interface CoinRateContentType {
   value: number
 }
 
-export interface PointerPosition {
+export interface PointerData {
   positionX: number
   positionY: number
+  data: CandleData | null
 }
