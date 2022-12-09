@@ -232,17 +232,7 @@ export function updateCandleChart(
   // )
 
   // 현재 가격을 업데이트한다.
-  updateCurrentPrice(yAxisScale, data, option, chartAreaXsize)
-
-  // 마우스따라움직이는 UI
-  // updatePointerUI(
-  //   pointerInfo,
-  //   yAxisScale,
-  //   option,
-  //   data,
-  //   chartAreaXsize,
-  //   chartAreaYsize
-  // )
+  updateCurrentPrice(yAxisScale, data, option, chartAreaXsize, chartAreaYsize)
 
   chartArea
     .selectAll<SVGSVGElement, CandleData>('g')

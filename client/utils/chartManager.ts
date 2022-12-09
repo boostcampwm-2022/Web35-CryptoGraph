@@ -99,7 +99,8 @@ export function updateCurrentPrice(
   yAxisScale: d3.ScaleLinear<number, number, never>,
   data: CandleData[],
   renderOpt: CandleChartRenderOption,
-  chartAreaXsize: number
+  chartAreaXsize: number,
+  chartAreaYSize: number
 ) {
   const $currentPrice = d3.select('svg#current-price')
   const yCoord = yAxisScale(data[0].trade_price)
@@ -117,10 +118,28 @@ export function updateCurrentPrice(
     .attr('stroke-width', 2)
     .attr('stroke-dasharray', '10,10')
   $currentPrice
-    .select('text')
+    .select('rect')
     .attr('fill', strokeColor)
+    .attr('width', CHART_AXIS_RECT_WIDTH)
+    .attr('height', CHART_AXIS_RECT_HEIGHT)
+    .attr('x', chartAreaXsize)
+    .attr(
+      'y',
+      Math.min(
+        Math.max(0, yCoord - CHART_AXIS_RECT_HEIGHT / 2),
+        chartAreaYSize - CHART_AXIS_RECT_HEIGHT
+      )
+    )
+  $currentPrice
+    .select('text')
+    .attr('fill', 'white')
     .attr('font-size', CHART_FONT_SIZE)
-    .attr('transform', `translate(${chartAreaXsize + 3}, ${yCoord})`)
+    .attr(
+      'transform',
+      getTextTransform(yCoord, 1, chartAreaXsize, chartAreaYSize)
+    )
+    .attr('font-weight', '600')
+    .attr('text-anchor', 'middle')
     .attr('dominant-baseline', 'middle')
     .text(data[0].trade_price.toLocaleString())
 }
@@ -262,7 +281,7 @@ function getRectTransform(
 
 // 시간정보 텍스트 반환
 function getTimeText(unitData: CandleData | null) {
-  if (unitData === null) {
+  if (!unitData) {
     return ''
   }
   const timeString = unitData.candle_date_time_kst
@@ -291,7 +310,8 @@ function getPriceInfo(pointerInfo: PointerData) {
   }
 
   // const index = getDataIndexFromPosX(positionX, renderOpt, chartAreaXsize)
-  if (pointerInfo.data === null) {
+  if (!pointerInfo.data) {
+    console.error(pointerInfo)
     console.error('예외상황')
     return { priceText: '' }
   }

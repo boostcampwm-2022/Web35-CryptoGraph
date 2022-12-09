@@ -179,6 +179,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
           <svg id="chart-area" />
           <svg id="current-price">
             <line />
+            <rect />
             <text />
           </svg>
           <svg id="mouse-pointer-UI"></svg>
