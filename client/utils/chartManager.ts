@@ -3,15 +3,12 @@ import {
   CANDLE_COLOR_BLUE,
   CANDLE_CHART_POINTER_LINE_COLOR,
   CHART_FONT_SIZE,
-  DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT,
-  DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
   CHART_Y_AXIS_MARGIN,
   DEFAULT_CANDLE_COUNT,
   DEFAULT_RENDER_START_INDEX,
   CHART_X_AXIS_MARGIN,
   CHART_AXIS_RECT_WIDTH,
-  CHART_AXIS_RECT_HEIGHT,
-  CANDLE_CHART_GRID_COLOR
+  CHART_AXIS_RECT_HEIGHT
 } from '@/constants/ChartConstants'
 import { DatePeriod } from '@/types/ChartTypes'
 import { WindowSize } from 'hooks/useWindowSize'
@@ -23,15 +20,8 @@ import {
 } from '@/types/ChartTypes'
 import * as d3 from 'd3'
 import { makeDate } from './dateManager'
-import { CandleChartProps } from '@/components/Candlechart'
 import { blueColorScale, redColorScale } from '@/styles/colorScale'
 
-// export function calculateCandlewidth(
-//   option: CandleChartRenderOption,
-//   chartXSize: number
-// ): number {
-//   return Math.ceil(chartXSize / option.renderCandleCount)
-// }
 export function getVolumeHeightScale(
   data: CandleData[],
   CHART_AREA_Y_SIZE: number
@@ -47,6 +37,7 @@ export function getVolumeHeightScale(
   }
   return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 30])
 }
+
 export function getYAxisScale(data: CandleData[], CHART_AREA_Y_SIZE: number) {
   const [min, max] = [
     d3.min(data, d => d.low_price),
@@ -59,13 +50,6 @@ export function getYAxisScale(data: CandleData[], CHART_AREA_Y_SIZE: number) {
   }
   return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 0])
 }
-// export function getOffSetX(
-//   renderOpt: CandleChartRenderOption,
-//   chartAreaXsize: number
-// ) {
-//   const candleWidth = calculateCandlewidth(renderOpt, chartAreaXsize)
-//   return renderOpt.translateX % candleWidth
-// }
 
 // scale함수 updateChart에서만 호출
 export function getXAxisScale(
@@ -74,8 +58,6 @@ export function getXAxisScale(
   chartAreaXsize: number,
   candlePeriod: ChartPeriod
 ) {
-  // const offSetX = getOffSetX(option, chartAreaXsize)
-  // const candleWidth = calculateCandlewidth(option, chartAreaXsize)
   return d3
     .scaleTime()
     .domain([
@@ -167,7 +149,6 @@ export function updatePointerUI(
   if (!yAxisScale) {
     return
   }
-  const xAxisScale = getXAxisScale(renderOpt, data, chartAreaXsize, chartPeriod)
   d3.select('text#price-info')
     .attr('fill', color ? color : 'black')
     .attr('font-size', CHART_FONT_SIZE)
@@ -218,7 +199,6 @@ export function updatePointerUI(
           .select('rect')
           .attr('width', CHART_AXIS_RECT_WIDTH)
           .attr('height', CHART_AXIS_RECT_HEIGHT)
-          // .attr('fill', 'grey')
           .attr('transform', (d, i) =>
             getRectTransform(d, i, chartAreaXsize, chartAreaYsize)
           )
@@ -281,35 +261,18 @@ function getRectTransform(
 
 // 시간정보 텍스트 반환
 function getTimeText(unitData: CandleData | null) {
-  if (!unitData) {
+  if (!unitData || !unitData.candle_date_time_kst) {
     return ''
   }
   const timeString = unitData.candle_date_time_kst
   return `${timeString.substring(5, 10)} ${timeString.substring(11, 16)}`
 }
 
-// 마우스 포인터 x좌표와 renderOpt를 이용해 몇번째 데이터인지 인덱스 반환
-// function getDataIndexFromPosX(
-//   positionX: number,
-//   renderOpt: CandleChartRenderOption,
-//   chartAreaXsize: number
-// ) {
-//   return 0
-//   // const offSetX = renderOpt.translateX + (chartAreaXsize - positionX)
-//   // const candleWidth = calculateCandlewidth(renderOpt, chartAreaXsize)
-//   // return Math.floor(offSetX / candleWidth) < 0
-//   //   ? 0
-//   //   : Math.floor(offSetX / candleWidth)
-//   //이거 가끔 음수를 return하는데?
-// }
-
 // 마우스 포인터가 가리키는 위치의 분봉데이터를 찾아 렌더링될 가격정보를 반환
 function getPriceInfo(pointerInfo: PointerData) {
   if (pointerInfo.positionX < 0) {
     return { priceText: '' }
   }
-
-  // const index = getDataIndexFromPosX(positionX, renderOpt, chartAreaXsize)
   if (!pointerInfo.data) {
     console.error(pointerInfo)
     console.error('예외상황')
@@ -381,92 +344,16 @@ export function checkNeedFetch(
   )
 }
 
-export function getRenderOption(
-  width: number,
-  prev?: CandleChartRenderOption
-): CandleChartRenderOption {
-  const candleWidth = prev
-    ? prev.candleWidth
-    : Math.ceil(width / DEFAULT_CANDLE_COUNT)
-  const renderCandleCount = prev
-    ? Math.ceil(width / prev.candleWidth)
-    : DEFAULT_CANDLE_COUNT
-  const renderStartDataIndex = prev
-    ? prev.renderStartDataIndex
-    : DEFAULT_RENDER_START_INDEX
+export function getRenderOption(width: number): CandleChartRenderOption {
+  const candleWidth = Math.ceil(width / DEFAULT_CANDLE_COUNT)
   return {
     candleWidth,
     minCandleWidth: 4,
     maxCandleWidth: 100,
-    renderStartDataIndex,
-    renderCandleCount
+    renderStartDataIndex: DEFAULT_RENDER_START_INDEX,
+    renderCandleCount: DEFAULT_CANDLE_COUNT
   }
 }
-
-// export function checkNeedPastFetch(
-//   candleData: CandleData[],
-//   option: CandleChartRenderOption
-// ) {
-//   return {
-//     result:
-//       Math.min(
-//         candleData.length - option.DomElementStartIndex,
-//         DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
-//       ) <
-//       option.renderStartDataIndex + option.renderCandleCount + 100,
-//     //1000개의 data인데 현재 200~800인 경우 fetch할 필요가 없이 optionSetter만 넘겨주면 됩니다.
-//     willFetch:
-//       Math.ceil((candleData.length - option.DomElementStartIndex) / 100) *
-//         100 <=
-//       DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT
-//   }
-// }
-// export function checkNeedFutureFetch(
-//   candleData: CandleData[],
-//   option: ChartRenderOption
-// ) {
-//   return (
-//     candleData.length >= DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT &&
-//     option.renderStartDataIndex < 100 &&
-//     option.DomElementStartIndex > 0
-//   )
-// }
-// export function goToPast(props: CandleChartProps, windowSize: WindowSize) {
-//   return {
-//     ...props.option,
-//     DomElementStartIndex:
-//       props.option.DomElementStartIndex +
-//       DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-//     renderStartDataIndex:
-//       props.option.renderStartDataIndex -
-//       DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-//     translateX:
-//       props.option.translateX -
-//       DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
-//         calculateCandlewidth(
-//           props.option,
-//           windowSize.width - CHART_Y_AXIS_MARGIN
-//         )
-//   }
-// }
-// export function goToFuture(props: CandleChartProps, windowSize: WindowSize) {
-//   return {
-//     ...props.option,
-//     DomElementStartIndex:
-//       props.option.DomElementStartIndex -
-//       DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-//     renderStartDataIndex:
-//       props.option.renderStartDataIndex +
-//       DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-//     translateX:
-//       props.option.translateX +
-//       DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT *
-//         calculateCandlewidth(
-//           props.option,
-//           windowSize.width - CHART_Y_AXIS_MARGIN
-//         )
-//   }
-// }
 
 export const colorQuantizeScale = (min: number, max: number, value: number) => {
   return value > 0

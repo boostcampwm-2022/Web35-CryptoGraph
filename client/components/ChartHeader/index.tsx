@@ -12,8 +12,6 @@ import Image from 'next/image'
 import { Typography, useMediaQuery } from '@mui/material'
 
 interface ChartHeaderProps {
-  // selected: ChartPeriod
-  // selectedSetter: Dispatch<SetStateAction<ChartPeriod>>
   chartOption: CandleChartOption
   chartOptionSetter: Dispatch<SetStateAction<CandleChartOption>>
   coinPriceInfo: CoinPrice

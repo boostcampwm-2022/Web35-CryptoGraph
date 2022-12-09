@@ -1,13 +1,9 @@
 import {
-  DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT,
   CHART_Y_AXIS_MARGIN,
   CHART_X_AXIS_MARGIN,
   CANDLE_CHART_GRID_COLOR,
-  CHART_FONT_SIZE,
   CANDLE_COLOR_RED,
-  CANDLE_COLOR_BLUE,
-  DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT,
-  MIN_CANDLE_COUNT
+  CANDLE_COLOR_BLUE
 } from '@/constants/ChartConstants'
 import { WindowSize } from '@/hooks/useWindowSize'
 import {
@@ -17,11 +13,9 @@ import {
   PointerData
 } from '@/types/ChartTypes'
 import {
-  // calculateCandlewidth,
   getYAxisScale,
   getXAxisScale,
   updateCurrentPrice,
-  // updatePointerUI,
   handleMouseEvent,
   getVolumeHeightScale
 } from '@/utils/chartManager'
@@ -96,22 +90,6 @@ export function addEventsToChart(
           'drag',
           (event: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
             translateXSetter(prev => prev + event.dx)
-            // optionSetter((prev: CandleChartRenderOption) => {
-            //   const movedCandle = Math.max(
-            //     Math.floor(
-            //       (prev.translateX + event.dx) /
-            //         calculateCandlewidth(prev, chartAreaXsize)
-            //     ),
-            //     0
-            //   )
-
-            //   return {
-            //     ...prev,
-            //     renderStartDataIndex: movedCandle,
-            //     translateX: Math.max(prev.translateX + event.dx, 0)
-            //   }
-            // })
-
             handleMouseEvent(
               event.sourceEvent,
               pointerPositionSetter,
@@ -124,13 +102,6 @@ export function addEventsToChart(
     .on('wheel', (e: WheelEvent) => {
       e.preventDefault()
       optionSetter((prev: CandleChartRenderOption) => {
-        // const newRenderCandleCount = Math.min(
-        //   Math.max(
-        //     prev.renderCandleCount + (e.deltaY > 0 ? 1 : -1), //휠이벤트 e.deltaY가 확대면 -1 축소면 +1
-        //     MIN_CANDLE_COUNT
-        //   ),
-        //   DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT //최소 5~200개로 제한
-        // )
         const newCandleWidth = Math.min(
           Math.max(
             prev.candleWidth + (e.deltaY > 0 ? -1 : 1),
@@ -139,16 +110,10 @@ export function addEventsToChart(
           prev.maxCandleWidth
         )
         const newRenderCandleCount = Math.ceil(chartAreaXsize / newCandleWidth)
-        // const newTranslateX =
-        //   calculateCandlewidth(
-        //     { ...prev, renderCandleCount: newRenderCandleCount },
-        //     chartAreaXsize
-        //   ) * prev.renderStartDataIndex
         return {
           ...prev,
           renderCandleCount: newRenderCandleCount,
           candleWidth: newCandleWidth
-          // translateX: newTranslateX
         }
       })
     })
@@ -188,7 +153,6 @@ export function updateCandleChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
   option: CandleChartRenderOption,
-  pointerInfo: PointerData,
   windowSize: WindowSize,
   candlePeriod: ChartPeriod,
   translateX: number
@@ -249,8 +213,8 @@ export function updateCandleChart(
         $g = placeVolumeRect($g, chartAreaXsize, candleWidth, yAxisScale) */
         // 거래량, 개발예정, 성능 문제로 보류
         // $g.append('line')
-        placeCandleLine($g, chartAreaXsize, candleWidth, yAxisScale, xAxisScale)
         // $g.append('rect').classed('candleRect', true)
+        placeCandleLine($g, chartAreaXsize, candleWidth, yAxisScale, xAxisScale)
         placeCandleRect($g, chartAreaXsize, candleWidth, yAxisScale, xAxisScale)
         placeFullRect($g, candleWidth, xAxisScale, chartAreaYsize)
         return $g
@@ -269,7 +233,7 @@ export function updateCandleChart(
           )
           .attr(
             'x',
-            (d, i) =>
+            d =>
               xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth * 0.8
           )
           .attr('y', d =>
@@ -368,11 +332,11 @@ function placeCandleLine(
   $g.append('line')
     .attr(
       'x1',
-      (d, i) => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
+      d => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
     )
     .attr(
       'x2',
-      (d, i) => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
+      d => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
     )
     .attr('y1', d => yAxisScale(d.low_price))
     .attr('y2', d => yAxisScale(d.high_price))
@@ -395,7 +359,7 @@ function placeCandleRect(
     )
     .attr(
       'x',
-      (d, i) => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth * 0.8
+      d => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth * 0.8
     )
     .attr('y', d =>
       Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))

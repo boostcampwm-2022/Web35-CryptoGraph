@@ -42,7 +42,6 @@ export const useRealTimeUpbitData = (
       const d = JSON.parse(str_d)
       if (d.type == 'ticker') {
         const code = d.code.split('-')[1]
-        // console.log(marketRef.current, periodRef.current)
         if (code === marketRef.current) {
           setRealtimeCandleData(prevData =>
             updateData(prevData, d, periodRef.current)
@@ -91,9 +90,6 @@ export function connectWS(priceInfo: CoinPriceObj) {
       .map(code => `"KRW-${code}"`)
       .join(',')
     filterRequest(`[{"ticket":"test"},{"type":"ticker","codes":[${markets}]}]`)
-    // filterRequest(
-    //   `[{"ticket":"test"},{"type":"ticker","codes":[${'KRW-BTC'}]}]`
-    // )
   }
   socket.onclose = function () {
     socket = undefined

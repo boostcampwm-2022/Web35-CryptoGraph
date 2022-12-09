@@ -7,7 +7,7 @@ import {
   DEFAULT_CANDLE_CHART_OPTION,
   DEFAULT_CANDLE_PERIOD
 } from '@/constants/ChartConstants'
-import { CandleChartOption, CandleData, ChartPeriod } from '@/types/ChartTypes'
+import { CandleChartOption, CandleData } from '@/types/ChartTypes'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { CandleChart } from '@/components/Candlechart'
@@ -25,14 +25,13 @@ export default function Detail({
   priceInfo
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const theme = useTheme()
-  const marketParsedInURL = useURL(market)
+  // const marketParsedInURL = useURL(market)
   const [candleChartOption, setCandleChartOption] = useState<CandleChartOption>(
     {
       ...DEFAULT_CANDLE_CHART_OPTION,
       marketType: market
     }
   )
-  // const [marketType, setMarketType] = useState<string>(market)
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
 
   // const [chartRenderOption, setRenderOption] = useState<ChartRenderOption>({
@@ -50,11 +49,8 @@ export default function Detail({
       return { ...prev, marketType: market }
     })
   }, [market])
-  // const [candlePeriod, setCandlePeriod] = useState<ChartPeriod>(
-  //   DEFAULT_CANDLE_PERIOD
-  // )
+
   const [realtimeCandleData, setRealtimeCandleData, realtimePriceInfo] =
-    // useRealTimeUpbitData(candlePeriod, marketType, candleData, priceInfo)
     useRealTimeUpbitData(candleChartOption, candleData, priceInfo)
   return (
     <HomeContainer>

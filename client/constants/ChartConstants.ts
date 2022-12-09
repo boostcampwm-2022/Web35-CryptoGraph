@@ -1,9 +1,4 @@
-import {
-  ChartPeriod,
-  CandleChartOption,
-  CandleChartRenderOption,
-  PointerData
-} from '@/types/ChartTypes'
+import { ChartPeriod, CandleChartOption, PointerData } from '@/types/ChartTypes'
 
 export const CHART_Y_AXIS_MARGIN = 70
 export const CHART_X_AXIS_MARGIN = 20
@@ -12,10 +7,6 @@ export const MAX_FETCH_CANDLE_COUNT = 200
 export const DEFAULT_RENDER_CANDLE_DOM_ELEMENT_COUNT = 200
 export const DEFAULT_MAX_CANDLE_DOM_ELEMENT_COUNT = 600
 export const DEFAULT_CANDLE_PERIOD: ChartPeriod = 'minutes/1'
-// export const DEFAULT_CANDLE_CHART_RENDER_OPTION: CandleChartRenderOption = {
-//   renderStartDataIndex: 0,
-//   renderCandleCount: DEFAULT_CANDLE_RENDER_COUNT
-// }
 export const DEFAULT_CANDLE_COUNT = 30
 export const DEFAULT_RENDER_START_INDEX = 0
 export const DEFAULT_CANDLE_CHART_OPTION: CandleChartOption = {
