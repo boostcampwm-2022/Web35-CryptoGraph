@@ -91,6 +91,9 @@ export function connectWS(priceInfo: CoinPriceObj) {
       .map(code => `"KRW-${code}"`)
       .join(',')
     filterRequest(`[{"ticket":"test"},{"type":"ticker","codes":[${markets}]}]`)
+    // filterRequest(
+    //   `[{"ticket":"test"},{"type":"ticker","codes":[${'KRW-BTC'}]}]`
+    // )
   }
   socket.onclose = function () {
     socket = undefined

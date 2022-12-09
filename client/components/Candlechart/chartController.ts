@@ -46,186 +46,7 @@ export function initCandleChart(
   )
 }
 
-export function translateCandleChart(
-  svgRef: React.RefObject<SVGSVGElement>,
-  translateX: number
-) {
-  const chartArea = d3.select(svgRef.current).select('svg#chart-area')
-  const $xAxis = d3.select(svgRef.current).select('g#x-axis')
-  chartArea.selectAll('g').attr('transform', `translate(${translateX})`)
-  if (!$xAxis.attr('transform')) {
-    return
-  }
-  $xAxis.attr(
-    'transform',
-    $xAxis.attr('transform').replace(/\(([0-9.\-]*),/, `(${translateX},`)
-  )
-  return
-}
-
-function translateByX(transformAttr: string, translateX: number) {
-  if (!transformAttr) {
-    return ''
-  }
-  const reg = /\(([0-9.\-]*),([0-9.\-]*)\)/
-  const matchedArr = transformAttr.match(reg)
-  if (matchedArr === null || !matchedArr[1] || !matchedArr[2]) {
-    return ''
-  }
-  const prevTranslateX = Number(matchedArr[1])
-  return `translate(${prevTranslateX + translateX},${matchedArr[2]})`
-}
-
-export function updateCandleChart(
-  svgRef: React.RefObject<SVGSVGElement>,
-  data: CandleData[],
-  option: CandleChartRenderOption,
-  pointerInfo: PointerPosition,
-  windowSize: WindowSize,
-  candlePeriod: ChartPeriod,
-  translateX: number
-) {
-  const chartContainerXsize = windowSize.width
-  const chartContainerYsize = windowSize.height
-  const chartAreaXsize = chartContainerXsize - CHART_Y_AXIS_MARGIN
-  const chartAreaYsize = chartContainerYsize - CHART_X_AXIS_MARGIN
-  const candleWidth = option.candleWidth
-  const chartContainer = d3.select(svgRef.current)
-  const chartArea = chartContainer.select('svg#chart-area')
-  const yAxisScale = getYAxisScale(
-    data.slice(
-      option.renderStartDataIndex,
-      option.renderStartDataIndex + option.renderCandleCount
-    ),
-    chartAreaYsize
-  )
-  if (!yAxisScale) {
-    return
-  }
-
-  const xAxisScale = getXAxisScale(option, data, chartAreaXsize, candlePeriod)
-  UpdateAxis(
-    chartContainer,
-    xAxisScale,
-    yAxisScale,
-    chartAreaXsize,
-    chartAreaYsize,
-    candleWidth,
-    translateX
-  ) // axis를 업데이트한다.
-
-  // 볼륨 스케일 함수, 추후 볼륨 추가시 해금예정
-  // const volumeHeightScale = getVolumeHeightScale(
-  //   data.slice(
-  //     option.renderStartDataIndex,
-  //     option.renderStartDataIndex + option.renderCandleCount
-  //   ),
-  //   chartAreaYsize
-  // )
-
-  // 현재 가격을 업데이트한다.
-  // updateCurrentPrice(yAxisScale, data, option, chartAreaXsize)
-
-  // 마우스따라움직이는 UI
-  // updatePointerUI(
-  //   pointerInfo,
-  //   yAxisScale,
-  //   option,
-  //   data,
-  //   chartAreaXsize,
-  //   chartAreaYsize
-  // )
-
-  chartArea
-    .selectAll<SVGSVGElement, CandleData>('g')
-    .data(
-      data.slice(
-        option.renderStartDataIndex,
-        option.renderStartDataIndex + option.renderCandleCount
-      )
-    )
-    .join(
-      enter => {
-        let $g = enter.append('g')
-        /*  $g.append('rect').classed('volumeRect', true)
-        $g = placeVolumeRect($g, chartAreaXsize, candleWidth, yAxisScale) */
-        // 거래량, 개발예정, 성능 문제로 보류
-        $g.append('line')
-        $g = placeCandleLine(
-          $g,
-          chartAreaXsize,
-          candleWidth,
-          yAxisScale,
-          xAxisScale
-        )
-        $g.append('rect').classed('candleRect', true)
-        $g = placeCandleRect(
-          $g,
-          chartAreaXsize,
-          candleWidth,
-          yAxisScale,
-          xAxisScale
-        )
-        return $g
-      },
-      update => {
-        update
-          .select('rect.candleRect')
-          .attr('width', candleWidth * 0.6)
-          .attr('height', d =>
-            Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price)) <=
-            0
-              ? 1
-              : Math.abs(
-                  yAxisScale(d.trade_price) - yAxisScale(d.opening_price)
-                )
-          )
-          .attr(
-            'x',
-            (d, i) =>
-              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth * 0.8
-          )
-          .attr('y', d =>
-            Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
-          )
-          .attr('fill', d =>
-            d.opening_price < d.trade_price
-              ? CANDLE_COLOR_RED
-              : CANDLE_COLOR_BLUE
-          )
-        update
-          .select('line')
-          .attr(
-            'x1',
-            (d, i) =>
-              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
-          )
-          .attr(
-            'x2',
-            (d, i) =>
-              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
-          )
-          .attr('y1', d => yAxisScale(d.low_price))
-          .attr('y2', d => yAxisScale(d.high_price))
-        // update
-        //   .select('rect.volumeRect')
-        //   .attr('width', candleWidth * 0.6)
-        //   .attr('height', 10)
-        //   .attr('height', d => d.candle_acc_trade_price)
-        //   .attr('x', (d, i) => chartAreaXsize - candleWidth * (i + 0.8))
-        //   .attr('y', 300)
-        //   .attr('fill', 'yellow')
-        //   .attr('opacity', 0.5)
-        // 거래량
-        return update
-      },
-      exit => {
-        exit.remove()
-      }
-    )
-}
-
-export function initCandleChartSVG(
+function initCandleChartSVG(
   svgRef: React.RefObject<SVGSVGElement>,
   windowSize: WindowSize
 ) {
@@ -340,6 +161,174 @@ export function addEventsToChart(
       )
     }
   )
+}
+
+// xAxis와 캔들유닛들 translate시키는 함수
+export function translateCandleChart(
+  svgRef: React.RefObject<SVGSVGElement>,
+  translateX: number
+) {
+  const chartArea = d3.select(svgRef.current).select('svg#chart-area')
+  const $xAxis = d3.select(svgRef.current).select('g#x-axis')
+  chartArea.selectAll('g').attr('transform', `translate(${translateX})`)
+  if (!$xAxis.attr('transform')) {
+    return
+  }
+  $xAxis.attr(
+    'transform',
+    $xAxis.attr('transform').replace(/\(([0-9.\-]*),/, `(${translateX},`)
+  )
+  return
+}
+
+// 차트에 표시되는 데이터가 변경됨으로써 다시 data join이 일어나는 함수
+export function updateCandleChart(
+  svgRef: React.RefObject<SVGSVGElement>,
+  data: CandleData[],
+  option: CandleChartRenderOption,
+  pointerInfo: PointerPosition,
+  windowSize: WindowSize,
+  candlePeriod: ChartPeriod,
+  translateX: number
+) {
+  const chartContainerXsize = windowSize.width
+  const chartContainerYsize = windowSize.height
+  const chartAreaXsize = chartContainerXsize - CHART_Y_AXIS_MARGIN
+  const chartAreaYsize = chartContainerYsize - CHART_X_AXIS_MARGIN
+  const candleWidth = option.candleWidth
+  const chartContainer = d3.select(svgRef.current)
+  const chartArea = chartContainer.select('svg#chart-area')
+  const yAxisScale = getYAxisScale(
+    data.slice(
+      option.renderStartDataIndex,
+      option.renderStartDataIndex + option.renderCandleCount
+    ),
+    chartAreaYsize
+  )
+  if (!yAxisScale) {
+    return
+  }
+
+  const xAxisScale = getXAxisScale(option, data, chartAreaXsize, candlePeriod)
+  UpdateAxis(
+    chartContainer,
+    xAxisScale,
+    yAxisScale,
+    chartAreaXsize,
+    chartAreaYsize,
+    candleWidth,
+    translateX
+  ) // axis를 업데이트한다.
+
+  // 볼륨 스케일 함수, 추후 볼륨 추가시 해금예정
+  // const volumeHeightScale = getVolumeHeightScale(
+  //   data.slice(
+  //     option.renderStartDataIndex,
+  //     option.renderStartDataIndex + option.renderCandleCount
+  //   ),
+  //   chartAreaYsize
+  // )
+
+  // 현재 가격을 업데이트한다.
+  updateCurrentPrice(yAxisScale, data, option, chartAreaXsize)
+
+  // 마우스따라움직이는 UI
+  // updatePointerUI(
+  //   pointerInfo,
+  //   yAxisScale,
+  //   option,
+  //   data,
+  //   chartAreaXsize,
+  //   chartAreaYsize
+  // )
+
+  chartArea
+    .selectAll<SVGSVGElement, CandleData>('g')
+    .data(
+      data.slice(
+        option.renderStartDataIndex,
+        option.renderStartDataIndex + option.renderCandleCount
+      )
+    )
+    .join(
+      enter => {
+        let $g = enter.append('g')
+        /*  $g.append('rect').classed('volumeRect', true)
+        $g = placeVolumeRect($g, chartAreaXsize, candleWidth, yAxisScale) */
+        // 거래량, 개발예정, 성능 문제로 보류
+        $g.append('line')
+        $g = placeCandleLine(
+          $g,
+          chartAreaXsize,
+          candleWidth,
+          yAxisScale,
+          xAxisScale
+        )
+        $g.append('rect').classed('candleRect', true)
+        $g = placeCandleRect(
+          $g,
+          chartAreaXsize,
+          candleWidth,
+          yAxisScale,
+          xAxisScale
+        )
+        return $g
+      },
+      update => {
+        update
+          .select('rect.candleRect')
+          .attr('width', candleWidth * 0.6)
+          .attr('height', d =>
+            Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price)) <=
+            0
+              ? 1
+              : Math.abs(
+                  yAxisScale(d.trade_price) - yAxisScale(d.opening_price)
+                )
+          )
+          .attr(
+            'x',
+            (d, i) =>
+              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth * 0.8
+          )
+          .attr('y', d =>
+            Math.min(yAxisScale(d.trade_price), yAxisScale(d.opening_price))
+          )
+          .attr('fill', d =>
+            d.opening_price < d.trade_price
+              ? CANDLE_COLOR_RED
+              : CANDLE_COLOR_BLUE
+          )
+        update
+          .select('line')
+          .attr(
+            'x1',
+            (d, i) =>
+              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
+          )
+          .attr(
+            'x2',
+            (d, i) =>
+              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
+          )
+          .attr('y1', d => yAxisScale(d.low_price))
+          .attr('y2', d => yAxisScale(d.high_price))
+        // update
+        //   .select('rect.volumeRect')
+        //   .attr('width', candleWidth * 0.6)
+        //   .attr('height', 10)
+        //   .attr('height', d => d.candle_acc_trade_price)
+        //   .attr('x', (d, i) => chartAreaXsize - candleWidth * (i + 0.8))
+        //   .attr('y', 300)
+        //   .attr('fill', 'yellow')
+        //   .attr('opacity', 0.5)
+        // 거래량
+        return update
+      },
+      exit => {
+        exit.remove()
+      }
+    )
 }
 
 function UpdateAxis(

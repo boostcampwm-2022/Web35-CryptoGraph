@@ -53,6 +53,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   //   })
   // }, [props.marketType])
 
+  // 차트 초기화 차트 구성요소 크기지정 및 렌더링 옵션 지정(창의 크기에 맞추어 변경)
   useEffect(() => {
     initCandleChart(
       chartSvg,
@@ -66,6 +67,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
     })
   }, [windowSize])
 
+  // translateX의 변경에 따라 기존의 문서요소들을 이동만 시킨다.
   useEffect(() => {
     // const candleWidth = Math.ceil(windowSize.width / option.renderCandleCount)
     if (translateX < 0) {
@@ -99,27 +101,43 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
     translateCandleChart(chartSvg, translateX)
   }, [translateX, windowSize, option])
 
+  // 문서요소들을 다시 join해야할때
+  // 더 최적화하려면 소켓을 통해 들어오는 0번 데이터 처리하기
   useEffect(() => {
-    if (isFetching.current) {
-      return
-    }
     const needFetch = checkNeedFetch(props.candleData, option)
     if (needFetch) {
-      isFetching.current = true
-      getCandleDataArray(
-        props.chartOption.candlePeriod,
-        props.chartOption.marketType,
-        MAX_FETCH_CANDLE_COUNT,
-        props.candleData[props.candleData.length - 1].timestamp
-      ).then(res => {
-        //fetch완료된 newData를 기존 data와 병합
-        if (res === null) {
-          console.error('코인 쿼리 실패, 404에러')
-          return
-        }
-        isFetching.current = false
-        props.candleDataSetter(prev => [...prev, ...res])
-      })
+      // console.log('fetching at ', props.candleData.length, isFetching.current)
+      if (!isFetching.current) {
+        isFetching.current = true
+        getCandleDataArray(
+          props.chartOption.candlePeriod,
+          props.chartOption.marketType,
+          MAX_FETCH_CANDLE_COUNT,
+          props.candleData[props.candleData.length - 1].timestamp
+        ).then(res => {
+          //fetch완료된 newData를 기존 data와 병합
+          if (res === null) {
+            console.error('코인 쿼리 실패, 404에러')
+            return
+          }
+          // console.log(
+          //   props.candleData[props.candleData.length - 1].candle_date_time_kst
+          // )
+          // console.log(res[0].candle_date_time_kst)
+          isFetching.current = false
+          props.candleDataSetter(prev => {
+            const lastDate = new Date(
+              prev[prev.length - 1].candle_date_time_kst
+            )
+            const newDate = new Date(res[0].candle_date_time_kst)
+            // console.log(lastDate, newDate)
+            if (newDate <= lastDate) {
+              return [...prev, ...res]
+            }
+            return [...prev]
+          })
+        })
+      }
       return
     }
     updateCandleChart(
