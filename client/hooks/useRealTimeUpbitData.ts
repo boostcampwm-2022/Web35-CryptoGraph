@@ -21,11 +21,15 @@ export const useRealTimeUpbitData = (
   const [realtimePriceInfo, setRealtimePriceInfo] =
     useState<CoinPriceObj>(priceInfo)
   const isInitialMount = useRef(true)
-  const marketRef = useRef(market)
-  const periodRef = useRef(period)
 
   useEffect(() => {
     connectWS(priceInfo)
+    return () => {
+      closeWS()
+    }
+  }, [])
+
+  useEffect(() => {
     if (!socket) {
       console.error('분봉 설정 관련 error')
       return
@@ -37,23 +41,15 @@ export const useRealTimeUpbitData = (
       const d = JSON.parse(str_d)
       if (d.type == 'ticker') {
         const code = d.code.split('-')[1]
-        // console.log(marketRef.current, periodRef.current)
-        if (code === marketRef.current) {
-          setRealtimeCandleData(prevData =>
-            updateData(prevData, d, periodRef.current)
-          )
+        console.log(market, period)
+        if (code === market) {
+          setRealtimeCandleData(prevData => updateData(prevData, d, period))
         }
         setRealtimePriceInfo(prev => updateRealTimePrice(prev, d, code))
       }
     }
-    return () => {
-      closeWS()
-    }
-  }, [])
-
-  useEffect(() => {
-    marketRef.current = market
-    periodRef.current = period
+    // marketRef.current = market
+    // periodRef.current = period
     const fetchData = async () => {
       const fetched: CandleData[] | null = await getCandleDataArray(
         period,
