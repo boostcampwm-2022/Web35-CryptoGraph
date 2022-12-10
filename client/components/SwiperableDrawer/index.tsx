@@ -48,8 +48,14 @@ export default function SwipeableTemporaryDrawer({
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
       >
-        <Box sx={{ minHeight: '30vh', maxHeight: '50vh' }}>{children}</Box>
+        <Box sx={style}>{children}</Box>
       </SwipeableDrawer>
     </div>
   )
+}
+
+const style = {
+  height: '400px',
+  maxHeight: '80vh', //400px보다 화면 높이가 작을경우, 최대 값 정의, 100vh면 drawer를 나갈 수 없다.. 적당히 80vh 설정
+  width: '100%'
 }

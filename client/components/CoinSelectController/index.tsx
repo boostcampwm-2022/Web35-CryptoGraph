@@ -10,7 +10,7 @@ import { TabProps } from '@mui/material'
 interface CoinChecked {
   [key: string]: boolean
 }
-interface CoinSelectControllerProps extends TabProps {
+interface CoinSelectControllerProps {
   selectedCoinList: string[]
   selectedCoinListSetter: React.Dispatch<React.SetStateAction<string[]>>
   tabLabelInfo?: string

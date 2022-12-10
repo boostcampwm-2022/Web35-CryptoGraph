@@ -60,9 +60,7 @@ const Container = styled('div')`
   flex-direction: column;
   width: 100%;
   box-sizing: border-box;
-  padding: 8px;
-  border: 1px solid #cac4d0;
-  border-radius: 20px;
+  padding: 16px;
   font-size: 12px;
 `
 

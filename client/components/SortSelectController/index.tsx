@@ -7,7 +7,7 @@ import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { TabProps } from '@/components/TabContainer'
 
-interface SortSelectControllerProps extends TabProps {
+interface SortSelectControllerProps {
   selectedSort: string
   selectedSortSetter: React.Dispatch<React.SetStateAction<string>>
   selectedChart: string

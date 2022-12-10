@@ -19,6 +19,7 @@ import { useRealTimeCoinListData } from '@/hooks/useRealTimeCoinListData'
 import { NoSelectedCoinAlertView } from '@/components/NoSelectedCoinAlertView'
 import MuiModal from '@/components/Modal'
 import LinkButton from '@/components/LinkButton'
+import TabBox from '@/components/TabBox'
 interface getDataProps {
   data: MarketCapInfo[]
   Market?: string[] //선택된 코인 리스트
@@ -51,7 +52,7 @@ export default function Home({
       ? (() => {
           setIsDrawerOpened(true)
           setSelectedMarket(market)
-          setSelectedTab(3)
+          setSelectedTab(2) //코인 상세 정보가 3번째 탭에 위치에 있기 때문에 발생하는 매직 넘버
         })()
       : (() => {
           setIsModalOpened(true)
@@ -72,32 +73,33 @@ export default function Home({
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
             >
-              <ChartSelectController
-                selected={selectedChart}
-                selectedSetter={setSelectedChart}
-                tabLabelInfo={'차트 선택'}
-              />
-              <SortSelectController
-                selectedSort={selectedSort}
-                selectedSortSetter={setSelectedSort}
-                selectedChart={selectedChart}
-                tabLabelInfo={'정렬 기준'}
-              />
-              <CoinSelectController
-                selectedCoinList={selectedMarketList}
-                selectedCoinListSetter={setSelectedMarketList}
-                tabLabelInfo={'코인 선택'}
-              />
-              <Box>
-                <CoinDetailedInfo
-                  market={selectedMarket}
-                  tabLabelInfo={'상세 정보'}
-                ></CoinDetailedInfo>
+              <TabBox tabLabelInfo={'차트 설정'}>
+                <Box sx={{ p: '32px' }}>
+                  <ChartSelectController
+                    selected={selectedChart}
+                    selectedSetter={setSelectedChart}
+                  />
+                  <SortSelectController
+                    selectedSort={selectedSort}
+                    selectedSortSetter={setSelectedSort}
+                    selectedChart={selectedChart}
+                  />
+                </Box>
+              </TabBox>
+              <TabBox tabLabelInfo={'코인 선택'}>
+                <CoinSelectController
+                  selectedCoinList={selectedMarketList}
+                  selectedCoinListSetter={setSelectedMarketList}
+                />
+              </TabBox>
+              <TabBox tabLabelInfo={'상세 정보'}>
+                <CoinDetailedInfo market={selectedMarket}></CoinDetailedInfo>
                 <LinkButton
                   goto={`detail/${selectedMarket}`}
                   content={`${selectedMarket}(으)로 바로가기`}
+                  style={{ position: 'absolute', bottom: 0 }}
                 />
-              </Box>
+              </TabBox>
             </TabContainer>
           </SwipeableTemporaryDrawer>
         </Box>
