@@ -53,6 +53,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       windowSize
     )
     setOption(prev => getRenderOptionByWindow(windowSize.width, prev))
+    setPointerInfo(DEFAULT_POINTER_DATA)
   }, [windowSize])
 
   // period혹은 market이 변경되면 모든 렌더옵션 초기화
