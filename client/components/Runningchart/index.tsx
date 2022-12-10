@@ -73,7 +73,7 @@ const updateChart = (
     }
   })()
 
-  if (!max) {
+  if (max === undefined) {
     console.error('정상적인 등락률 데이터가 아닙니다.')
     return
   }
