@@ -38,6 +38,7 @@ export default function Home({
   const coinData = useRealTimeCoinListData(data)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
+
   useEffect(() => {
     if (selectedChart === 'RunningChart') {
       setSelectedSort('descending')
@@ -45,6 +46,7 @@ export default function Home({
       setSelectedSort('change rate')
     }
   }, [selectedChart])
+
   const chartNodeHandler = (market: string) => {
     isMobile
       ? (() => {

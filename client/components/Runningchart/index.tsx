@@ -265,9 +265,11 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
   const chartSvg = React.useRef(null)
   const { width, height } = useWindowSize(chartContainerRef)
-  const [changeRate, setchangeRate] = React.useState<CoinRateType>(data) //선택된 코인 값만 보유
+  const [coinRate, setCoinRate] = React.useState<CoinRateType>(data) //coin의 등락률 값, 모든 코인 값 보유
+  const [changeRate, setchangeRate] = React.useState<CoinRateType>({}) //선택된 코인 값만 보유
 
   React.useEffect(() => {
+    if (!Object.keys(changeRate).length) return
     updateChart(
       durationPeriod,
       chartSvg,
@@ -289,13 +291,13 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   ]) // 창크기에 따른 차트크기 조절
 
   React.useEffect(() => {
-    if (!data || !Market[0]) return
+    if (!coinRate || !Market[0]) return
     const newCoinData: CoinRateType = {}
     for (const tick of Market) {
-      newCoinData['KRW-' + tick] = data['KRW-' + tick]
+      newCoinData['KRW-' + tick] = coinRate['KRW-' + tick]
     }
     setchangeRate(newCoinData)
-  }, [data, Market])
+  }, [data, Market, coinRate])
 
   return (
     <div
