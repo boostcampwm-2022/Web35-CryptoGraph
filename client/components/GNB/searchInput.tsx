@@ -7,13 +7,15 @@ import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { useRouter } from 'next/router'
 import { matchNameKRwithENG, validateInputName } from '@/utils/inputBarManager'
+import { useMediaQuery } from '@mui/material'
+import theme from '@/styles/theme'
 export default function SearchInput() {
   /* -------------주의------------- */
   // CoinNames의 fetch는 api_server를 이용했습니다.
   // express서버를 키고 작동해야 제대로 받아올 수 있습니다.
   const [CoinNames, setCoinNames] = React.useState<MarketCapInfo[]>([])
-  const router = useRouter()
   const inputRef = React.useRef<HTMLInputElement>()
+  const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
   React.useEffect(() => {
     async function asyncGetCoinName() {
       const data: MarketCapInfo[] | null = await getMarketCapInfo()
@@ -37,7 +39,10 @@ export default function SearchInput() {
     }
   }
   return (
-    <Stack spacing={2} sx={{ width: 400 }}>
+    <Stack
+      spacing={2}
+      sx={isMobile ? { width: 400 } : { paddingLeft: '68px', width: 400 }}
+    >
       <Autocomplete
         freeSolo
         id="free-solo-2-demo"

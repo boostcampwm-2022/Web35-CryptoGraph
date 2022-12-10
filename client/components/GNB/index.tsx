@@ -51,7 +51,13 @@ export default function GNB() {
           </Link>
         ) : (
           <Link href="/">
-            <Image src="/logo-white.svg" alt="" width={200} height={48} />
+            <Image
+              style={{ margin: '0px 16px 0px 32px' }}
+              src="/logo-white.svg"
+              alt=""
+              width={200}
+              height={48}
+            />
           </Link>
         )}
         <SearchInput />
