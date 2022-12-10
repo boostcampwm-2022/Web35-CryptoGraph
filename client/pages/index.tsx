@@ -6,9 +6,6 @@ import TreeChart from '@/components/Treechart'
 import { RunningChart } from '@/components/Runningchart'
 import { ChartType } from '@/types/ChartTypes'
 import ChartSelectController from '@/components/ChartSelectController'
-import { MarketCapInfo } from '@/types/CoinDataTypes'
-import { getMarketCapInfo } from '@/utils/metaDataManages'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import SortSelectController from '@/components/SortSelectController'
 
 import { useMediaQuery } from '@mui/material'
@@ -17,11 +14,6 @@ import TabContainer from '@/components/TabContainer'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
 import { useRealTimeCoinListData } from '@/hooks/useRealTimeCoinListData'
 import { MyAppContext } from './_app'
-
-interface getDataProps {
-  data: MarketCapInfo[]
-  Market?: string[] //선택된 코인 리스트
-}
 
 export default function Home() {
   const data = useContext(MyAppContext)
@@ -59,9 +51,7 @@ export default function Home() {
                 tabLabelInfo={'정렬 기준'}
               />
               <CoinSelectController
-                selectedCoinList={selectedMarket}
                 selectedCoinListSetter={setSelectedMarket}
-                data={data}
                 tabLabelInfo={'코인 선택'}
               />
               <CoinDetailedInfo
@@ -83,11 +73,7 @@ export default function Home() {
             selectedChart={selectedChart}
           />
           <Box sx={{ width: '100%', height: '60%' }}>
-            <CoinSelectController
-              selectedCoinList={selectedMarket}
-              selectedCoinListSetter={setSelectedMarket}
-              data={data}
-            />
+            <CoinSelectController selectedCoinListSetter={setSelectedMarket} />
           </Box>
           <Box sx={{ width: '100%', height: '30%' }}>
             <CoinDetailedInfo market="btc"></CoinDetailedInfo>
@@ -118,18 +104,6 @@ export default function Home() {
     </HomeContainer>
   )
 }
-
-// // 솔직히 서버사이드 프롭스 없애는게 낫지 않나 싶음..
-// export const getServerSideProps: GetServerSideProps<
-//   getDataProps
-// > = async () => {
-//   const fetchedData: MarketCapInfo[] | null = await getMarketCapInfo()
-//   return {
-//     props: {
-//       data: fetchedData === null ? [] : fetchedData
-//     }
-//   }
-// }
 
 const HomeContainer = styled('div')`
   display: flex;

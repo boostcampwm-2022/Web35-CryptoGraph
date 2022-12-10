@@ -3,28 +3,28 @@ import TextField from '@mui/material/TextField'
 import SearchIcon from '@mui/icons-material/Search'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { debounce } from 'lodash'
+import { useContext } from 'react'
+import { MyAppContext } from '../../pages/_app'
 
 interface SearchCoinProps {
-  coinNames: MarketCapInfo[]
   inputCoinName: string
   setInputCoinNameSetter: React.Dispatch<React.SetStateAction<string>>
 }
 
 export default function SearchCoin({
-  coinNames,
   inputCoinName,
   setInputCoinNameSetter
 }: SearchCoinProps) {
-  //실시간으로 밑에 코인이 변하면서 보이기 vs 엔터 후 보이기
+  const data = useContext(MyAppContext)
   return (
     <Autocomplete
       freeSolo
       disableClearable
       options={
-        coinNames.length
+        data.length
           ? [
-              ...coinNames.map((coin: MarketCapInfo) => coin.name),
-              ...coinNames.map((coin: MarketCapInfo) => coin.name_kr)
+              ...data.map((coin: MarketCapInfo) => coin.name),
+              ...data.map((coin: MarketCapInfo) => coin.name_kr)
             ]
           : [] //CoinName 검증을 위한 삼항연산자 만일 fetch 되지않았으면 껍데기만 보이게 함
       }

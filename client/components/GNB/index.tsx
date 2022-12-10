@@ -2,13 +2,11 @@ import Image from 'next/image'
 import { styled } from '@mui/material/styles'
 import { Container, useMediaQuery, useTheme } from '@mui/material'
 import SearchInput from './searchInput'
-import { MarketCapInfo } from '@/types/CoinDataTypes'
+import { MyAppContext } from '../../pages/_app'
+import { useContext } from 'react'
 
-interface GNBProps {
-  data: MarketCapInfo[]
-}
-
-export default function GNB({ data }: GNBProps) {
+export default function GNB() {
+  const data = useContext(MyAppContext)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
   return (
@@ -26,7 +24,7 @@ export default function GNB({ data }: GNBProps) {
         ) : (
           <Image src="/logo-white.svg" alt="" width={200} height={48} />
         )}
-        <SearchInput data={data} />
+        <SearchInput />
       </Container>
     </GNBContainer>
   )

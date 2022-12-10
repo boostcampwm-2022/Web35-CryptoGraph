@@ -6,17 +6,11 @@ import SearchIcon from '@mui/icons-material/Search'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 //import { useRouter } from 'next/router'
 import { matchNameKRwithENG, validateInputName } from '@/utils/inputBarManager'
+import { MyAppContext } from '../../pages/_app'
 
-interface SearchInputProps {
-  data: MarketCapInfo[]
-}
-
-export default function SearchInput({ data }: SearchInputProps) {
-  /* -------------주의------------- */
-  // CoinNames의 fetch는 api_server를 이용했습니다.
-  // express서버를 키고 작동해야 제대로 받아올 수 있습니다.
-  const [coins, setCoins] = React.useState<MarketCapInfo[]>(data)
+export default function SearchInput() {
   //const router = useRouter()
+  const data = React.useContext(MyAppContext)
   return (
     <Stack spacing={2} sx={{ width: 300 }}>
       <Autocomplete
@@ -24,10 +18,10 @@ export default function SearchInput({ data }: SearchInputProps) {
         id="free-solo-2-demo"
         disableClearable
         options={
-          coins
+          data
             ? [
-                ...coins.map((coin: MarketCapInfo) => coin.name),
-                ...coins.map((coin: MarketCapInfo) => coin.name_kr)
+                ...data.map((coin: MarketCapInfo) => coin.name),
+                ...data.map((coin: MarketCapInfo) => coin.name_kr)
               ]
             : [] //coinNames 검증을 위한 삼항연산자 만일 fetch 되지않았으면 껍데기만 보이게 함
         }
@@ -55,8 +49,8 @@ export default function SearchInput({ data }: SearchInputProps) {
           if (e.key === 'Enter') {
             //1.입력값이 db에 있는지 검증하는 로직
             //2.로직을 통과하면 해당 값으로 리다이렉트
-            if (validateInputName(coins, inputCoinName)) {
-              const engCoinName = matchNameKRwithENG(coins, inputCoinName)
+            if (validateInputName(data, inputCoinName)) {
+              const engCoinName = matchNameKRwithENG(data, inputCoinName)
               //생각해볼점   router.push(`/detail/${engCoinName}`)
               window.location.href = `/detail/${engCoinName}`
             }

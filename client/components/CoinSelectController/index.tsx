@@ -7,6 +7,7 @@ import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { TabProps } from '@mui/material'
 import SearchCoin from './searchCoin'
 import MakeCoinDict from './MakeCoinDict'
+import { MyAppContext } from '../../pages/_app'
 
 interface dict<T> {
   [key: string]: T
@@ -16,17 +17,14 @@ interface CoinChecked {
   [key: string]: boolean
 }
 interface CoinSelectControllerProps extends TabProps {
-  selectedCoinList: string[]
   selectedCoinListSetter: React.Dispatch<React.SetStateAction<string[]>>
-  data: MarketCapInfo[]
   tabLabelInfo?: string
 }
 
 export default function CoinSelectController({
-  selectedCoinList,
-  selectedCoinListSetter,
-  data
+  selectedCoinListSetter
 }: CoinSelectControllerProps) {
+  const data = React.useContext(MyAppContext)
   const [coinList, setCoinList] = useState<MarketCapInfo[] | null>([])
   const [checked, setChecked] = useState<CoinChecked>({
     all: true
@@ -103,7 +101,6 @@ export default function CoinSelectController({
         </HeaderSelectCoin>
         <HeaderSearchCoin>
           <SearchCoin
-            coinNames={data}
             inputCoinName={inputCoinName}
             setInputCoinNameSetter={setInputCoinName}
           />

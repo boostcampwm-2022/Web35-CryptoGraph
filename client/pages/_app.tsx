@@ -34,7 +34,7 @@ export default function MyApp(props: MyAppProps) {
         <CssBaseline />
         <Global styles={GlobalStyle} />
         <MyAppContext.Provider value={data}>
-          <GNB data={data} />
+          <GNB />
           <ContainerHeightLimiter>
             <Container
               disableGutters
