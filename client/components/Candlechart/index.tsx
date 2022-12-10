@@ -117,6 +117,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
         ref={chartContainerRef}
         style={{
           display: 'flex',
+          background: '#ffffff',
           width: '100%',
           height: '100%'
         }}

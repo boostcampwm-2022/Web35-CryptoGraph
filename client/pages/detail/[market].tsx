@@ -178,6 +178,7 @@ const InfoContainer = styled(Box)`
   width: 400px;
   min-width: 400px;
   height: 100%;
+  margin-left: 8px;
   ${props => props.theme.breakpoints.down('tablet')} {
     height: auto;
     margin: 0;

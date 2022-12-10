@@ -30,6 +30,9 @@ const theme = createTheme({
     error: {
       main: red.A400
     },
+    background: {
+      default: '#eee6e6'
+    },
     custom: {
       red: '#D24F45',
       blue: '#1D61C4'

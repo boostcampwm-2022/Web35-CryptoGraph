@@ -93,8 +93,6 @@ const Container = styled('div')`
   overflow-y: auto;
   padding: 8px;
   background-color: #ffffff;
-  border: 1px solid #cac4d0;
-  border-radius: 20px;
   ${props => props.theme.breakpoints.down('tablet')} {
     height: 100%;
   }

@@ -278,7 +278,12 @@ export default function TreeChart({
 
   return (
     <div
-      style={{ display: 'flex', width: '100%', height: '100%' }}
+      style={{
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        background: '#ffffff'
+      }}
       ref={chartContainerSvg}
     >
       <svg id="tree-chart" ref={chartSvg}>

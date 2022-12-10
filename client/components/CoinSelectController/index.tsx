@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
-import { TabProps } from '@mui/material'
 
 interface CoinChecked {
   [key: string]: boolean
@@ -67,7 +66,7 @@ export default function CoinSelectController({
   return (
     <Container>
       <Header>
-        <HeaderTitle>코인선택</HeaderTitle>
+        <HeaderTitle>코인 선택</HeaderTitle>
         <HeaderSelectBox>
           <HeaderSelectBoxContent>전부 [선택/해제]</HeaderSelectBoxContent>
           <Checkbox checked={checked.all} onChange={coinCheckAll} name="all" />
@@ -97,9 +96,11 @@ export default function CoinSelectController({
 
 const Container = styled('div')`
   display: flex;
+  background-color: '#ffffff';
   flex-direction: column;
   width: 100%;
   height: 100%;
+  margin-bottom: 100px;
 `
 const Header = styled('div')`
   display: flex;

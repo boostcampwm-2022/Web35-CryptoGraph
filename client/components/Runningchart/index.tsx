@@ -302,7 +302,8 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       style={{
         display: 'flex',
         width: '100%',
-        height: '98%',
+        background: '#ffffff',
+        height: '100%',
         overflow: 'auto'
       }}
     >

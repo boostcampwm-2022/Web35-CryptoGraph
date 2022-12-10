@@ -40,7 +40,12 @@ export default function MyApp(props: MyAppProps) {
           <Container
             disableGutters
             maxWidth="max"
-            sx={{ display: 'flex', width: '100%', height: '100%' }}
+            sx={{
+              display: 'flex',
+              width: '100%',
+              height: '100%',
+              padding: '8px'
+            }}
           >
             <Component {...pageProps} />
           </Container>
@@ -52,14 +57,15 @@ export default function MyApp(props: MyAppProps) {
 
 const ContainerHeightLimiter = styled('div')`
   display: flex;
+
   width: 100%;
   height: 100%;
-  min-height: 500px;
+  overflow-y: auto;
   ${props => props.theme.breakpoints.down('tablet')} {
-    padding-top: calc(64px + 8px);
+    padding-top: calc(64px);
   }
   ${props => props.theme.breakpoints.up('tablet')} {
-    padding-top: calc(96px + 8px);
+    padding-top: calc(96px);
     //매직 넘버 상수화 필요
   }
 `

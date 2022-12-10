@@ -104,7 +104,7 @@ export default function Home({
           </SwipeableTemporaryDrawer>
         </Box>
       ) : (
-        <SideBarContainer>
+        <SideBarContainer sx={{ backgroundColor: '#ffffff' }}>
           <ChartSelectController
             selected={selectedChart}
             selectedSetter={setSelectedChart}
@@ -186,11 +186,14 @@ const SideBarContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding: 0 1rem;
+  background-color: '#ffffff';
   align-items: center;
   min-width: 330px;
   max-width: 330px;
   height: 100%;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  margin-top: 8px;
   ${props => props.theme.breakpoints.down('tablet')} {
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
     height: 100px;
@@ -198,6 +201,7 @@ const SideBarContainer = styled(Box)`
 `
 const ChartContainer = styled(Box)`
   display: flex;
+  background: '#ffffff';
   box-sizing: content-box; //얘가 차트 크기를 고정해준다. 이유는 아직 모르겠다..
   min-width: 300px;
   width: 100%;

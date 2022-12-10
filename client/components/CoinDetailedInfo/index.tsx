@@ -61,6 +61,7 @@ const Container = styled('div')`
   width: 100%;
   box-sizing: border-box;
   padding: 16px;
+  background-color: #ffffff;
   font-size: 12px;
 `
 
@@ -70,7 +71,7 @@ const Header = styled('div')`
 `
 const HeaderContent = styled('div')`
   display: flex;
-  margin-left: 10px;
+  margin-left: 8px;
   font-size: 15px;
   flex-direction: column;
   justify-content: center;
