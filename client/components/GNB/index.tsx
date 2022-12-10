@@ -2,6 +2,8 @@ import Image from 'next/image'
 import { styled } from '@mui/material/styles'
 import { Container, useMediaQuery, useTheme } from '@mui/material'
 import SearchInput from './searchInput'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 const GNBContainer = styled('div')`
   position: fixed;
@@ -27,6 +29,7 @@ const GNBContainer = styled('div')`
 export default function GNB() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
+  const router = useRouter()
   return (
     <GNBContainer>
       <Container
@@ -34,13 +37,26 @@ export default function GNB() {
         id="GNBcontainer"
         sx={{
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
+          paddingLeft: '16px'
         }}
       >
         {isMobile ? (
-          <Image src="/logo-only-white.svg" alt="" width={40} height={40} />
+          //Router.push / Router.replace / Link태그 사용시 메인페이지->메인페이지 새로고침 불가능 => reload로 해결
+          //ex)코인선택 기능을 여러번 사용하고 트리맵화면에서 logo아이콘 클릭시 다시 기본세팅 (코인세팅 전부 , 러닝차트 descending) 되지않음
+          <Link href="/" onClick={() => router.reload()}>
+            <Image
+              style={{ paddingRight: '16px' }}
+              src="/logo-only-white.svg"
+              alt=""
+              width={40}
+              height={40}
+            />
+          </Link>
         ) : (
-          <Image src="/logo-white.svg" alt="" width={200} height={48} />
+          <Link href="/" onClick={() => router.reload()}>
+            <Image src="/logo-white.svg" alt="" width={200} height={48} />
+          </Link>
         )}
         <SearchInput />
       </Container>
