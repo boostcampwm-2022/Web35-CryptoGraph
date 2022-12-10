@@ -127,7 +127,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
             if (newDate <= lastDate) {
               return [...prev, ...res]
             }
-            return [...prev, ...res]
+            return [...prev]
           })
         })
       }
