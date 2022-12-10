@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { TabProps } from '@mui/material'
-import SearchCoin from './searchCoin'
+import SearchCoin from './SearchCoin'
 import MakeCoinDict from './MakeCoinDict'
 import { MyAppContext } from '../../pages/_app'
 
