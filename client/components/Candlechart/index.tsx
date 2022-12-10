@@ -7,7 +7,8 @@ import {
 } from '@/types/ChartTypes'
 import {
   checkNeedFetch,
-  getRenderOption,
+  getInitRenderOption,
+  getRenderOptionByWindow,
   updatePointerUI
 } from '@/utils/chartManager'
 import {
@@ -34,7 +35,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const windowSize = useWindowSize(chartContainerRef)
   // 렌더링에 관여하는 모든 속성들
   const [option, setOption] = useState<CandleChartRenderOption>(
-    getRenderOption(windowSize.width)
+    getInitRenderOption(windowSize.width)
   )
   // 캔들유닛들이 얼마나 translate되어있는지 분리
   const [translateX, setTranslateX] = useState<number>(0)
@@ -51,10 +52,12 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       setPointerInfo,
       windowSize
     )
+    setOption(prev => getRenderOptionByWindow(windowSize.width, prev))
   }, [windowSize])
 
+  // period혹은 market이 변경되면 모든 렌더옵션 초기화
   useEffect(() => {
-    setOption(getRenderOption(windowSize.width))
+    setOption(getInitRenderOption(windowSize.width))
   }, [props.chartOption])
 
   // translateX의 변경에 따라 기존의 문서요소들을 이동만 시킨다.

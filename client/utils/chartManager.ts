@@ -344,14 +344,29 @@ export function checkNeedFetch(
   )
 }
 
-export function getRenderOption(width: number): CandleChartRenderOption {
+export function getInitRenderOption(width: number) {
   const candleWidth = Math.ceil(width / DEFAULT_CANDLE_COUNT)
   return {
     candleWidth,
-    minCandleWidth: 4,
-    maxCandleWidth: 100,
+    minCandleWidth: Math.max(5, Math.ceil(width / 200)),
+    maxCandleWidth: Math.max(5, Math.ceil(width / 10)),
     renderStartDataIndex: DEFAULT_RENDER_START_INDEX,
     renderCandleCount: DEFAULT_CANDLE_COUNT
+  }
+}
+
+export function getRenderOptionByWindow(
+  width: number,
+  prev: CandleChartRenderOption
+): CandleChartRenderOption {
+  const renderCandleCount = Math.ceil(width / prev.candleWidth)
+  const minCandleWidth = Math.max(5, Math.ceil(width / 200))
+  const maxCandleWidth = Math.max(5, Math.ceil(width / 10))
+  return {
+    ...prev,
+    renderCandleCount,
+    minCandleWidth,
+    maxCandleWidth
   }
 }
 
