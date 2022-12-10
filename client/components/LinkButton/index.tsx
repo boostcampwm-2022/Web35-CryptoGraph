@@ -12,7 +12,7 @@ export default function Chartbutton({
   style = {}
 }: ChartButtonProps) {
   return (
-    <Link href={goto}>
+    <Link href={goto} style={{ textDecoration: 'none' }}>
       <Button
         style={{ width: '100%', ...style }}
         size="large"
