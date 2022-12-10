@@ -4,12 +4,10 @@ import Stack from '@mui/material/Stack'
 import Autocomplete from '@mui/material/Autocomplete'
 import SearchIcon from '@mui/icons-material/Search'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
-//import { useRouter } from 'next/router'
 import { matchNameKRwithENG, validateInputName } from '@/utils/inputBarManager'
 import { MyAppContext } from '../../pages/_app'
 
 export default function SearchInput() {
-  //const router = useRouter()
   const data = React.useContext(MyAppContext)
   return (
     <Stack spacing={2} sx={{ width: 300 }}>
@@ -51,7 +49,6 @@ export default function SearchInput() {
             //2.로직을 통과하면 해당 값으로 리다이렉트
             if (validateInputName(data, inputCoinName)) {
               const engCoinName = matchNameKRwithENG(data, inputCoinName)
-              //생각해볼점   router.push(`/detail/${engCoinName}`)
               window.location.href = `/detail/${engCoinName}`
             }
           }

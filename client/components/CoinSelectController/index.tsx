@@ -25,7 +25,7 @@ export default function CoinSelectController({
   selectedCoinListSetter
 }: CoinSelectControllerProps) {
   const data = React.useContext(MyAppContext)
-  const [coinList, setCoinList] = useState<MarketCapInfo[] | null>([])
+  const [coinList, setCoinList] = useState<MarketCapInfo[] | null>(data)
   const [checked, setChecked] = useState<CoinChecked>({
     all: true
   })
@@ -33,9 +33,6 @@ export default function CoinSelectController({
   const [coinDict, setCoinDict] = useState<dict<Array<string>>>(
     MakeCoinDict(data)
   )
-  useEffect(() => {
-    setCoinList(data)
-  }, [])
 
   useEffect(() => {
     if (coinList == null) return
@@ -100,10 +97,7 @@ export default function CoinSelectController({
           </HeaderSelectBox>
         </HeaderSelectCoin>
         <HeaderSearchCoin>
-          <SearchCoin
-            inputCoinName={inputCoinName}
-            setInputCoinNameSetter={setInputCoinName}
-          />
+          <SearchCoin setInputCoinNameSetter={setInputCoinName} />
         </HeaderSearchCoin>
       </Header>
       <Body>

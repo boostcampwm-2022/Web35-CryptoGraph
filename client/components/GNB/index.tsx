@@ -1,12 +1,9 @@
 import Image from 'next/image'
 import { styled } from '@mui/material/styles'
 import { Container, useMediaQuery, useTheme } from '@mui/material'
-import SearchInput from './searchInput'
-import { MyAppContext } from '../../pages/_app'
-import { useContext } from 'react'
+import SearchInput from './SearchInput'
 
 export default function GNB() {
-  const data = useContext(MyAppContext)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
   return (

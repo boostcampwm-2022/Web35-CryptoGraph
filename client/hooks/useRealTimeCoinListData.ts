@@ -1,4 +1,4 @@
-import { updateTreeData } from '@/components/Treechart/getCoinData'
+import { UpdateTreeData } from '@/components/Treechart/GetCoinData'
 import { CoinRateContentType, CoinRateType } from '@/types/ChartTypes'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { useState } from 'react'
@@ -33,7 +33,7 @@ export function useRealTimeCoinListData(data: MarketCapInfo[]) {
 
   useInterval(() => {
     async function update() {
-      const updatedCoinRate = await updateTreeData(coinData)
+      const updatedCoinRate = await UpdateTreeData(coinData)
       setCoinData(updatedCoinRate)
     }
     update()
