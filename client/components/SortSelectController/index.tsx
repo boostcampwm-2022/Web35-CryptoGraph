@@ -13,6 +13,10 @@ interface SortSelectControllerProps extends TabProps {
   selectedChart: string
 }
 
+type sortType = {
+  [value: string]: string
+}
+
 export default function SortSelectController({
   selectedSort,
   selectedSortSetter,
@@ -34,6 +38,15 @@ export default function SortSelectController({
     'market capitalization',
     'trade price'
   ]
+  const sortType: sortType = {
+    'change rate': '등락률',
+    'change rate(absolute)': '등락률(절대값)',
+    'market capitalization': '시가총액',
+    'trade price': '거래량',
+    ascending: '오름차순',
+    descending: '내림차순',
+    absolute: '절대값'
+  }
   return (
     <SortSelectorContainer>
       <Box sx={{ minWidth: 300 }}>
@@ -44,14 +57,14 @@ export default function SortSelectController({
               ? runningSortTypeArr.map(value => {
                   return (
                     <MenuItem key={value} value={value}>
-                      {value}
+                      {sortType[value]}
                     </MenuItem>
                   )
                 })
               : treeSortTypeArr.map(value => {
                   return (
                     <MenuItem key={value} value={value}>
-                      {value}
+                      {sortType[value]}
                     </MenuItem>
                   )
                 })}
