@@ -13,6 +13,7 @@ const getInitData = (data: MarketCapInfo[]): CoinRateType => {
       name: '',
       ticker: '',
       parent: '',
+      acc_trade_price_24h: 0,
       market_cap: 0,
       cmc_rank: 0,
       value: 0
@@ -20,6 +21,7 @@ const getInitData = (data: MarketCapInfo[]): CoinRateType => {
     coinContent.name = coinData.name_kr
     coinContent.ticker = 'KRW-' + coinData.name
     coinContent.parent = 'Origin'
+    coinContent.acc_trade_price_24h = coinData.acc_trade_price_24h
     coinContent.market_cap = Number(coinData.market_cap)
     coinContent.cmc_rank = Number(coinData.cmc_rank)
     coinContent.value = Number((coinData.signed_change_rate * 100).toFixed(2))

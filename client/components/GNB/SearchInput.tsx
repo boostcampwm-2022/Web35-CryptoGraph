@@ -9,22 +9,32 @@ import { MyAppContext } from '../../pages/_app'
 
 export default function SearchInput() {
   const data = React.useContext(MyAppContext)
+  const inputRef = React.useRef<HTMLInputElement>()
+  function goToDetail(value: string) {
+    const inputCoinName = value
+    if (validateInputName(data, inputCoinName)) {
+      const engCoinName = matchNameKRwithENG(data, inputCoinName)
+      //생각해볼점
+      //window.history.pushState('', 'asdf', `/detail/${engCoinName}`)
+      // router.replace(`/detail/${engCoinName}`)
+      window.location.href = `/detail/${engCoinName}`
+      // router.push(`/detail/${engCoinName}`)
+    }
+  }
   return (
-    <Stack spacing={2} sx={{ width: 300 }}>
+    <Stack spacing={2} sx={{ width: 400 }}>
       <Autocomplete
         freeSolo
         id="free-solo-2-demo"
         disableClearable
-        options={
-          data
-            ? [
-                ...data.map((coin: MarketCapInfo) => coin.name),
-                ...data.map((coin: MarketCapInfo) => coin.name_kr)
-              ]
-            : [] //coinNames 검증을 위한 삼항연산자 만일 fetch 되지않았으면 껍데기만 보이게 함
-        }
+        onChange={(e, value) => goToDetail(value)}
+        options={[
+          ...data.map((coin: MarketCapInfo) => coin.name),
+          ...data.map((coin: MarketCapInfo) => coin.name_kr)
+        ]}
         renderInput={params => (
           <TextField
+            inputRef={inputRef}
             sx={{ marginLeft: 'auto' }}
             {...params}
             InputProps={{
@@ -38,21 +48,20 @@ export default function SearchInput() {
                 gap: 2
               },
               placeholder: '검색어를 입력하세요',
-              endAdornment: <SearchIcon sx={{ opacity: 0.2 }} />
+              endAdornment: (
+                <a
+                  href=""
+                  onClick={e => {
+                    e.preventDefault()
+                    if (inputRef.current) goToDetail(inputRef.current.value)
+                  }}
+                >
+                  <SearchIcon sx={{ opacity: 0.2 }} />
+                </a>
+              )
             }}
           />
         )}
-        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-          const inputCoinName = (e.target as HTMLInputElement).value
-          if (e.key === 'Enter') {
-            //1.입력값이 db에 있는지 검증하는 로직
-            //2.로직을 통과하면 해당 값으로 리다이렉트
-            if (validateInputName(data, inputCoinName)) {
-              const engCoinName = matchNameKRwithENG(data, inputCoinName)
-              window.location.href = `/detail/${engCoinName}`
-            }
-          }
-        }}
       />
     </Stack>
   )

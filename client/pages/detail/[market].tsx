@@ -4,10 +4,10 @@ import TabContainer from '@/components/TabContainer'
 import InfoSidebarContainer from '@/components/InfoSidebarContainer'
 import ChartHeader from '@/components/ChartHeader'
 import {
-  DEFAULT_CANDLE_PERIOD,
-  DEFAULT_CANDLER_CHART_RENDER_OPTION
+  DEFAULT_CANDLE_CHART_OPTION,
+  DEFAULT_CANDLE_PERIOD
 } from '@/constants/ChartConstants'
-import { CandleData, ChartPeriod, ChartRenderOption } from '@/types/ChartTypes'
+import { CandleChartOption, CandleData } from '@/types/ChartTypes'
 import { getCandleDataArray } from '@/utils/upbitManager'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { CandleChart } from '@/components/Candlechart'
@@ -18,50 +18,41 @@ import RealTimeCoinPrice from '@/components/RealTimeCoinPrice'
 import LinkButton from '@/components/LinkButton'
 import { getPriceInfo } from '@/utils/apiManager'
 import { CoinPriceObj } from '@/types/CoinPriceTypes'
-import { useURL } from '@/hooks/useURL'
 export default function Detail({
   market,
   candleData,
   priceInfo
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const theme = useTheme()
-  const marketParsedInURL = useURL(market)
-  const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
-
-  const [chartRenderOption, setRenderOption] = useState<ChartRenderOption>({
-    ...DEFAULT_CANDLER_CHART_RENDER_OPTION,
-    marketType: market
-  })
-  useEffect(() => {
-    setRenderOption(prev => {
-      return { ...prev, marketType: marketParsedInURL }
-    })
-  }, [marketParsedInURL])
-  const [candlePeriod, setCandlePeriod] = useState<ChartPeriod>(
-    DEFAULT_CANDLE_PERIOD
+  const [candleChartOption, setCandleChartOption] = useState<CandleChartOption>(
+    {
+      ...DEFAULT_CANDLE_CHART_OPTION,
+      marketType: market
+    }
   )
+  const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
+  const [selectedTab, setSelectedTab] = useState<number>(0)
+  useEffect(() => {
+    setCandleChartOption(prev => {
+      return { ...prev, marketType: market }
+    })
+  }, [market])
+
   const [realtimeCandleData, setRealtimeCandleData, realtimePriceInfo] =
-    useRealTimeUpbitData(
-      candlePeriod,
-      chartRenderOption.marketType,
-      candleData,
-      priceInfo
-    )
+    useRealTimeUpbitData(candleChartOption, candleData, priceInfo)
   return (
     <HomeContainer>
       <ChartAreaContainer>
         <ChartHeader
-          selected={candlePeriod}
-          selectedSetter={setCandlePeriod}
+          chartOption={candleChartOption}
+          chartOptionSetter={setCandleChartOption}
           coinPriceInfo={realtimePriceInfo[market]}
         />
         <Box sx={{ height: '90%', paddingTop: '8px' }}>
           <CandleChart
-            candlePeriod={candlePeriod}
+            chartOption={candleChartOption}
             candleData={realtimeCandleData}
             candleDataSetter={setRealtimeCandleData}
-            option={chartRenderOption}
-            optionSetter={setRenderOption}
           ></CandleChart>
         </Box>
       </ChartAreaContainer>
@@ -74,7 +65,10 @@ export default function Detail({
               width: '100%'
             }}
           >
-            <TabContainer>
+            <TabContainer
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            >
               <CoinDetailedInfo market={market} tabLabelInfo={'코인 디테일'} />
               <RealTimeCoinPrice
                 tabLabelInfo={'실시간 코인 정보'}

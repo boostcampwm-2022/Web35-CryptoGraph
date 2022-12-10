@@ -20,7 +20,7 @@ export interface CandleData {
 }
 export const ChartTypeArr = ['TreeChart', 'RunningChart'] as const
 export type ChartType = typeof ChartTypeArr[number]
-type ChartPeriodItered<T> = {
+export type ChartPeriodItered<T> = {
   [K in ChartPeriod]: T
 }
 export type ChartPeriod =
@@ -31,7 +31,6 @@ export type ChartPeriod =
   | 'minutes/240'
   | 'days'
   | 'weeks'
-
 export const DatePeriod: ChartPeriodItered<number> = {
   'minutes/1': 60,
   'minutes/3': 180,
@@ -41,16 +40,32 @@ export const DatePeriod: ChartPeriodItered<number> = {
   days: 86400,
   weeks: 604800
 }
+
 export const ChartPeriodList = Object.keys(DatePeriod)
-export interface ChartRenderOption {
+// export interface ChartRenderOption {
+//   marketType: string
+//   DomElementStartIndex: number
+//   fetchCandleCount: number
+//   renderStartDataIndex: number
+//   renderCandleCount: number
+//   translateX: number
+//   isVolumeVislble: boolean
+//   isMovingAverageVisible: boolean
+// }
+
+export interface CandleChartOption {
   marketType: string
-  DomElementStartIndex: number
-  fetchCandleCount: number
+  candlePeriod: ChartPeriod
+  isVolumeVisible: boolean
+  isMovingAverageVisible: boolean
+}
+
+export interface CandleChartRenderOption {
   renderStartDataIndex: number
   renderCandleCount: number
-  translateX: number
-  isVolumeVislble: boolean
-  isMovingAverageVisible: boolean
+  minCandleWidth: number
+  maxCandleWidth: number
+  candleWidth: number
 }
 
 //treeChart
@@ -91,12 +106,14 @@ export interface CoinRateContentType {
   name: string
   ticker: string
   parent: string
+  acc_trade_price_24h: number
   market_cap: number
   cmc_rank?: number
   value: number
 }
 
-export interface PointerPosition {
+export interface PointerData {
   positionX: number
   positionY: number
+  data: CandleData | null
 }
