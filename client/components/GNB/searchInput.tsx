@@ -59,16 +59,19 @@ export default function SearchInput() {
             InputProps={{
               ...params.InputProps,
               type: 'search',
+              //하나의 TextField도 여러 div태그로 겹겹이 감싸져있기때문에 sx스타일로 처리하면 타겟 태그에 padding적용이 안되서 따로 빼서 다이렉트로 적용.
+              style: { padding: '0px 12px' },
               sx: {
                 backgroundColor: 'white',
                 height: '48px',
                 width: { mobile: '100%', tablet: 400, desktop: 600 },
-                p: 2,
+                p: 1,
                 gap: 2
               },
               placeholder: '검색어를 입력하세요',
               endAdornment: (
                 <a
+                  style={{ display: 'flex', alignItems: 'center' }}
                   href=""
                   onClick={e => {
                     e.preventDefault()
