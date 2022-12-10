@@ -147,6 +147,9 @@ const HomeContainer = styled(Box)`
     align-items: center;
     flex-direction: column;
   }
+  ${props => props.theme.breakpoints.up('tablet')} {
+    max-height: 1080px;
+  }
 `
 //왼쪽 메인차트
 const ChartAreaContainer = styled('div')`
@@ -156,9 +159,6 @@ const ChartAreaContainer = styled('div')`
   height: 100%;
   min-width: 350px;
   flex-direction: column;
-  ${props => props.theme.breakpoints.up('tablet')} {
-    max-height: 1080px;
-  }
 `
 
 //오른쪽 정보 표시 사이드바
