@@ -107,10 +107,7 @@ export const getServerSideProps: GetServerSideProps<
 > = async context => {
   if (context.params === undefined) {
     return {
-      redirect: {
-        permanent: false,
-        destination: '/'
-      }
+      notFound: true
     }
   }
 
@@ -120,10 +117,7 @@ export const getServerSideProps: GetServerSideProps<
 
   if (!market) {
     return {
-      redirect: {
-        permanent: false,
-        destination: '/'
-      }
+      notFound: true
     }
   }
 
@@ -134,20 +128,14 @@ export const getServerSideProps: GetServerSideProps<
   )
   if (fetchedCandleData === null) {
     return {
-      redirect: {
-        permanent: false,
-        destination: '/'
-      }
+      notFound: true
     }
   }
 
   const priceInfo: CoinPriceObj = await getPriceInfo()
   if (priceInfo === null) {
     return {
-      redirect: {
-        permanent: false,
-        destination: '/'
-      }
+      notFound: true
     }
   }
   return {
