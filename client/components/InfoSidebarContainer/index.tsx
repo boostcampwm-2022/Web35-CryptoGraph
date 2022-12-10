@@ -1,5 +1,4 @@
 import * as React from 'react'
-import LinkButton from '@/components/LinkButton'
 import { ReactNode } from 'react'
 
 interface InfoSidebarContainerProps {

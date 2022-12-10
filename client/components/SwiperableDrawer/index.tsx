@@ -4,12 +4,14 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer'
 import Fab from '@mui/material/Fab'
 import NavigationIcon from '@mui/icons-material/Navigation'
 interface SwipeableTemporaryDrawerProps {
+  buttonLabel: string
   isDrawerOpened: boolean
   setIsDrawerOpened: React.Dispatch<React.SetStateAction<boolean>>
   children: React.ReactNode
 }
 
 export default function SwipeableTemporaryDrawer({
+  buttonLabel,
   isDrawerOpened,
   setIsDrawerOpened,
   children
@@ -37,10 +39,10 @@ export default function SwipeableTemporaryDrawer({
         size="medium"
         color="primary"
         aria-label="add"
-        sx={{ mb: 3 }}
+        sx={{ mb: 1, mt: 1 }}
       >
         <NavigationIcon sx={{ mr: 1 }} />
-        차트 정보 더보기
+        {buttonLabel}
       </Fab>
       <SwipeableDrawer
         anchor={'bottom'}

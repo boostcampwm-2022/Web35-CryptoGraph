@@ -1,7 +1,6 @@
 import { styled } from '@mui/material/styles'
 import { Box, useMediaQuery, useTheme } from '@mui/material'
 import TabContainer from '@/components/TabContainer'
-import InfoSidebarContainer from '@/components/InfoSidebarContainer'
 import ChartHeader from '@/components/ChartHeader'
 import {
   DEFAULT_CANDLE_CHART_OPTION,
@@ -18,6 +17,8 @@ import RealTimeCoinPrice from '@/components/RealTimeCoinPrice'
 import LinkButton from '@/components/LinkButton'
 import { getPriceInfo } from '@/utils/apiManager'
 import { CoinPriceObj } from '@/types/CoinPriceTypes'
+import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
+import TabBox from '@/components/TabBox'
 export default function Detail({
   market,
   candleData,
@@ -31,6 +32,7 @@ export default function Detail({
     }
   )
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
+  const [isDrawerOpened, setIsDrawerOpened] = useState<boolean>(false)
   const [selectedTab, setSelectedTab] = useState<number>(0)
   useEffect(() => {
     setCandleChartOption(prev => {
@@ -48,41 +50,47 @@ export default function Detail({
           chartOptionSetter={setCandleChartOption}
           coinPriceInfo={realtimePriceInfo[market]}
         />
-        <Box sx={{ height: '90%', paddingTop: '8px' }}>
+        <Box
+          sx={{
+            mt: '8px',
+            height: isMobile ? 'calc(100% - 150px)' : '90%',
+            backgroundColor: '#ffffff'
+          }}
+        >
           <CandleChart
             chartOption={candleChartOption}
             candleData={realtimeCandleData}
             candleDataSetter={setRealtimeCandleData}
-          ></CandleChart>
+          />
         </Box>
       </ChartAreaContainer>
       <InfoContainer>
         {isMobile ? (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%'
-            }}
+          <SwipeableTemporaryDrawer
+            buttonLabel="코인 상세 정보"
+            isDrawerOpened={isDrawerOpened}
+            setIsDrawerOpened={setIsDrawerOpened}
           >
             <TabContainer
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
             >
-              <CoinDetailedInfo market={market} tabLabelInfo={'코인 디테일'} />
+              <TabBox tabLabelInfo={'코인 디테일'}>
+                <CoinDetailedInfo market={market} />
+                <LinkButton goto="/" content="Go to Main" />
+              </TabBox>
               <RealTimeCoinPrice
                 tabLabelInfo={'실시간 코인 정보'}
                 priceInfo={realtimePriceInfo}
               />
             </TabContainer>
-            <LinkButton goto="/" content="Go to Main" />
-          </Box>
+          </SwipeableTemporaryDrawer>
         ) : (
-          <InfoSidebarContainer>
+          <>
             <CoinDetailedInfo market={market} />
             <RealTimeCoinPrice priceInfo={realtimePriceInfo} />
             <LinkButton goto="/" content="Go to Main" />
-          </InfoSidebarContainer>
+          </>
         )}
       </InfoContainer>
     </HomeContainer>
@@ -150,6 +158,7 @@ const HomeContainer = styled(Box)`
   }
   ${props => props.theme.breakpoints.up('tablet')} {
     max-height: 1080px;
+    min-height: 500px;
   }
 `
 //왼쪽 메인차트

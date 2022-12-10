@@ -59,6 +59,7 @@ export default function Home() {
       {isMobile ? (
         <Box sx={{ position: 'absolute' }}>
           <SwipeableTemporaryDrawer
+            buttonLabel="차트 정보 더보기"
             isDrawerOpened={isDrawerOpened}
             setIsDrawerOpened={setIsDrawerOpened}
           >
