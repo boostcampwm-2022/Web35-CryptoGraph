@@ -20,6 +20,7 @@ export interface CoinMetaData {
 
 export interface MarketCapInfo {
   name: string
+  name_es: string
   cmc_rank: string
   name_kr: string
   logo: string

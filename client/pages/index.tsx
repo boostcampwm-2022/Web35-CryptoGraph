@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import Box from '@mui/material/Box'
 import { styled, useTheme } from '@mui/material/styles'
 import CoinSelectController from '@/components/CoinSelectController'
@@ -6,9 +6,6 @@ import TreeChart from '@/components/Treechart'
 import { RunningChart } from '@/components/Runningchart'
 import { ChartType } from '@/types/ChartTypes'
 import ChartSelectController from '@/components/ChartSelectController'
-import { MarketCapInfo } from '@/types/CoinDataTypes'
-import { getMarketCapInfo } from '@/utils/metaDataManages'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import SortSelectController from '@/components/SortSelectController'
 
 import { useMediaQuery } from '@mui/material'
@@ -16,18 +13,14 @@ import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
 import TabContainer from '@/components/TabContainer'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
 import { useRealTimeCoinListData } from '@/hooks/useRealTimeCoinListData'
-import { NoSelectedCoinAlertView } from '@/components/NoSelectedCoinAlertView'
+import { MyAppContext } from './_app'
 import MuiModal from '@/components/Modal'
 import LinkButton from '@/components/LinkButton'
 import TabBox from '@/components/TabBox'
-interface getDataProps {
-  data: MarketCapInfo[]
-  Market?: string[] //선택된 코인 리스트
-}
+import { NoSelectedCoinAlertView } from '@/components/NoSelectedCoinAlertView'
 
-export default function Home({
-  data
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Home() {
+  const data = useContext(MyAppContext)
   const [selectedChart, setSelectedChart] = useState<ChartType>('RunningChart')
   const [selectedMarketList, setSelectedMarketList] = useState<string[]>(
     data.map(coin => coin.name)
@@ -88,7 +81,6 @@ export default function Home({
               </TabBox>
               <TabBox tabLabelInfo={'코인 선택'}>
                 <CoinSelectController
-                  selectedCoinList={selectedMarketList}
                   selectedCoinListSetter={setSelectedMarketList}
                 />
               </TabBox>
@@ -116,7 +108,6 @@ export default function Home({
           />
           <Box sx={{ width: '100%', height: '80%' }}>
             <CoinSelectController
-              selectedCoinList={selectedMarketList}
               selectedCoinListSetter={setSelectedMarketList}
             />
           </Box>
@@ -158,18 +149,6 @@ export default function Home({
       </ChartContainer>
     </HomeContainer>
   )
-}
-
-//솔직히 서버사이드 프롭스 없애는게 낫지 않나 싶음..
-export const getServerSideProps: GetServerSideProps<
-  getDataProps
-> = async () => {
-  const fetchedData: MarketCapInfo[] | null = await getMarketCapInfo()
-  return {
-    props: {
-      data: fetchedData === null ? [] : fetchedData
-    }
-  }
 }
 
 const HomeContainer = styled('div')`
