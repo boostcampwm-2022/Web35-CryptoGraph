@@ -112,6 +112,12 @@ const updateChart = (
           .style('opacity', 1)
 
         $g.append('rect')
+          .on('mouseover', function (d, i) {
+            d3.select(this).style('opacity', '.70')
+          })
+          .on('mouseout', function (d, i) {
+            d3.select(this).style('opacity', '1')
+          })
           .attr('width', function (d) {
             // console.log(d.acc_trade_price_24h)
             return scale(

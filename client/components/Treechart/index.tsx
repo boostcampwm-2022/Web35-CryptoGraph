@@ -81,6 +81,12 @@ const updateChart = (
       enter => {
         const $g = enter.append('g')
         $g.append('rect')
+          .on('mouseover', function (d, i) {
+            d3.select(this).style('opacity', '.70')
+          })
+          .on('mouseout', function (d, i) {
+            d3.select(this).style('opacity', '1')
+          })
           .on('click', function (this, e, d) {
             nodeOnclickHandler(d.data.ticker.split('-')[1])
           })
@@ -104,6 +110,7 @@ const updateChart = (
               : colorQuantizeScale(min, d.data.value)
           })
           .style('stroke', 'gray')
+
         $g.append('text')
           .attr('x', function (d) {
             return d.x0 + Math.abs(d.x1 - d.x0) / 2
@@ -154,6 +161,7 @@ const updateChart = (
           .transition()
           .duration(500)
           .style('stroke', 'gray')
+
         update
           .select('text')
           .transition()
