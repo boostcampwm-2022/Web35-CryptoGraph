@@ -18,14 +18,12 @@ import RealTimeCoinPrice from '@/components/RealTimeCoinPrice'
 import LinkButton from '@/components/LinkButton'
 import { getPriceInfo } from '@/utils/apiManager'
 import { CoinPriceObj } from '@/types/CoinPriceTypes'
-import { useURL } from '@/hooks/useURL'
 export default function Detail({
   market,
   candleData,
   priceInfo
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const theme = useTheme()
-  // const marketParsedInURL = useURL(market)
   const [candleChartOption, setCandleChartOption] = useState<CandleChartOption>(
     {
       ...DEFAULT_CANDLE_CHART_OPTION,
@@ -33,16 +31,6 @@ export default function Detail({
     }
   )
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
-
-  // const [chartRenderOption, setRenderOption] = useState<ChartRenderOption>({
-  //   ...DEFAULT_CANDLER_CHART_RENDER_OPTION,
-  //   marketType: market
-  // })
-  // useEffect(() => {
-  //   setRenderOption(prev => {
-  //     return { ...prev, marketType: marketParsedInURL }
-  //   })
-  // }, [marketParsedInURL])
 
   useEffect(() => {
     setCandleChartOption(prev => {

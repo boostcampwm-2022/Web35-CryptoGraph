@@ -131,8 +131,7 @@ export function updatePointerUI(
   pointerInfo: PointerData,
   renderOpt: CandleChartRenderOption,
   data: CandleData[],
-  windowSize: WindowSize,
-  chartPeriod: ChartPeriod
+  windowSize: WindowSize
 ) {
   const [chartAreaXsize, chartAreaYsize] = [
     windowSize.width - CHART_Y_AXIS_MARGIN,
@@ -274,8 +273,8 @@ function getPriceInfo(pointerInfo: PointerData) {
     return { priceText: '' }
   }
   if (!pointerInfo.data) {
-    console.error(pointerInfo)
-    console.error('예외상황')
+    // console.error(pointerInfo)
+    // console.error('예외상황')
     return { priceText: '' }
   }
   const candleUnitData = pointerInfo.data

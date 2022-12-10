@@ -257,13 +257,11 @@ export function updateCandleChart(
           .select('line')
           .attr(
             'x1',
-            (d, i) =>
-              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
+            d => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
           )
           .attr(
             'x2',
-            (d, i) =>
-              xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
+            d => xAxisScale(new Date(d.candle_date_time_kst)) - candleWidth / 2
           )
           .attr('y1', d => yAxisScale(d.low_price))
           .attr('y2', d => yAxisScale(d.high_price))
