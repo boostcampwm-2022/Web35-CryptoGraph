@@ -36,7 +36,7 @@ async function getCoinData() {
   const responseBody = await axios({
     method: "get",
     baseURL: "https://pro-api.coinmarketcap.com",
-    url: "v1/cryptocurrency/listings/latest?start=1&limit=600&convert=KRW",
+    url: "v1/cryptocurrency/listings/latest?start=1&limit=2000&convert=KRW",
     headers: {
       Accept: "application/json",
       "X-CMC_PRO_API_KEY": process.env.COINMARKETCAP_API_KEY,

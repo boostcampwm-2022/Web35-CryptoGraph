@@ -1,5 +1,5 @@
 import { styled, useTheme } from '@mui/material/styles'
-import { ChartPeriod } from '@/types/ChartTypes'
+import { CandleChartOption, ChartPeriod } from '@/types/ChartTypes'
 import { Dispatch, SetStateAction } from 'react'
 import InputLabel from '@mui/material/InputLabel'
 import Box from '@mui/material/Box'
@@ -12,8 +12,8 @@ import Image from 'next/image'
 import { Typography, useMediaQuery } from '@mui/material'
 
 interface ChartHeaderProps {
-  selected: ChartPeriod
-  selectedSetter: Dispatch<SetStateAction<ChartPeriod>>
+  chartOption: CandleChartOption
+  chartOptionSetter: Dispatch<SetStateAction<CandleChartOption>>
   coinPriceInfo: CoinPrice
 }
 
@@ -23,8 +23,8 @@ export default function ChartHeader(props: ChartHeaderProps) {
     <ChartHeaderContainer>
       <HeaderCoinInfo coinPriceInfo={props.coinPriceInfo}></HeaderCoinInfo>
       <ChartPeriodSelector
-        selected={props.selected}
-        selectedSetter={props.selectedSetter}
+        selected={props.chartOption.candlePeriod}
+        selectedSetter={props.chartOptionSetter}
       ></ChartPeriodSelector>
     </ChartHeaderContainer>
   )
@@ -89,7 +89,7 @@ function HeaderCoinInfo(props: HeaderCoinPriceInfoProps) {
 // 기존의 ChartPeriodSelector
 interface ChartPeriodSelectorProps {
   selected: ChartPeriod
-  selectedSetter: Dispatch<SetStateAction<ChartPeriod>>
+  selectedSetter: Dispatch<SetStateAction<CandleChartOption>>
 }
 function ChartPeriodSelector(props: ChartPeriodSelectorProps) {
   const theme = useTheme()
@@ -97,7 +97,9 @@ function ChartPeriodSelector(props: ChartPeriodSelectorProps) {
     theme.breakpoints.between('tablet', 'desktop')
   )
   const handleChange = (event: SelectChangeEvent) => {
-    props.selectedSetter(event.target.value as ChartPeriod)
+    props.selectedSetter(prev => {
+      return { ...prev, candlePeriod: event.target.value as ChartPeriod }
+    })
     // as 사용을 지양해야하지만, 런타임 중에
     // ChartPeriod 이외에 다른 value가 들어올
     // 가능성이 없으므로 사용함.
