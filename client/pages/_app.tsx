@@ -54,6 +54,7 @@ const ContainerHeightLimiter = styled('div')`
   display: flex;
   width: 100%;
   height: 100%;
+  min-height: 500px;
   ${props => props.theme.breakpoints.down('tablet')} {
     padding-top: calc(64px + 8px);
   }
