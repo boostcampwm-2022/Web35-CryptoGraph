@@ -3,32 +3,17 @@ import TextField from '@mui/material/TextField'
 import Stack from '@mui/material/Stack'
 import Autocomplete from '@mui/material/Autocomplete'
 import SearchIcon from '@mui/icons-material/Search'
-import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
-import { useRouter } from 'next/router'
 import { matchNameKRwithENG, validateInputName } from '@/utils/inputBarManager'
+import { MyAppContext } from '../../pages/_app'
+
 export default function SearchInput() {
-  /* -------------주의------------- */
-  // CoinNames의 fetch는 api_server를 이용했습니다.
-  // express서버를 키고 작동해야 제대로 받아올 수 있습니다.
-  const [CoinNames, setCoinNames] = React.useState<MarketCapInfo[]>([])
-  const router = useRouter()
+  const data = React.useContext(MyAppContext)
   const inputRef = React.useRef<HTMLInputElement>()
-  React.useEffect(() => {
-    async function asyncGetCoinName() {
-      const data: MarketCapInfo[] | null = await getMarketCapInfo()
-      if (!data) {
-        console.error('검색바 자동완성기능 데이터 fetch 에러')
-        return
-      }
-      setCoinNames(data)
-    }
-    asyncGetCoinName()
-  }, [])
   function goToDetail(value: string) {
     const inputCoinName = value
-    if (validateInputName(CoinNames, inputCoinName)) {
-      const engCoinName = matchNameKRwithENG(CoinNames, inputCoinName)
+    if (validateInputName(data, inputCoinName)) {
+      const engCoinName = matchNameKRwithENG(data, inputCoinName)
       //생각해볼점
       //window.history.pushState('', 'asdf', `/detail/${engCoinName}`)
       // router.replace(`/detail/${engCoinName}`)
@@ -43,14 +28,10 @@ export default function SearchInput() {
         id="free-solo-2-demo"
         disableClearable
         onChange={(e, value) => goToDetail(value)}
-        options={
-          CoinNames.length
-            ? [
-                ...CoinNames.map((coin: MarketCapInfo) => coin.name),
-                ...CoinNames.map((coin: MarketCapInfo) => coin.name_kr)
-              ]
-            : [] //CoinName 검증을 위한 삼항연산자 만일 fetch 되지않았으면 껍데기만 보이게 함
-        }
+        options={[
+          ...data.map((coin: MarketCapInfo) => coin.name),
+          ...data.map((coin: MarketCapInfo) => coin.name_kr)
+        ]}
         renderInput={params => (
           <TextField
             inputRef={inputRef}

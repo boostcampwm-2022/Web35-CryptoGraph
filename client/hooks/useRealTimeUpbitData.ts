@@ -1,4 +1,4 @@
-import { CandleData } from '@/types/ChartTypes'
+import { CandleChartOption, CandleData } from '@/types/ChartTypes'
 import { useEffect, useState, useRef, Dispatch, SetStateAction } from 'react'
 import { ChartPeriod } from '@/types/ChartTypes'
 import { getCandleDataArray } from '@/utils/upbitManager'
@@ -11,11 +11,16 @@ import {
 let socket: WebSocket | undefined
 
 export const useRealTimeUpbitData = (
-  period: ChartPeriod,
-  market: string,
+  // period: ChartPeriod,
+  // market: string,
+  candleChartOption: CandleChartOption,
   initData: CandleData[],
   priceInfo: CoinPriceObj
 ): [CandleData[], Dispatch<SetStateAction<CandleData[]>>, CoinPriceObj] => {
+  const [period, market] = [
+    candleChartOption.candlePeriod,
+    candleChartOption.marketType
+  ]
   const [realtimeCandleData, setRealtimeCandleData] =
     useState<CandleData[]>(initData)
   const [realtimePriceInfo, setRealtimePriceInfo] =
@@ -37,7 +42,6 @@ export const useRealTimeUpbitData = (
       const d = JSON.parse(str_d)
       if (d.type == 'ticker') {
         const code = d.code.split('-')[1]
-        // console.log(marketRef.current, periodRef.current)
         if (code === marketRef.current) {
           setRealtimeCandleData(prevData =>
             updateData(prevData, d, periodRef.current)

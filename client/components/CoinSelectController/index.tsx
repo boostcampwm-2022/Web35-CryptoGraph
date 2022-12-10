@@ -3,32 +3,36 @@ import { styled } from '@mui/material/styles'
 import Checkbox from '@mui/material/Checkbox'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { getMarketCapInfo } from '@/utils/metaDataManages'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { TabProps } from '@mui/material'
+import SearchCoin from './SearchCoin'
+import MakeCoinDict from './MakeCoinDict'
+import { MyAppContext } from '../../pages/_app'
+
+interface dict<T> {
+  [key: string]: T
+}
 
 interface CoinChecked {
   [key: string]: boolean
 }
 interface CoinSelectControllerProps extends TabProps {
-  selectedCoinList: string[]
   selectedCoinListSetter: React.Dispatch<React.SetStateAction<string[]>>
   tabLabelInfo?: string
 }
+
 export default function CoinSelectController({
-  selectedCoinList,
   selectedCoinListSetter
 }: CoinSelectControllerProps) {
-  const [coinList, setCoinList] = useState<MarketCapInfo[] | null>([])
+  const data = React.useContext(MyAppContext)
+  const [coinList, setCoinList] = useState<MarketCapInfo[] | null>(data)
   const [checked, setChecked] = useState<CoinChecked>({
     all: true
   })
-
-  useEffect(() => {
-    getMarketCapInfo().then(data => {
-      setCoinList(data)
-    })
-  }, [])
+  const [inputCoinName, setInputCoinName] = useState('')
+  const [coinDict, setCoinDict] = useState<dict<Array<string>>>(
+    MakeCoinDict(data)
+  )
 
   useEffect(() => {
     if (coinList == null) return
@@ -50,9 +54,22 @@ export default function CoinSelectController({
   }, [checked])
 
   const coinCheckAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    for (const coin in checked) {
-      checked[coin] = event.target.checked
+    if (checked['all']) {
+      for (const coin in checked) {
+        checked[coin] = event.target.checked
+      }
+    } else {
+      for (const coin in checked) {
+        if (
+          coin !== 'all' &&
+          inputCoinName &&
+          !coinDict[inputCoinName].includes(coin)
+        )
+          continue
+        checked[coin] = event.target.checked
+      }
     }
+
     setChecked({
       ...checked
     })
@@ -64,19 +81,38 @@ export default function CoinSelectController({
       [event.target.name]: event.target.checked
     })
   }
+
   return (
     <Container>
       <Header>
-        <HeaderTitle>코인선택</HeaderTitle>
-        <HeaderSelectBox>
-          <HeaderSelectBoxContent>전부 [선택/해제]</HeaderSelectBoxContent>
-          <Checkbox checked={checked.all} onChange={coinCheckAll} name="all" />
-        </HeaderSelectBox>
+        <HeaderSelectCoin>
+          <HeaderTitle>코인선택</HeaderTitle>
+          <HeaderSelectBox>
+            <HeaderSelectBoxContent>전체 [선택/해제]</HeaderSelectBoxContent>
+            <Checkbox
+              checked={checked.all}
+              onChange={coinCheckAll}
+              name="all"
+            />
+          </HeaderSelectBox>
+        </HeaderSelectCoin>
+        <HeaderSearchCoin>
+          <SearchCoin setInputCoinNameSetter={setInputCoinName} />
+        </HeaderSearchCoin>
       </Header>
       <Body>
         {coinList?.map((coin: MarketCapInfo, index) => {
           return (
-            <SelectCoinInnerLayer key={index}>
+            <SelectCoinInnerLayer
+              key={index}
+              style={
+                inputCoinName
+                  ? coinDict[inputCoinName]?.includes(coin.name)
+                    ? { display: 'flex' }
+                    : { display: 'none' }
+                  : {}
+              }
+            >
               <Image src={coin.logo} alt="" width={44} height={44} />
               <SelectCoinInnerFont>{coin.name_kr}</SelectCoinInnerFont>
               <Checkbox
@@ -102,9 +138,18 @@ const Container = styled('div')`
   height: 100%;
 `
 const Header = styled('div')`
+  padding: 1rem;
+  align-items: center;
+`
+const HeaderSelectCoin = styled('div')`
   display: flex;
   justify-content: space-between;
   padding: 1rem;
+  align-items: center;
+`
+const HeaderSearchCoin = styled('div')`
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 `
 const Body = styled('div')`
