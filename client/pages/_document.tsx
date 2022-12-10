@@ -1,32 +1,44 @@
 import * as React from 'react'
-import Document, { Html, Head, Main, NextScript } from 'next/document'
+import Document, {
+  Html,
+  Head,
+  Main,
+  NextScript,
+  DocumentContext,
+  DocumentInitialProps
+} from 'next/document'
 import createEmotionServer from '@emotion/server/create-instance'
 import theme, { roboto } from '../style/theme'
 import createEmotionCache from '../style/createEmotionCache'
+import { EmotionCache } from '@emotion/react'
+import { AppType } from 'next/app'
 
-export default class MyDocument extends Document {
-  render() {
-    return (
-      <Html lang="en" className={roboto.className}>
-        <Head>
-          {/* PWA primary color */}
-          <meta name="theme-color" content={theme.palette.primary.main} />
-          <link rel="shortcut icon" href="/favicon.ico" />
-          <meta name="emotion-insertion-point" content="" />
-          {(this.props as any).emotionStyleTags}
-        </Head>
-        <body>
-          <Main />
-          <NextScript />
-        </body>
-      </Html>
-    )
-  }
+interface DocumentProps extends DocumentInitialProps {
+  emotionStyleTags: React.ReactNode[]
+}
+export default function MyDocument(props: DocumentProps) {
+  return (
+    <Html lang="en" className={roboto.className}>
+      <Head>
+        {/* PWA primary color */}
+        <meta name="theme-color" content={theme.palette.primary.main} />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <meta name="emotion-insertion-point" content="" />
+        {props.emotionStyleTags}
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  )
 }
 
 // `getInitialProps` belongs to `_document` (instead of `_app`),
 // it's compatible with static-site generation (SSG).
-MyDocument.getInitialProps = async ctx => {
+MyDocument.getInitialProps = async (
+  ctx: DocumentContext
+): Promise<DocumentProps> => {
   // Resolution order
   //
   // On the server:
@@ -58,12 +70,13 @@ MyDocument.getInitialProps = async ctx => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: (App: any) =>
+      enhanceApp: (
+        App: AppType | React.ComponentType<{ emotionCache: EmotionCache }>
+      ) =>
         function EnhanceApp(props) {
           return <App emotionCache={cache} {...props} />
         }
     })
-
   const initialProps = await Document.getInitialProps(ctx)
   // This is important. It prevents Emotion to render invalid HTML.
   // See https://github.com/mui/material-ui/issues/26561#issuecomment-855286153
