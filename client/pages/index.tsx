@@ -16,6 +16,7 @@ import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
 import TabContainer from '@/components/TabContainer'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
 import { useRealTimeCoinListData } from '@/hooks/useRealTimeCoinListData'
+import { NoSelectedCoinAlertView } from '@/components/NoSelectedCoinAlertView'
 import MuiModal from '@/components/Modal'
 import LinkButton from '@/components/LinkButton'
 interface getDataProps {
@@ -129,29 +130,30 @@ export default function Home({
           </MuiModal>
         </SideBarContainer>
       )}
-      {selectedMarketList.length !== 0 ? (
-        <ChartContainer>
-          {selectedChart === 'RunningChart' ? (
-            <RunningChart
-              candleCount={selectedMarketList.length}
-              durationPeriod={500}
-              data={coinData}
-              Market={selectedMarketList}
-              selectedSort={selectedSort}
-              modalOpenHandler={chartNodeHandler}
-            />
-          ) : (
-            <TreeChart
-              data={coinData}
-              Market={selectedMarketList}
-              selectedSort={selectedSort}
-              modalOpenHandler={chartNodeHandler}
-            />
-          )}
-        </ChartContainer>
-      ) : (
-        '선택된 코인이 없습니다.' // 괜찮은 이미지 추가하면 좋을듯
-      )}
+      <ChartContainer>
+        {selectedMarketList.length !== 0 ? (
+          <>
+            {selectedChart === 'RunningChart' ? (
+              <RunningChart
+                durationPeriod={500}
+                data={coinData}
+                Market={selectedMarketList}
+                selectedSort={selectedSort}
+                modalOpenHandler={chartNodeHandler}
+              />
+            ) : (
+              <TreeChart
+                data={coinData}
+                Market={selectedMarketList}
+                selectedSort={selectedSort}
+                modalOpenHandler={chartNodeHandler}
+              />
+            )}
+          </>
+        ) : (
+          <NoSelectedCoinAlertView />
+        )}
+      </ChartContainer>
     </HomeContainer>
   )
 }
