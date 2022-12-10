@@ -63,6 +63,9 @@ const Container = styled('div')`
   padding: 16px;
   background-color: #ffffff;
   font-size: 12px;
+  ${props => props.theme.breakpoints.up('tablet')} {
+    margin-bottom: 8px;
+  }
 `
 
 const Header = styled('div')`

@@ -12,9 +12,16 @@ export default function Chartbutton({
   style = {}
 }: ChartButtonProps) {
   return (
-    <Link href={goto} style={{ textDecoration: 'none' }}>
+    <Link
+      href={goto}
+      style={{ textDecoration: 'none', width: '100%', marginTop: '8px' }}
+    >
       <Button
-        style={{ width: '100%', ...style }}
+        style={{
+          width: '100%',
+
+          ...style
+        }}
         size="large"
         variant="contained"
       >

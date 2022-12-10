@@ -13,7 +13,6 @@ export default function InfoSidebarContainer({
       {React.Children.map(children, child => {
         return child
       })}
-      <LinkButton goto="/" content="Go to Main" />
     </>
   )
 }

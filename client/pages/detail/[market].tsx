@@ -81,6 +81,7 @@ export default function Detail({
           <InfoSidebarContainer>
             <CoinDetailedInfo market={market} />
             <RealTimeCoinPrice priceInfo={realtimePriceInfo} />
+            <LinkButton goto="/" content="Go to Main" />
           </InfoSidebarContainer>
         )}
       </InfoContainer>
