@@ -7,12 +7,11 @@ import { convertUnit } from '@/utils/chartManager'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
-  durationPeriod: number
-  candleCount: number
   data: CoinRateType //선택된 코인 리스트
   Market: string[]
   selectedSort: string
   modalOpenHandler: (market: string) => void
+  durationPeriod?: number
 }
 
 //------------------------------setChartContainerSize------------------------------
@@ -108,7 +107,7 @@ const updateChart = (
           (d, i) => 'translate(0,' + i * (barHeight + barMargin) + ')'
         )
           .transition()
-          .duration(1000)
+          .duration(durationPeriod)
           .style('opacity', 1)
 
         $g.append('rect')
@@ -198,7 +197,7 @@ const updateChart = (
             )
           })
           .attr('height', barHeight)
-          .style('fill', (d, i) => {
+          .style('fill', d => {
             if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
             else return colorQuantizeScale(max, d.value)
@@ -219,7 +218,7 @@ const updateChart = (
           .attr('y', barHeight / 2)
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'middle')
-          .style('font-size', `${barHeight * 0.6}px`)
+          .style('font-size', `${barHeight * 0.3}px`)
           .text(d =>
             selectedSort !== 'trade price'
               ? selectedSort === 'market capitalization'
@@ -255,8 +254,7 @@ const updateChart = (
 }
 //------------------------------Component------------------------------
 export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
-  durationPeriod,
-  candleCount,
+  durationPeriod = 500,
   data,
   Market,
   selectedSort,
@@ -274,7 +272,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       changeRate,
       width,
       height,
-      candleCount,
+      Market.length,
       selectedSort,
       modalOpenHandler
     )
@@ -282,9 +280,9 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     width,
     height,
     changeRate,
-    candleCount,
     selectedSort,
     durationPeriod,
+    Market.length,
     modalOpenHandler
   ]) // 창크기에 따른 차트크기 조절
 
