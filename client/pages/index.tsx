@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import Box from '@mui/material/Box'
 import { styled, useTheme } from '@mui/material/styles'
 import CoinSelectController from '@/components/CoinSelectController'
@@ -16,15 +16,15 @@ import SwipeableTemporaryDrawer from '@/components/SwiperableDrawer'
 import TabContainer from '@/components/TabContainer'
 import CoinDetailedInfo from '@/components/CoinDetailedInfo'
 import { useRealTimeCoinListData } from '@/hooks/useRealTimeCoinListData'
+import { MyAppContext } from './_app'
 
 interface getDataProps {
   data: MarketCapInfo[]
   Market?: string[] //선택된 코인 리스트
 }
 
-export default function Home({
-  data
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Home() {
+  const data = useContext(MyAppContext)
   const [selectedChart, setSelectedChart] = useState<ChartType>('RunningChart')
   const [selectedMarket, setSelectedMarket] = useState<string[]>(
     data.map(coin => coin.name)
@@ -40,6 +40,7 @@ export default function Home({
       setSelectedSort('change rate')
     }
   }, [selectedChart])
+
   return (
     <HomeContainer>
       {isMobile ? (
@@ -118,17 +119,17 @@ export default function Home({
   )
 }
 
-//솔직히 서버사이드 프롭스 없애는게 낫지 않나 싶음..
-export const getServerSideProps: GetServerSideProps<
-  getDataProps
-> = async () => {
-  const fetchedData: MarketCapInfo[] | null = await getMarketCapInfo()
-  return {
-    props: {
-      data: fetchedData === null ? [] : fetchedData
-    }
-  }
-}
+// // 솔직히 서버사이드 프롭스 없애는게 낫지 않나 싶음..
+// export const getServerSideProps: GetServerSideProps<
+//   getDataProps
+// > = async () => {
+//   const fetchedData: MarketCapInfo[] | null = await getMarketCapInfo()
+//   return {
+//     props: {
+//       data: fetchedData === null ? [] : fetchedData
+//     }
+//   }
+// }
 
 const HomeContainer = styled('div')`
   display: flex;
