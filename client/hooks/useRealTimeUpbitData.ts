@@ -41,15 +41,12 @@ export const useRealTimeUpbitData = (
       const d = JSON.parse(str_d)
       if (d.type == 'ticker') {
         const code = d.code.split('-')[1]
-        console.log(market, period)
         if (code === market) {
           setRealtimeCandleData(prevData => updateData(prevData, d, period))
         }
         setRealtimePriceInfo(prev => updateRealTimePrice(prev, d, code))
       }
     }
-    // marketRef.current = market
-    // periodRef.current = period
     const fetchData = async () => {
       const fetched: CandleData[] | null = await getCandleDataArray(
         period,
