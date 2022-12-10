@@ -112,10 +112,9 @@ async function getPriceData(coinInfos) {
   if (!coinInfos) {
     return null;
   }
+  const marketCodes = await getUpbitMarketCode();
   const priceData = await getUpbitMarketDatas(
-    Object.keys(coinInfos)
-      .map((code) => `KRW-${code}`)
-      .join(",")
+    marketCodes.map(({ code }) => `KRW-${code}`).join(",")
   );
   const result = {};
   priceData.forEach((data, index) => {
