@@ -22,6 +22,7 @@ import {
 import * as d3 from 'd3'
 import { D3DragEvent } from 'd3'
 import React from 'react'
+import { throttle } from 'lodash'
 
 export function initCandleChart(
   svgRef: React.RefObject<SVGSVGElement>,
@@ -55,7 +56,6 @@ function initCandleChartSVG(
   const chartArea = chartContainer.select('svg#chart-area')
   chartArea.attr('width', chartAreaXsize)
   chartArea.attr('height', chartAreaYsize)
-  chartArea.attr('view')
   // xAxis초기값 설정
   chartContainer
     .select('svg#x-axis-container')
@@ -82,52 +82,70 @@ export function addEventsToChart(
   //margin값도 크기에 맞춰 변수화 시켜야함.
   // xAxis초기값 설정
   // currentPrice초기값 설정
-  d3.select<SVGSVGElement, CandleData>('svg#chart-container')
-    .call(
-      d3
-        .drag<SVGSVGElement, CandleData>()
-        .on(
-          'drag',
-          (event: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
-            translateXSetter(prev => prev + event.dx)
-            handleMouseEvent(
-              event.sourceEvent,
-              pointerPositionSetter,
-              chartAreaXsize,
-              chartAreaYsize
-            )
-          }
-        )
-    )
-    .on('wheel', (e: WheelEvent) => {
-      e.preventDefault()
-      optionSetter((prev: CandleChartRenderOption) => {
-        const newCandleWidth = Math.min(
-          Math.max(
-            prev.candleWidth + (e.deltaY > 0 ? -1 : 1),
-            prev.minCandleWidth
-          ),
-          prev.maxCandleWidth
-        )
-        const newRenderCandleCount = Math.ceil(chartAreaXsize / newCandleWidth)
-        return {
-          ...prev,
-          renderCandleCount: newRenderCandleCount,
-          candleWidth: newCandleWidth
-        }
-      })
-    })
-  d3.select<SVGSVGElement, CandleData>('svg#chart-area').on(
-    'mousemove',
-    (event: MouseEvent) => {
-      handleMouseEvent(
-        event,
-        pointerPositionSetter,
-        chartAreaXsize,
-        chartAreaYsize
+  if (svgRef.current !== null) {
+    d3.select<SVGSVGElement, CandleData>(svgRef.current)
+      .call(
+        d3
+          .drag<SVGSVGElement, CandleData>()
+          .on(
+            'drag',
+            (event: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
+              translateXSetter(prev => prev + event.dx)
+              handleMouseEvent(
+                event.sourceEvent,
+                pointerPositionSetter,
+                chartAreaXsize,
+                chartAreaYsize
+              )
+            }
+          )
       )
-    }
-  )
+      .on('wheel', (e: WheelEvent) => {
+        e.preventDefault()
+        optionSetter((prev: CandleChartRenderOption) => {
+          const newCandleWidth = Math.min(
+            Math.max(
+              prev.candleWidth + (e.deltaY > 0 ? -1 : 1),
+              prev.minCandleWidth
+            ),
+            prev.maxCandleWidth
+          )
+          const newRenderCandleCount = Math.ceil(
+            chartAreaXsize / newCandleWidth
+          )
+          if (prev.maxDataLength !== Infinity) {
+            const newMaxRenderStartDataIndex =
+              prev.maxDataLength - newRenderCandleCount + 1
+            return {
+              ...prev,
+              renderCandleCount: newRenderCandleCount,
+              candleWidth: newCandleWidth,
+              maxRenderStartDataIndex: newMaxRenderStartDataIndex,
+              renderStartDataIndex: Math.min(
+                prev.renderStartDataIndex,
+                newMaxRenderStartDataIndex
+              )
+            }
+          }
+          return {
+            ...prev,
+            renderCandleCount: newRenderCandleCount,
+            candleWidth: newCandleWidth
+          }
+        })
+      })
+    d3.select<SVGSVGElement, CandleData>(svgRef.current).on(
+      'mousemove',
+      throttle((event: MouseEvent) => {
+        handleMouseEvent(
+          event,
+          pointerPositionSetter,
+          chartAreaXsize,
+          chartAreaYsize
+        )
+      }, 50)
+    )
+  }
 }
 
 // xAxis와 캔들유닛들 translate시키는 함수

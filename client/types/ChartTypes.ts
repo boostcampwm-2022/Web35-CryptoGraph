@@ -14,6 +14,7 @@ export interface CandleData {
   change_price: number
   trade_volume: number
   candle_date_time_kst: string
+  candle_date_time_utc: string
   timestamp: number
   candle_acc_trade_price: number
   trade_timestamp: number
@@ -42,16 +43,6 @@ export const DatePeriod: ChartPeriodItered<number> = {
 }
 
 export const ChartPeriodList = Object.keys(DatePeriod)
-// export interface ChartRenderOption {
-//   marketType: string
-//   DomElementStartIndex: number
-//   fetchCandleCount: number
-//   renderStartDataIndex: number
-//   renderCandleCount: number
-//   translateX: number
-//   isVolumeVislble: boolean
-//   isMovingAverageVisible: boolean
-// }
 
 export interface CandleChartOption {
   marketType: string
@@ -66,6 +57,8 @@ export interface CandleChartRenderOption {
   minCandleWidth: number
   maxCandleWidth: number
   candleWidth: number
+  maxRenderStartDataIndex: number
+  maxDataLength: number
 }
 
 //treeChart

@@ -8,7 +8,9 @@ import {
   DEFAULT_RENDER_START_INDEX,
   CHART_X_AXIS_MARGIN,
   CHART_AXIS_RECT_WIDTH,
-  CHART_AXIS_RECT_HEIGHT
+  CHART_AXIS_RECT_HEIGHT,
+  DEFAULT_MAX_CANDLE_COUNT,
+  DEFAULT_MAX_RENDER_START_INDEX
 } from '@/constants/ChartConstants'
 import { DatePeriod } from '@/types/ChartTypes'
 import { WindowSize } from 'hooks/useWindowSize'
@@ -318,10 +320,10 @@ export function handleMouseEvent(
   const $rect = d3.select(event.target as SVGRectElement)
   const data = $rect.data().length > 0 ? $rect.data()[0] : null
   if (
-    event.offsetX > 1 &&
-    event.offsetY > 1 &&
-    event.offsetX < chartAreaXsize - 1 &&
-    event.offsetY < chartAreaYsize - 1
+    event.offsetX > 0 &&
+    event.offsetY > 0 &&
+    event.offsetX < chartAreaXsize &&
+    event.offsetY < chartAreaYsize
   ) {
     pointerPositionSetter({
       positionX: event.offsetX,
@@ -343,14 +345,16 @@ export function checkNeedFetch(
   )
 }
 
-export function getInitRenderOption(width: number) {
+export function getInitRenderOption(width: number): CandleChartRenderOption {
   const candleWidth = Math.ceil(width / DEFAULT_CANDLE_COUNT)
   return {
     candleWidth,
     minCandleWidth: Math.max(5, Math.ceil(width / 200)),
     maxCandleWidth: Math.max(5, Math.ceil(width / 10)),
     renderStartDataIndex: DEFAULT_RENDER_START_INDEX,
-    renderCandleCount: DEFAULT_CANDLE_COUNT
+    renderCandleCount: DEFAULT_CANDLE_COUNT,
+    maxDataLength: DEFAULT_MAX_CANDLE_COUNT,
+    maxRenderStartDataIndex: DEFAULT_MAX_RENDER_START_INDEX
   }
 }
 

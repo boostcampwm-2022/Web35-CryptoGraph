@@ -1,14 +1,13 @@
 import { CandleData, ChartPeriod, TreeMapData } from '@/types/ChartTypes'
 import { DEFAULT_CANDLE_COUNT } from '@/constants/ChartConstants'
-import { makeDate } from '@/utils/dateManager'
 export async function getCandleDataArray(
   period: ChartPeriod,
   market: string,
   count = DEFAULT_CANDLE_COUNT,
-  endTimeStamp?: number
+  lastTime?: string
 ): Promise<CandleData[] | null> {
   let res
-  if (!endTimeStamp) {
+  if (!lastTime) {
     res = await fetch(
       `https://api.upbit.com/v1/candles/${period}?market=KRW-${market}&count=${count}`,
       {
@@ -17,9 +16,11 @@ export async function getCandleDataArray(
       }
     )
   } else {
-    const endTime = makeDate(endTimeStamp, 60).toJSON().slice(0, -5).concat('Z')
+    // const endTime = makeDate(endTimeStamp, 60).toJSON().slice(0, -5).concat('Z')
     res = await fetch(
-      `https://api.upbit.com/v1/candles/${period}?market=KRW-${market}&to=${endTime}&count=${count}`,
+      `https://api.upbit.com/v1/candles/${period}?market=KRW-${market}&to=${
+        lastTime + 'Z'
+      }&count=${count}`,
       {
         method: 'GET',
         headers: { accept: 'application/json' }
