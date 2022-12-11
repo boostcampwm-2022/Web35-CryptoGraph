@@ -1,10 +1,8 @@
 import { styled, Typography, useTheme } from '@mui/material'
-import * as React from 'react'
 import { TabProps } from '@/components/TabContainer'
 import Image from 'next/image'
 import { CoinPrice } from '@/types/CoinPriceTypes'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 //코인 실시간 정보
 export default function RealTimeCoinPrice(props: TabProps) {
   return (
@@ -31,7 +29,6 @@ const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
   coinPrice
 }) => {
   const theme = useTheme()
-  const router = useRouter()
   const isMinus = coinPrice.signed_change_price <= 0
   const textColor =
     coinPrice.signed_change_price === 0
@@ -40,36 +37,41 @@ const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
       ? theme.palette.custom.blue
       : theme.palette.custom.red
   return (
-    <CoinPriceDiv>
-      <Image src={coinPrice.logo} alt="" width={40} height={40} />
-      <div className="name">
-        <Link href={`/detail/${coinPrice.name}`}>
+    <Link
+      href={`/detail/${coinPrice.name}`}
+      style={{ textDecoration: 'none', color: 'black' }}
+    >
+      <CoinPriceDiv>
+        <Image src={coinPrice.logo} alt="" width={40} height={40} />
+        <div className="name">
           <Typography sx={{ margin: 0, fontSize: '12px', fontWeight: 'bold' }}>
             {coinPrice.name_kr}
           </Typography>
-        </Link>
-        <Typography sx={{ margin: 0, fontSize: '12px' }}>
-          {coinPrice.name}
-        </Typography>
-      </div>
-      <div className="price">
-        <Typography sx={{ color: textColor, fontSize: '12px' }}>
-          {coinPrice.price.toLocaleString()}
-        </Typography>
-      </div>
-      <div className="yesterday">
-        <Typography sx={{ color: textColor, margin: 0, fontSize: '12px' }}>
-          {(isMinus ? '' : '+') +
-            coinPrice.signed_change_price.toLocaleString()}
-        </Typography>
-        <Typography sx={{ color: textColor, fontSize: '12px' }}>
-          {(isMinus ? '' : '+') +
-            Math.floor(coinPrice.signed_change_rate * 10000) / 100}
-          %
-        </Typography>
-      </div>
-      <div className="amount">{transPrice(coinPrice.acc_trade_price_24h)}</div>
-    </CoinPriceDiv>
+          <Typography sx={{ margin: 0, fontSize: '12px' }}>
+            {coinPrice.name}
+          </Typography>
+        </div>
+        <div className="price">
+          <Typography sx={{ color: textColor, fontSize: '12px' }}>
+            {coinPrice.price.toLocaleString()}
+          </Typography>
+        </div>
+        <div className="yesterday">
+          <Typography sx={{ color: textColor, margin: 0, fontSize: '12px' }}>
+            {(isMinus ? '' : '+') +
+              coinPrice.signed_change_price.toLocaleString()}
+          </Typography>
+          <Typography sx={{ color: textColor, fontSize: '12px' }}>
+            {(isMinus ? '' : '+') +
+              Math.floor(coinPrice.signed_change_rate * 10000) / 100}
+            %
+          </Typography>
+        </div>
+        <div className="amount">
+          {transPrice(coinPrice.acc_trade_price_24h)}
+        </div>
+      </CoinPriceDiv>
+    </Link>
   )
 }
 
@@ -161,6 +163,10 @@ const CoinPriceDiv = styled('div')`
   }
   & > div.amount {
     flex: 1;
+  }
+  :hover {
+    background-color: #eee6e6;
+    transition: 0.5s;
   }
 `
 
