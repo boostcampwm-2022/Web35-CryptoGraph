@@ -125,10 +125,10 @@ const updateChart = (
             d3.select(this).style('opacity', '.70')
           })
           .on('mousemove', function (d, i) {
-            MainChartHandleMouseEvent(d, setPointerHandler, i, height)
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
           })
           .on('mouseout', function (d, i) {
-            MainChartHandleMouseEvent(d, setPointerHandler, i, height)
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
             d3.select(this).style('opacity', '1')
           })
           .attr('width', function (d) {

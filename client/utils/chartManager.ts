@@ -391,11 +391,12 @@ export function MainChartHandleMouseEvent(
     React.SetStateAction<MainChartPointerData>
   >,
   data: CoinRateContentType,
+  width: number,
   height: number
 ) {
   if (event.type === 'mousemove') {
     pointerInfoSetter({
-      offsetX: event.offsetX,
+      offsetX: width * 4 > event.offsetX * 5 ? event.offsetX : event.offsetX - 150,
       offsetY: height / 2 > event.clientY - 100 ? event.clientY - 100 : event.clientY - 250,
       data: data
     })
