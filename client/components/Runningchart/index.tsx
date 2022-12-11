@@ -111,9 +111,22 @@ const updateChart = (
     .data(ArrayDataValue, d => d.name)
     .join(
       enter => {
-        const $g = enter.append('g').on('click', function (e, d) {
-          nodeOnclickHandler(d.ticker.split('-')[1])
-        })
+        const $g = enter
+          .append('g')
+          .on('click', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          }) //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseover', function () {
+            d3.select(this).style('opacity', '.70')
+          })
+          .on('mousemove', (d, i) => {
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseout', function (d, i) {
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+            d3.select(this).style('opacity', '1')
+          })
         $g.attr(
           'transform',
           (d, i) => 'translate(0,' + i * (barHeight + barMargin) + ')'
@@ -122,17 +135,7 @@ const updateChart = (
           .duration(durationPeriod)
           .style('opacity', 1)
         $g.append('rect')
-          .on('mouseover', function (d, i) {
-            d3.select(this).style('opacity', '.70')
-          })
-          .on('mousemove', function (d, i) {
-            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
-          })
-          .on('mouseout', function (d, i) {
-            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
-            d3.select(this).style('opacity', '1')
-          })
-          .attr('width', function (d) {
+          .attr('width', d => {
             return scale(
               selectedSort !== 'trade price'
                 ? selectedSort !== 'market capitalization'

@@ -34,10 +34,10 @@ const updateChart = (
   ]
   const root: d3.HierarchyNode<CoinRateContentType> = d3
     .stratify<CoinRateContentType>()
-    .id(function (d): string {
+    .id((d): string => {
       return d.name
     })
-    .parentId(function (d): string {
+    .parentId((d): string => {
       return d.parent
     })(data)
   const sort = (
@@ -60,7 +60,7 @@ const updateChart = (
   }
 
   root
-    .sum(function (d): number {
+    .sum((d): number => {
       if (d.name === 'Origin') {
         return 0
       }
@@ -86,14 +86,16 @@ const updateChart = (
     )
     .join(
       enter => {
-        const $g = enter.append('g').on('click', function (this, e, d) {
-          nodeOnclickHandler(d.data.ticker.split('-')[1])
-        })
-        $g.append('rect')
-          .on('mouseover', function (d, i) {
+        const $g = enter
+          .append('g')
+          .on('click', (e, d) => {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseover', function (this) {
             d3.select(this).style('opacity', '.70')
           })
-          .on('mousemove', function (d, i) {
+          .on('mousemove', (d, i) => {
             MainChartHandleMouseEvent(
               d,
               setPointerHandler,
@@ -102,6 +104,7 @@ const updateChart = (
               height
             )
           })
+          //this 사용을 위해 함수 선언문 형식 사용
           .on('mouseout', function (d, i) {
             MainChartHandleMouseEvent(
               d,
@@ -112,22 +115,21 @@ const updateChart = (
             )
             d3.select(this).style('opacity', '1')
           })
-          .on('click', function (this, e, d) {
-            nodeOnclickHandler(d.data.ticker.split('-')[1])
-          })
-          .attr('x', function (d) {
+        $g.append('rect')
+
+          .attr('x', d => {
             return d.x0
           })
-          .attr('y', function (d) {
+          .attr('y', d => {
             return d.y0
           })
-          .attr('width', function (d) {
+          .attr('width', d => {
             return d.x1 - d.x0
           })
-          .attr('height', function (d) {
+          .attr('height', d => {
             return d.y1 - d.y0
           })
-          .attr('fill', function (d) {
+          .attr('fill', d => {
             return d.data.value >= 0
               ? d.data.value > 0
                 ? colorQuantizeScale(max, d.data.value)
@@ -137,14 +139,14 @@ const updateChart = (
           .style('stroke', 'gray')
 
         $g.append('text')
-          .attr('x', function (d) {
+          .attr('x', d => {
             return d.x0 + Math.abs(d.x1 - d.x0) / 2
           })
-          .attr('y', function (d) {
+          .attr('y', d => {
             return d.y0 + Math.abs(d.y1 - d.y0) / 2
           })
           .attr('text-anchor', 'middle')
-          .text(function (d) {
+          .text(d => {
             // 초기값 changerate 아니라면 수정해줘야함
             return (
               d.data.ticker?.split('-')[1] +
@@ -153,7 +155,7 @@ const updateChart = (
               '%'
             )
           })
-          .style('font-size', function (d) {
+          .style('font-size', d => {
             return `${(d.x1 - d.x0) / 9}px`
           })
           .attr('fill', 'white')
@@ -164,19 +166,19 @@ const updateChart = (
           .select('rect')
           .transition()
           .duration(500)
-          .attr('x', function (d) {
+          .attr('x', d => {
             return d.x0
           })
-          .attr('y', function (d) {
+          .attr('y', d => {
             return d.y0
           })
-          .attr('width', function (d) {
+          .attr('width', d => {
             return d.x1 - d.x0
           })
-          .attr('height', function (d) {
+          .attr('height', d => {
             return d.y1 - d.y0
           })
-          .attr('fill', function (d) {
+          .attr('fill', d => {
             return d.data.value >= 0
               ? d.data.value > 0
                 ? colorQuantizeScale(max, d.data.value)
@@ -191,14 +193,14 @@ const updateChart = (
           .select('text')
           .transition()
           .duration(500)
-          .attr('x', function (d) {
+          .attr('x', d => {
             return d.x0 + Math.abs(d.x1 - d.x0) / 2
           })
-          .attr('y', function (d) {
+          .attr('y', d => {
             return d.y0 + Math.abs(d.y1 - d.y0) / 2
           })
           .attr('text-anchor', 'middle')
-          .text(function (d) {
+          .text(d => {
             const text =
               selectedSort !== 'trade price'
                 ? selectedSort === 'market capitalization'
@@ -207,7 +209,7 @@ const updateChart = (
                 : convertUnit(Number(d.data.acc_trade_price_24h))
             return d.data.ticker?.split('-')[1] + '\n' + text
           })
-          .style('font-size', function (d) {
+          .style('font-size', d => {
             return `${(d.x1 - d.x0) / 9}px`
           })
           .attr('fill', 'white')
