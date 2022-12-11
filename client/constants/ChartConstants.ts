@@ -1,4 +1,9 @@
-import { ChartPeriod, CandleChartOption, PointerData,RunningPointerData } from '@/types/ChartTypes'
+import {
+  ChartPeriod,
+  CandleChartOption,
+  PointerData,
+  RunningPointerData
+} from '@/types/ChartTypes'
 
 export const CHART_Y_AXIS_MARGIN = 70
 export const CHART_X_AXIS_MARGIN = 20

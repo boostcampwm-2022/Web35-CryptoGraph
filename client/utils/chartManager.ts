@@ -387,8 +387,10 @@ export const convertUnit = (unit: number) => {
 }
 export function MainChartHandleMouseEvent(
   event: MouseEvent,
-  pointerPositionSetter: React.Dispatch<React.SetStateAction<RunningPointerData>>,
-  data : CoinRateContentType
+  pointerPositionSetter: React.Dispatch<
+    React.SetStateAction<RunningPointerData>
+  >,
+  data: CoinRateContentType
 ) {
   if (event.type === 'mousemove') {
     console.log(event)
@@ -404,5 +406,5 @@ export function MainChartHandleMouseEvent(
       data: null
     })
   }
-    return
+  return
 }
