@@ -5,9 +5,8 @@ import Box from '@mui/material/Box'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
-import { TabProps } from '@/components/TabContainer'
 
-interface SortSelectControllerProps extends TabProps {
+interface SortSelectControllerProps {
   selectedSort: string
   selectedSortSetter: React.Dispatch<React.SetStateAction<string>>
   selectedChart: string
@@ -48,10 +47,10 @@ export default function SortSelectController({
     absolute: '등락률(절대값)'
   }
   return (
-    <SortSelectorContainer>
-      <Box sx={{ minWidth: 300 }}>
+    <SortSelectorContainer sx={{ backgroundColor: '#ffffff' }}>
+      <Box sx={{ minWidth: 300, backgroundColor: 'white' }}>
         <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">정렬 기준</InputLabel>
+          <InputLabel>정렬 기준</InputLabel>
           <Select value={selectedSort} onChange={handleChange}>
             {selectedChart === 'RunningChart'
               ? runningSortTypeArr.map(value => {
@@ -75,7 +74,7 @@ export default function SortSelectController({
   )
 }
 
-const SortSelectorContainer = styled('div')`
+const SortSelectorContainer = styled(Box)`
   display: flex;
   width: 100%;
   height: 10%;

@@ -86,7 +86,9 @@ const updateChart = (
     )
     .join(
       enter => {
-        const $g = enter.append('g')
+        const $g = enter.append('g').on('click', function (this, e, d) {
+          nodeOnclickHandler(d.data.ticker.split('-')[1])
+        })
         $g.append('rect')
           .on('mouseover', function (d, i) {
             d3.select(this).style('opacity', '.70')
@@ -313,7 +315,12 @@ export default function TreeChart({
   }, [changeRate, width, height, selectedSort, modalOpenHandler])
   return (
     <div
-      style={{ display: 'flex', width: '100%', height: '100%' }}
+      style={{
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        background: '#ffffff'
+      }}
       ref={chartContainerSvg}
     >
       <svg id="tree-chart" ref={chartSvg}>

@@ -137,8 +137,6 @@ const ChartHeaderContainer = styled('div')`
   height: 10%;
   background-color: #ffffff;
   box-sizing: border-box;
-  border: 1px solid #cac4d0;
-  border-radius: 20px;
   justify-content: space-around;
   align-items: center;
   ${props => props.theme.breakpoints.down('tablet')} {

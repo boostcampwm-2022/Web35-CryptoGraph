@@ -16,12 +16,11 @@ import ChartTagController from '../ChartTagController'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
-  durationPeriod: number
-  candleCount: number
   data: CoinRateType //선택된 코인 리스트
   Market: string[]
   selectedSort: string
   modalOpenHandler: (market: string) => void
+  durationPeriod?: number
 }
 
 //------------------------------setChartContainerSize------------------------------
@@ -112,13 +111,15 @@ const updateChart = (
     .data(ArrayDataValue, d => d.name)
     .join(
       enter => {
-        const $g = enter.append('g')
+        const $g = enter.append('g').on('click', function (e, d) {
+          nodeOnclickHandler(d.ticker.split('-')[1])
+        })
         $g.attr(
           'transform',
           (d, i) => 'translate(0,' + i * (barHeight + barMargin) + ')'
         )
           .transition()
-          .duration(1000)
+          .duration(durationPeriod)
           .style('opacity', 1)
         $g.append('rect')
           .on('mouseover', function (d, i) {
@@ -141,9 +142,6 @@ const updateChart = (
             )
           })
           .attr('height', barHeight)
-          .on('click', function (this, e, d) {
-            nodeOnclickHandler(d.ticker.split('-')[1])
-          })
           .style('fill', d => {
             if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
@@ -216,7 +214,7 @@ const updateChart = (
             )
           })
           .attr('height', barHeight)
-          .style('fill', (d, i) => {
+          .style('fill', d => {
             if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
             else return colorQuantizeScale(max, d.value)
@@ -237,7 +235,7 @@ const updateChart = (
           .attr('y', barHeight / 2)
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'middle')
-          .style('font-size', `${barHeight * 0.6}px`)
+          .style('font-size', `${barHeight * 0.3}px`)
           .text(d =>
             selectedSort !== 'trade price'
               ? selectedSort === 'market capitalization'
@@ -273,8 +271,7 @@ const updateChart = (
 }
 //------------------------------Component------------------------------
 export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
-  durationPeriod,
-  candleCount,
+  durationPeriod = 500,
   data,
   Market,
   selectedSort,
@@ -296,7 +293,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       changeRate,
       width,
       height,
-      candleCount,
+      Market.length,
       selectedSort,
       modalOpenHandler,
       setPointerInfo
@@ -306,9 +303,9 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     width,
     height,
     changeRate,
-    candleCount,
     selectedSort,
     durationPeriod,
+    Market.length,
     modalOpenHandler
   ]) // 창크기에 따른 차트크기 조절
   useEffect(() => {
@@ -326,7 +323,8 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       style={{
         display: 'flex',
         width: '100%',
-        height: '98%',
+        background: '#ffffff',
+        height: '100%',
         overflow: 'auto'
       }}
     >

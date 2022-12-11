@@ -16,6 +16,8 @@ import { useRealTimeCoinListData } from '@/hooks/useRealTimeCoinListData'
 import { MyAppContext } from './_app'
 import MuiModal from '@/components/Modal'
 import LinkButton from '@/components/LinkButton'
+import TabBox from '@/components/TabBox'
+import { NoSelectedCoinAlertView } from '@/components/NoSelectedCoinAlertView'
 
 export default function Home() {
   const data = useContext(MyAppContext)
@@ -44,7 +46,7 @@ export default function Home() {
       ? (() => {
           setIsDrawerOpened(true)
           setSelectedMarket(market)
-          setSelectedTab(3)
+          setSelectedTab(2) //코인 상세 정보가 3번째 탭에 위치에 있기 때문에 발생하는 매직 넘버
         })()
       : (() => {
           setIsModalOpened(true)
@@ -58,6 +60,7 @@ export default function Home() {
       {isMobile ? (
         <Box sx={{ position: 'absolute' }}>
           <SwipeableTemporaryDrawer
+            buttonLabel="차트 정보 더보기"
             isDrawerOpened={isDrawerOpened}
             setIsDrawerOpened={setIsDrawerOpened}
           >
@@ -65,36 +68,37 @@ export default function Home() {
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
             >
-              <ChartSelectController
-                selected={selectedChart}
-                selectedSetter={setSelectedChart}
-                tabLabelInfo={'차트 선택'}
-              />
-              <SortSelectController
-                selectedSort={selectedSort}
-                selectedSortSetter={setSelectedSort}
-                selectedChart={selectedChart}
-                tabLabelInfo={'정렬 기준'}
-              />
-              <CoinSelectController
-                selectedCoinListSetter={setSelectedMarketList}
-                tabLabelInfo={'코인 선택'}
-              />
-              <Box>
-                <CoinDetailedInfo
-                  market={selectedMarket}
-                  tabLabelInfo={'상세 정보'}
-                ></CoinDetailedInfo>
+              <TabBox tabLabelInfo={'차트 설정'}>
+                <Box sx={{ p: '32px' }}>
+                  <ChartSelectController
+                    selected={selectedChart}
+                    selectedSetter={setSelectedChart}
+                  />
+                  <SortSelectController
+                    selectedSort={selectedSort}
+                    selectedSortSetter={setSelectedSort}
+                    selectedChart={selectedChart}
+                  />
+                </Box>
+              </TabBox>
+              <TabBox tabLabelInfo={'코인 선택'}>
+                <CoinSelectController
+                  selectedCoinListSetter={setSelectedMarketList}
+                />
+              </TabBox>
+              <TabBox tabLabelInfo={'상세 정보'}>
+                <CoinDetailedInfo market={selectedMarket}></CoinDetailedInfo>
                 <LinkButton
                   goto={`detail/${selectedMarket}`}
                   content={`${selectedMarket}(으)로 바로가기`}
+                  style={{ position: 'absolute', bottom: 0 }}
                 />
-              </Box>
+              </TabBox>
             </TabContainer>
           </SwipeableTemporaryDrawer>
         </Box>
       ) : (
-        <SideBarContainer>
+        <SideBarContainer sx={{ backgroundColor: '#ffffff' }}>
           <ChartSelectController
             selected={selectedChart}
             selectedSetter={setSelectedChart}
@@ -104,7 +108,7 @@ export default function Home() {
             selectedSortSetter={setSelectedSort}
             selectedChart={selectedChart}
           />
-          <Box sx={{ width: '100%', height: '60%' }}>
+          <Box sx={{ width: '100%', height: '80%' }}>
             <CoinSelectController
               selectedCoinListSetter={setSelectedMarketList}
             />
@@ -121,29 +125,30 @@ export default function Home() {
           </MuiModal>
         </SideBarContainer>
       )}
-      {selectedMarketList.length !== 0 ? (
-        <ChartContainer>
-          {selectedChart === 'RunningChart' ? (
-            <RunningChart
-              candleCount={selectedMarketList.length}
-              durationPeriod={500}
-              data={coinData}
-              Market={selectedMarketList}
-              selectedSort={selectedSort}
-              modalOpenHandler={chartNodeHandler}
-            />
-          ) : (
-            <TreeChart
-              data={coinData}
-              Market={selectedMarketList}
-              selectedSort={selectedSort}
-              modalOpenHandler={chartNodeHandler}
-            />
-          )}
-        </ChartContainer>
-      ) : (
-        '선택된 코인이 없습니다.' // 괜찮은 이미지 추가하면 좋을듯
-      )}
+      <ChartContainer>
+        {selectedMarketList.length !== 0 ? (
+          <>
+            {selectedChart === 'RunningChart' ? (
+              <RunningChart
+                durationPeriod={500}
+                data={coinData}
+                Market={selectedMarketList}
+                selectedSort={selectedSort}
+                modalOpenHandler={chartNodeHandler}
+              />
+            ) : (
+              <TreeChart
+                data={coinData}
+                Market={selectedMarketList}
+                selectedSort={selectedSort}
+                modalOpenHandler={chartNodeHandler}
+              />
+            )}
+          </>
+        ) : (
+          <NoSelectedCoinAlertView />
+        )}
+      </ChartContainer>
     </HomeContainer>
   )
 }
@@ -162,11 +167,14 @@ const SideBarContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding: 0 1rem;
+  background-color: '#ffffff';
   align-items: center;
   min-width: 330px;
   max-width: 330px;
   height: 100%;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  margin-top: 8px;
   ${props => props.theme.breakpoints.down('tablet')} {
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
     height: 100px;
@@ -174,6 +182,7 @@ const SideBarContainer = styled(Box)`
 `
 const ChartContainer = styled(Box)`
   display: flex;
+  background: '#ffffff';
   box-sizing: content-box; //얘가 차트 크기를 고정해준다. 이유는 아직 모르겠다..
   min-width: 300px;
   width: 100%;

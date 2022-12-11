@@ -1,32 +1,59 @@
 import * as React from 'react'
-import Document, { Html, Head, Main, NextScript } from 'next/document'
+import Document, {
+  Html,
+  Head,
+  Main,
+  NextScript,
+  DocumentContext,
+  DocumentInitialProps
+} from 'next/document'
 import createEmotionServer from '@emotion/server/create-instance'
 import theme, { roboto } from '../style/theme'
 import createEmotionCache from '../style/createEmotionCache'
+import { EmotionCache } from '@emotion/react'
+import { AppType } from 'next/app'
 
-export default class MyDocument extends Document {
-  render() {
-    return (
-      <Html lang="en" className={roboto.className}>
-        <Head>
-          {/* PWA primary color */}
-          <meta name="theme-color" content={theme.palette.primary.main} />
-          <link rel="shortcut icon" href="/favicon.ico" />
-          <meta name="emotion-insertion-point" content="" />
-          {(this.props as any).emotionStyleTags}
-        </Head>
-        <body>
-          <Main />
-          <NextScript />
-        </body>
-      </Html>
-    )
-  }
+interface DocumentProps extends DocumentInitialProps {
+  emotionStyleTags: React.ReactNode[]
+}
+export default function MyDocument(props: DocumentProps) {
+  return (
+    <Html lang="ko" className={roboto.className}>
+      <Head>
+        {/* PWA primary color */}
+        <meta name="theme-color" content={theme.palette.primary.main} />
+        <meta name="emotion-insertion-point" content="" />
+        {props.emotionStyleTags}
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://cryptograph.servehttp.com/" />
+        <meta property="og:title" content="크립토그래프" />
+        <meta
+          property="og:image"
+          content="https://cryptograph.servehttp.com/doge_thumbnail.png"
+        />
+        <meta
+          property="og:description"
+          content="실시간 암호화폐 데이터 시각화 웹 서비스"
+        />
+        <meta property="og:site_name" content="CryptoGraph" />
+        <meta property="og:locale" content="ko_KR" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  )
 }
 
 // `getInitialProps` belongs to `_document` (instead of `_app`),
 // it's compatible with static-site generation (SSG).
-MyDocument.getInitialProps = async ctx => {
+MyDocument.getInitialProps = async (
+  ctx: DocumentContext
+): Promise<DocumentProps> => {
   // Resolution order
   //
   // On the server:
@@ -58,12 +85,13 @@ MyDocument.getInitialProps = async ctx => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: (App: any) =>
+      enhanceApp: (
+        App: AppType | React.ComponentType<{ emotionCache: EmotionCache }>
+      ) =>
         function EnhanceApp(props) {
           return <App emotionCache={cache} {...props} />
         }
     })
-
   const initialProps = await Document.getInitialProps(ctx)
   // This is important. It prevents Emotion to render invalid HTML.
   // See https://github.com/mui/material-ui/issues/26561#issuecomment-855286153

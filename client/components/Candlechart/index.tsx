@@ -127,7 +127,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
             if (newDate <= lastDate) {
               return [...prev, ...res]
             }
-            return [...prev, ...res]
+            return [...prev]
           })
         })
       }
@@ -154,6 +154,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
         ref={chartContainerRef}
         style={{
           display: 'flex',
+          background: '#ffffff',
           width: '100%',
           height: '100%'
         }}
@@ -182,6 +183,6 @@ const ChartContainer = styled('div')`
   display: flex;
   height: 100%;
   ${props => props.theme.breakpoints.down('tablet')} {
-    height: 400px;
+    height: calc(100% - 150px);
   }
 `

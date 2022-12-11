@@ -60,10 +60,12 @@ const Container = styled('div')`
   flex-direction: column;
   width: 100%;
   box-sizing: border-box;
-  padding: 8px;
-  border: 1px solid #cac4d0;
-  border-radius: 20px;
+  padding: 16px;
+  background-color: #ffffff;
   font-size: 12px;
+  ${props => props.theme.breakpoints.up('tablet')} {
+    margin-bottom: 8px;
+  }
 `
 
 const Header = styled('div')`
@@ -72,7 +74,7 @@ const Header = styled('div')`
 `
 const HeaderContent = styled('div')`
   display: flex;
-  margin-left: 10px;
+  margin-left: 8px;
   font-size: 15px;
   flex-direction: column;
   justify-content: center;
