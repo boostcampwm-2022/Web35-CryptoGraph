@@ -112,8 +112,7 @@ const updateChart = (
           .style('opacity', 1)
 
         $g.append('rect')
-          .attr('width', function (d) {
-            // console.log(d.acc_trade_price_24h)
+          .attr('width', (d: CoinRateContentType) => {
             return scale(
               selectedSort !== 'trade price'
                 ? selectedSort !== 'market capitalization'
@@ -123,7 +122,7 @@ const updateChart = (
             )
           })
           .attr('height', barHeight)
-          .on('click', function (this, e, d) {
+          .on('click', (e, d: CoinRateContentType) => {
             nodeOnclickHandler(d.ticker.split('-')[1])
           })
           .style('fill', d => {
