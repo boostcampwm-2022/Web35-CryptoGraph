@@ -25,7 +25,6 @@ export default function MyDocument(props: DocumentProps) {
         <meta name="emotion-insertion-point" content="" />
         {props.emotionStyleTags}
         <link rel="shortcut icon" href="/favicon.ico" />
-        <meta name="viewport" content="initial-scale=1, width=device-width" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://cryptograph.servehttp.com/" />
         <meta property="og:title" content="크립토그래프" />
