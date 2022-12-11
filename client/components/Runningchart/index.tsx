@@ -125,10 +125,10 @@ const updateChart = (
             d3.select(this).style('opacity', '.70')
           })
           .on('mousemove', function (d, i) {
-            MainChartHandleMouseEvent(d, setPointerHandler, i)
+            MainChartHandleMouseEvent(d, setPointerHandler, i, height)
           })
           .on('mouseout', function (d, i) {
-            MainChartHandleMouseEvent(d, setPointerHandler, i)
+            MainChartHandleMouseEvent(d, setPointerHandler, i, height)
             d3.select(this).style('opacity', '1')
           })
           .attr('width', function (d) {
@@ -320,7 +320,6 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     }
     setchangeRate(newCoinData)
   }, [data, Market, coinRate])
-
   return (
     <div
       id="chart"
