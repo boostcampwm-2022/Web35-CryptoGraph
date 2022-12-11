@@ -27,7 +27,7 @@ export default function SearchCoin({
 const textFieldStyle = {
   backgroundColor: 'white',
   height: '48px',
+  pr: 2,
   width: '100%',
-  pl: 2,
   gap: 2
 }

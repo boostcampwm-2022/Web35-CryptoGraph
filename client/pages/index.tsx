@@ -40,6 +40,7 @@ export default function Home() {
       setSelectedSort('change rate')
     }
   }, [selectedChart])
+
   const chartNodeHandler = (market: string) => {
     isMobile
       ? (() => {
