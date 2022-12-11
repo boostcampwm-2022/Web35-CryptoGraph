@@ -3,19 +3,72 @@ import { TabProps } from '@/components/TabContainer'
 import Image from 'next/image'
 import { CoinPrice } from '@/types/CoinPriceTypes'
 import Link from 'next/link'
+import { useState } from 'react'
 //코인 실시간 정보
+
+export const sortTypeArr = [
+  'signed_change_rate',
+  'acc_trade_price_24h',
+  'price'
+] as const
+export type sortType = typeof sortTypeArr[number]
+
 export default function RealTimeCoinPrice(props: TabProps) {
+  const [toSort, setToSort] = useState<sortType>('acc_trade_price_24h')
+  const [sortDirection, setSortDirection] = useState<boolean>(true) //true <- 큰거부터, false <- 작은거부터
+
+  const sortHandler = (clicked: sortType) => {
+    if (clicked === toSort) {
+      setSortDirection(prev => !prev)
+      return
+    }
+    setToSort(clicked)
+    setSortDirection(true)
+  }
+
   return (
     <Container>
-      <CoinPriceHeader />
+      <Header>
+        <div className="header">
+          <div className="name">코인명</div>
+          <div
+            className="price"
+            onClick={() => {
+              sortHandler('price')
+            }}
+          >
+            현재가
+          </div>
+          <div
+            className="yesterday"
+            onClick={() => {
+              sortHandler('signed_change_rate')
+            }}
+          >
+            전일대비
+          </div>
+          <div
+            className="amount"
+            onClick={() => {
+              sortHandler('acc_trade_price_24h')
+            }}
+          >
+            거래대금
+          </div>
+        </div>
+      </Header>
       <CoinPriceContainer>
         {props.priceInfo &&
-          Object.values(props.priceInfo).map(coinPrice => (
-            <CoinPriceTab
-              key={coinPrice.name}
-              coinPrice={coinPrice}
-            ></CoinPriceTab>
-          ))}
+          Object.values(props.priceInfo)
+            .sort((a, b) => {
+              return (sortDirection ? 1 : -1) * (b[toSort] - a[toSort])
+            })
+            .map(coinPrice => (
+              <CoinPriceTab
+                key={coinPrice.name}
+                coinPrice={coinPrice}
+              ></CoinPriceTab>
+            ))}
       </CoinPriceContainer>
     </Container>
   )
@@ -75,19 +128,6 @@ const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
   )
 }
 
-const CoinPriceHeader: React.FunctionComponent = () => {
-  return (
-    <Header>
-      <div className="header">
-        <div className="name">코인명</div>
-        <div className="price">현재가</div>
-        <div className="yesterday">전일대비</div>
-        <div className="amount">거래대금</div>
-      </div>
-    </Header>
-  )
-}
-
 const Container = styled('div')`
   display: flex;
   flex-direction: column;
@@ -109,11 +149,27 @@ const Header = styled('div')`
   padding-left: 40px;
   & > div.header {
     display: flex;
-    & > div:first-child {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    & > div:first-of-type {
       flex: 2;
     }
-    & > div:nth-child(n + 2) {
+    & > div:nth-of-type(n + 2) {
       flex: 1;
+    }
+
+    & > div {
+      :hover {
+        background-color: ${props => props.theme.palette.primary.main};
+        color: #ffffff;
+        transition: 0.5s;
+        transform: scale(1.1); /*  default */
+        -webkit-transform: scale(1.1); /*  크롬 */
+        -moz-transform: scale(1.1); /* FireFox */
+        -o-transform: scale(1.1); /* Opera */
+      }
     }
   }
 `
@@ -126,16 +182,6 @@ const CoinPriceContainer = styled('div')`
   display: flex;
   flex-direction: column;
   gap: 5px;
-  ::-webkit-scrollbar {
-    width: 4px;
-    position: relative;
-  }
-  ::-webkit-scrollbar-track {
-    display: none;
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: rgb(199, 199, 199);
-  }
 `
 
 const CoinPriceDiv = styled('div')`
