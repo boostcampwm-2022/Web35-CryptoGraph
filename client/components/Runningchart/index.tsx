@@ -13,6 +13,7 @@ import {
 import { convertUnit } from '@/utils/chartManager'
 import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
 import ChartTagController from '../ChartTagController'
+import { styled } from '@mui/system'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
@@ -46,10 +47,6 @@ const updateChart = (
   nodeOnclickHandler: (market: string) => void,
   setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>
 ) => {
-  // if (!data || !svgRef) {
-  //   return
-  // }
-
   //ArrayDataValue : 기존 Object<object>이던 data를 data.value, 즉 실시간변동 퍼센테이지 값만 추출해서 Array<object>로 변경
   const ArrayDataValue: CoinRateContentType[] = [
     ...Object.values<CoinRateContentType>(data)
@@ -320,21 +317,19 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     setchangeRate(newCoinData)
   }, [data, Market, coinRate])
   return (
-    <div
-      id="chart"
-      ref={chartContainerRef}
-      style={{
-        display: 'flex',
-        width: '100%',
-        background: '#ffffff',
-        height: '100%',
-        overflow: 'auto'
-      }}
-    >
+    <ChartContainer ref={chartContainerRef}>
       <svg id="chart-container" ref={chartSvg}>
         <svg id="running-chart" />
       </svg>
       <ChartTagController pointerInfo={pointerInfo} />
-    </div>
+    </ChartContainer>
   )
 }
+
+const ChartContainer = styled('div')`
+  display: 'flex';
+  width: '100%';
+  background: '#ffffff';
+  height: '100%';
+  overflow: 'auto';
+`

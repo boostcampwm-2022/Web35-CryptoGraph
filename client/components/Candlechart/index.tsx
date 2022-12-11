@@ -99,7 +99,6 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   useEffect(() => {
     const needFetch = checkNeedFetch(props.candleData, option)
     if (needFetch) {
-      // console.log('fetching at ', props.candleData.length, isFetching.current)
       if (!isFetching.current) {
         isFetching.current = true
         getCandleDataArray(
@@ -113,17 +112,13 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
             console.error('코인 쿼리 실패, 404에러')
             return
           }
-          // console.log(
-          //   props.candleData[props.candleData.length - 1].candle_date_time_kst
-          // )
-          // console.log(res[0].candle_date_time_kst)
+
           isFetching.current = false
           props.candleDataSetter(prev => {
             const lastDate = new Date(
               prev[prev.length - 1].candle_date_time_kst
             )
             const newDate = new Date(res[0].candle_date_time_kst)
-            // console.log(lastDate, newDate)
             if (newDate <= lastDate) {
               return [...prev, ...res]
             }
@@ -148,33 +143,22 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   }, [pointerInfo, windowSize, option, props])
 
   return (
-    <ChartContainer>
-      <div
-        id="chart"
-        ref={chartContainerRef}
-        style={{
-          display: 'flex',
-          background: '#ffffff',
-          width: '100%',
-          height: '100%'
-        }}
-      >
-        <svg id="chart-container" ref={chartSvg}>
-          <g id="y-axis" />
-          <svg id="x-axis-container">
-            <g id="x-axis" />
-          </svg>
-          <svg id="chart-area" />
-          <svg id="current-price">
-            <line />
-            <rect />
-            <text />
-          </svg>
-          <svg id="mouse-pointer-UI"></svg>
-          <svg id="volume-UI"></svg>
-          <text id="price-info"></text>
+    <ChartContainer ref={chartContainerRef}>
+      <svg id="chart-container" ref={chartSvg}>
+        <g id="y-axis" />
+        <svg id="x-axis-container">
+          <g id="x-axis" />
         </svg>
-      </div>
+        <svg id="chart-area" />
+        <svg id="current-price">
+          <line />
+          <rect />
+          <text />
+        </svg>
+        <svg id="mouse-pointer-UI"></svg>
+        <svg id="volume-UI"></svg>
+        <text id="price-info"></text>
+      </svg>
     </ChartContainer>
   )
 }
@@ -182,6 +166,8 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
 const ChartContainer = styled('div')`
   display: flex;
   height: 100%;
+  width: '100%';
+  background: '#ffffff';
   ${props => props.theme.breakpoints.down('tablet')} {
     height: calc(100% - 150px);
   }

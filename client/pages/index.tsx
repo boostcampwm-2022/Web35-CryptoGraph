@@ -91,7 +91,7 @@ export default function Home() {
                 <LinkButton
                   goto={`detail/${selectedMarket}`}
                   content={`${selectedMarket}(으)로 바로가기`}
-                  style={{ position: 'absolute', bottom: 0 }}
+                  style={LinkButtonStyle}
                 />
               </TabBox>
             </TabContainer>
@@ -189,3 +189,4 @@ const ChartContainer = styled(Box)`
   height: 100%;
   flex-direction: column;
 `
+const LinkButtonStyle = { position: 'absolute', bottom: 0 }

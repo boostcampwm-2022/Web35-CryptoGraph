@@ -104,6 +104,7 @@ export default function CoinSelectController({
           return (
             <SelectCoinInnerLayer
               key={index}
+              //coin.name 의존성때문에 styled-component에 포함하지 않습니다.
               style={
                 inputCoinName
                   ? coinDict[inputCoinName]?.includes(coin.name)
