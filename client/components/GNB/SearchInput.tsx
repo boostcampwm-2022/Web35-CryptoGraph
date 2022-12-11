@@ -27,7 +27,7 @@ export default function SearchInput() {
   return (
     <Stack
       spacing={2}
-      sx={isMobile ? { width: 400 } : { paddingLeft: '68px', width: 400 }}
+      sx={isMobile ? { width: 400 } : { paddingLeft: '68px', width: 400 }} //단순 스타일링을 위한 매직넘버사용
     >
       <Autocomplete
         freeSolo
