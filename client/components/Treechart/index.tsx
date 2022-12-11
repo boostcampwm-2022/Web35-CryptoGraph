@@ -1,10 +1,16 @@
 import * as d3 from 'd3'
 import { useState, useEffect, useRef } from 'react'
 import { useWindowSize } from '@/hooks/useWindowSize'
-import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
+import {
+  CoinRateType,
+  CoinRateContentType,
+  RunningPointerData
+} from '@/types/ChartTypes'
 import { colorQuantizeScale } from '@/utils/chartManager'
 import { throttle } from 'lodash'
-import { convertUnit } from '@/utils/chartManager'
+import { convertUnit, MainChartHandleMouseEvent } from '@/utils/chartManager'
+import ChartTagController from '../ChartTagController'
+import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -12,7 +18,8 @@ const updateChart = (
   width: number,
   height: number,
   selectedSort: string,
-  nodeOnclickHandler: (market: string) => void
+  nodeOnclickHandler: (market: string) => void,
+  setPointerHandler: React.Dispatch<React.SetStateAction<RunningPointerData>>
 ) => {
   if (!svgRef.current) return
   const chartContainer = d3.select<SVGSVGElement, CoinRateContentType>(
@@ -84,7 +91,12 @@ const updateChart = (
           .on('mouseover', function (d, i) {
             d3.select(this).style('opacity', '.70')
           })
+          .on('mousemove', function (d, i) {
+            console.log(i, 'trree i')
+            MainChartHandleMouseEvent(d, setPointerHandler, i.data)
+          })
           .on('mouseout', function (d, i) {
+            MainChartHandleMouseEvent(d, setPointerHandler, i.data)
             d3.select(this).style('opacity', '1')
           })
           .on('click', function (this, e, d) {
@@ -132,6 +144,7 @@ const updateChart = (
             return `${(d.x1 - d.x0) / 9}px`
           })
           .attr('fill', 'white')
+        $g.append('text').attr('class', 'tag')
         return $g
       },
       update => {
@@ -250,6 +263,9 @@ export default function TreeChart({
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerSvg)
+  const [pointerInfo, setPointerInfo] = useState<RunningPointerData>(
+    DEFAULT_RUNNING_POINTER_DATA
+  )
 
   useEffect(() => {
     initChart(chartSvg, width, height)
@@ -280,10 +296,12 @@ export default function TreeChart({
       width,
       height,
       selectedSort,
-      modalOpenHandler
+      modalOpenHandler,
+      setPointerInfo
     )
+    setPointerInfo(DEFAULT_RUNNING_POINTER_DATA)
   }, [changeRate, width, height, selectedSort, modalOpenHandler])
-
+  console.log(pointerInfo)
   return (
     <div
       style={{ display: 'flex', width: '100%', height: '100%' }}
@@ -292,6 +310,7 @@ export default function TreeChart({
       <svg id="tree-chart" ref={chartSvg}>
         <svg id="chart-area"></svg>
       </svg>
+      <ChartTagController pointerInfo={pointerInfo} />
     </div>
   )
 }

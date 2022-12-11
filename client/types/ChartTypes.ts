@@ -117,3 +117,9 @@ export interface PointerData {
   positionY: number
   data: CandleData | null
 }
+
+export interface RunningPointerData {
+  offsetX: number
+  offsetY: number
+  data: CoinRateContentType | null
+}

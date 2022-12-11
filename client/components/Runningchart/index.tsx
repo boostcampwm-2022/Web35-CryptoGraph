@@ -1,9 +1,18 @@
 import * as d3 from 'd3'
-import * as React from 'react'
-import { CoinRateContentType, CoinRateType } from '@/types/ChartTypes'
+import { useState, useEffect, useRef } from 'react'
+import {
+  CoinRateContentType,
+  CoinRateType,
+  RunningPointerData
+} from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
-import { colorQuantizeScale } from '@/utils/chartManager'
+import {
+  colorQuantizeScale,
+  MainChartHandleMouseEvent
+} from '@/utils/chartManager'
 import { convertUnit } from '@/utils/chartManager'
+import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
+import ChartTagController from '../ChartTagController'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
@@ -35,11 +44,12 @@ const updateChart = (
   height: number,
   candleCount: number,
   selectedSort: string,
-  nodeOnclickHandler: (market: string) => void
+  nodeOnclickHandler: (market: string) => void,
+  setPointerHandler: React.Dispatch<React.SetStateAction<RunningPointerData>>
 ) => {
-  if (!data || !svgRef) {
-    return
-  }
+  // if (!data || !svgRef) {
+  //   return
+  // }
 
   //ArrayDataValue : 기존 Object<object>이던 data를 data.value, 즉 실시간변동 퍼센테이지 값만 추출해서 Array<object>로 변경
   const ArrayDataValue: CoinRateContentType[] = [
@@ -110,16 +120,18 @@ const updateChart = (
           .transition()
           .duration(1000)
           .style('opacity', 1)
-
         $g.append('rect')
           .on('mouseover', function (d, i) {
             d3.select(this).style('opacity', '.70')
           })
+          .on('mousemove', function (d, i) {
+            MainChartHandleMouseEvent(d, setPointerHandler, i)
+          })
           .on('mouseout', function (d, i) {
+            MainChartHandleMouseEvent(d, setPointerHandler, i)
             d3.select(this).style('opacity', '1')
           })
           .attr('width', function (d) {
-            // console.log(d.acc_trade_price_24h)
             return scale(
               selectedSort !== 'trade price'
                 ? selectedSort !== 'market capitalization'
@@ -165,7 +177,7 @@ const updateChart = (
           )
 
         $g.append('text')
-          .attr('id', 'CoinName')
+          .attr('class', 'CoinName')
           .attr('x', d => {
             return scale(
               selectedSort !== 'trade price'
@@ -180,6 +192,7 @@ const updateChart = (
           .attr('dominant-baseline', 'middle')
           .style('font-size', `${barHeight * 0.6}px`)
           .text(d => d.ticker.split('-')[1])
+        $g.append('text').attr('class', 'tag')
         return $g
       },
       update => {
@@ -235,7 +248,7 @@ const updateChart = (
           )
 
         update
-          .select('#CoinName')
+          .select('.CoinName')
           .transition()
           .duration(durationPeriod)
           .attr('x', d => {
@@ -268,13 +281,15 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   selectedSort,
   modalOpenHandler
 }) => {
-  const chartContainerRef = React.useRef<HTMLDivElement>(null)
-  const chartSvg = React.useRef(null)
+  const chartContainerRef = useRef<HTMLDivElement>(null)
+  const chartSvg = useRef(null)
   const { width, height } = useWindowSize(chartContainerRef)
-  const [coinRate, setCoinRate] = React.useState<CoinRateType>(data) //coin의 등락률 값, 모든 코인 값 보유
-  const [changeRate, setchangeRate] = React.useState<CoinRateType>({}) //선택된 코인 값만 보유
-
-  React.useEffect(() => {
+  const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값, 모든 코인 값 보유
+  const [changeRate, setchangeRate] = useState<CoinRateType>({}) //선택된 코인 값만 보유
+  const [pointerInfo, setPointerInfo] = useState<RunningPointerData>(
+    DEFAULT_RUNNING_POINTER_DATA
+  )
+  useEffect(() => {
     if (!Object.keys(changeRate).length) return
     updateChart(
       durationPeriod,
@@ -284,8 +299,10 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       height,
       candleCount,
       selectedSort,
-      modalOpenHandler
+      modalOpenHandler,
+      setPointerInfo
     )
+    setPointerInfo(DEFAULT_RUNNING_POINTER_DATA)
   }, [
     width,
     height,
@@ -295,8 +312,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     durationPeriod,
     modalOpenHandler
   ]) // 창크기에 따른 차트크기 조절
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (!coinRate || !Market[0]) return
     const newCoinData: CoinRateType = {}
     for (const tick of Market) {
@@ -319,6 +335,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       <svg id="chart-container" ref={chartSvg}>
         <svg id="running-chart" />
       </svg>
+      <ChartTagController pointerInfo={pointerInfo} />
     </div>
   )
 }
