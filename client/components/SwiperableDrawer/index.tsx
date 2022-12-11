@@ -4,12 +4,14 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer'
 import Fab from '@mui/material/Fab'
 import NavigationIcon from '@mui/icons-material/Navigation'
 interface SwipeableTemporaryDrawerProps {
+  buttonLabel: string
   isDrawerOpened: boolean
   setIsDrawerOpened: React.Dispatch<React.SetStateAction<boolean>>
   children: React.ReactNode
 }
 
 export default function SwipeableTemporaryDrawer({
+  buttonLabel,
   isDrawerOpened,
   setIsDrawerOpened,
   children
@@ -37,10 +39,10 @@ export default function SwipeableTemporaryDrawer({
         size="medium"
         color="primary"
         aria-label="add"
-        sx={{ mb: 3 }}
+        sx={{ mb: 1, mt: 1 }}
       >
         <NavigationIcon sx={{ mr: 1 }} />
-        차트 정보 더보기
+        {buttonLabel}
       </Fab>
       <SwipeableDrawer
         anchor={'bottom'}
@@ -48,8 +50,14 @@ export default function SwipeableTemporaryDrawer({
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
       >
-        <Box sx={{ minHeight: '30vh', maxHeight: '50vh' }}>{children}</Box>
+        <Box sx={style}>{children}</Box>
       </SwipeableDrawer>
     </div>
   )
+}
+
+const style = {
+  height: '400px',
+  maxHeight: '80vh', //400px보다 화면 높이가 작을경우, 최대 값 정의, 100vh면 drawer를 나갈 수 없다.. 적당히 80vh 설정
+  width: '100%'
 }

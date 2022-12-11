@@ -1,20 +1,26 @@
 import { Button } from '@mui/material'
-import { fontSize } from '@mui/system'
 import Link from 'next/link'
 
 interface ChartButtonProps {
   goto: string
   content: string
+  style?: object
 }
 export default function Chartbutton({
   goto = '/',
-  content = 'default'
+  content = 'default',
+  style = {}
 }: ChartButtonProps) {
   return (
-    <Link href={goto}>
+    <Link
+      href={goto}
+      style={{ textDecoration: 'none', width: '100%', marginTop: '8px' }}
+    >
       <Button
         style={{
-          width: '100%'
+          width: '100%',
+
+          ...style
         }}
         size="large"
         variant="contained"

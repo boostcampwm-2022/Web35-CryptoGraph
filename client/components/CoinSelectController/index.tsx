@@ -4,7 +4,6 @@ import Checkbox from '@mui/material/Checkbox'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
-import { TabProps } from '@mui/material'
 import SearchCoin from './SearchCoin'
 import MakeCoinDict from './MakeCoinDict'
 import { MyAppContext } from '../../pages/_app'
@@ -16,7 +15,7 @@ interface dict<T> {
 interface CoinChecked {
   [key: string]: boolean
 }
-interface CoinSelectControllerProps extends TabProps {
+interface CoinSelectControllerProps {
   selectedCoinListSetter: React.Dispatch<React.SetStateAction<string[]>>
   tabLabelInfo?: string
 }
@@ -86,7 +85,7 @@ export default function CoinSelectController({
     <Container>
       <Header>
         <HeaderSelectCoin>
-          <HeaderTitle>코인선택</HeaderTitle>
+          <HeaderTitle>코인 선택</HeaderTitle>
           <HeaderSelectBox>
             <HeaderSelectBoxContent>전체 [선택/해제]</HeaderSelectBoxContent>
             <Checkbox
@@ -133,9 +132,11 @@ export default function CoinSelectController({
 
 const Container = styled('div')`
   display: flex;
+  background-color: '#ffffff';
   flex-direction: column;
   width: 100%;
   height: 100%;
+  margin-bottom: 100px;
 `
 const Header = styled('div')`
   padding: 1rem;

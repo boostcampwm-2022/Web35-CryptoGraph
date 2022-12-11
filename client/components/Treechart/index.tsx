@@ -1,10 +1,16 @@
 import * as d3 from 'd3'
 import { useState, useEffect, useRef } from 'react'
 import { useWindowSize } from '@/hooks/useWindowSize'
-import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
+import {
+  CoinRateType,
+  CoinRateContentType,
+  MainChartPointerData
+} from '@/types/ChartTypes'
 import { colorQuantizeScale } from '@/utils/chartManager'
 import { throttle } from 'lodash'
-import { convertUnit } from '@/utils/chartManager'
+import { convertUnit, MainChartHandleMouseEvent } from '@/utils/chartManager'
+import ChartTagController from '../ChartTagController'
+import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -12,7 +18,8 @@ const updateChart = (
   width: number,
   height: number,
   selectedSort: string,
-  nodeOnclickHandler: (market: string) => void
+  nodeOnclickHandler: (market: string) => void,
+  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>
 ) => {
   if (!svgRef.current) return
   const chartContainer = d3.select<SVGSVGElement, CoinRateContentType>(
@@ -79,11 +86,37 @@ const updateChart = (
     )
     .join(
       enter => {
-        const $g = enter.append('g')
-        $g.append('rect')
+        const $g = enter
+          .append('g')
           .on('click', (e, d) => {
             nodeOnclickHandler(d.data.ticker.split('-')[1])
           })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseover', function (this) {
+            d3.select(this).style('opacity', '.70')
+          })
+          .on('mousemove', (d, i) => {
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseout', function (d, i) {
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+            d3.select(this).style('opacity', '1')
+          })
+        $g.append('rect')
+
           .attr('x', d => {
             return d.x0
           })
@@ -104,6 +137,7 @@ const updateChart = (
               : colorQuantizeScale(min, d.data.value)
           })
           .style('stroke', 'gray')
+
         $g.append('text')
           .attr('x', d => {
             return d.x0 + Math.abs(d.x1 - d.x0) / 2
@@ -154,6 +188,7 @@ const updateChart = (
           .transition()
           .duration(500)
           .style('stroke', 'gray')
+
         update
           .select('text')
           .transition()
@@ -242,6 +277,9 @@ export default function TreeChart({
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerSvg)
+  const [pointerInfo, setPointerInfo] = useState<MainChartPointerData>(
+    DEFAULT_RUNNING_POINTER_DATA
+  )
 
   useEffect(() => {
     initChart(chartSvg, width, height)
@@ -272,18 +310,25 @@ export default function TreeChart({
       width,
       height,
       selectedSort,
-      modalOpenHandler
+      modalOpenHandler,
+      setPointerInfo
     )
+    setPointerInfo(DEFAULT_RUNNING_POINTER_DATA)
   }, [changeRate, width, height, selectedSort, modalOpenHandler])
-
   return (
     <div
-      style={{ display: 'flex', width: '100%', height: '100%' }}
+      style={{
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        background: '#ffffff'
+      }}
       ref={chartContainerSvg}
     >
       <svg id="tree-chart" ref={chartSvg}>
         <svg id="chart-area"></svg>
       </svg>
+      <ChartTagController pointerInfo={pointerInfo} />
     </div>
   )
 }

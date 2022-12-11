@@ -16,11 +16,13 @@ import {
   CandleChartRenderOption,
   CandleData,
   PointerData,
-  ChartPeriod
+  ChartPeriod,
+  MainChartPointerData
 } from '@/types/ChartTypes'
 import * as d3 from 'd3'
 import { makeDate } from './dateManager'
 import { blueColorScale, redColorScale } from '@/styles/colorScale'
+import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
 
 export function getVolumeHeightScale(
   data: CandleData[],
@@ -382,4 +384,28 @@ export const convertUnit = (unit: number) => {
     return (unit / 1000000000000).toFixed(2) + '조'
   }
   return (unit / 100000000).toFixed(0) + '억'
+}
+export function MainChartHandleMouseEvent(
+  event: MouseEvent,
+  pointerInfoSetter: React.Dispatch<
+    React.SetStateAction<MainChartPointerData>
+  >,
+  data: CoinRateContentType,
+  width: number,
+  height: number
+) {
+  if (event.type === 'mousemove') {
+    pointerInfoSetter({
+      offsetX: width * 4 > event.offsetX * 5 ? event.offsetX : event.offsetX - 150,
+      offsetY: height / 2 > event.clientY - 100 ? event.clientY - 100 : event.clientY - 250,
+      data: data
+    })
+  } else {
+    pointerInfoSetter({
+      offsetX: -1,
+      offsetY: -1,
+      data: null
+    })
+  }
+  return
 }
