@@ -18,13 +18,29 @@ interface DocumentProps extends DocumentInitialProps {
 }
 export default function MyDocument(props: DocumentProps) {
   return (
-    <Html lang="en" className={roboto.className}>
+    <Html lang="ko" className={roboto.className}>
       <Head>
         {/* PWA primary color */}
         <meta name="theme-color" content={theme.palette.primary.main} />
-        <link rel="shortcut icon" href="/favicon.ico" />
         <meta name="emotion-insertion-point" content="" />
         {props.emotionStyleTags}
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <meta name="viewport" content="initial-scale=1, width=device-width" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://cryptograph.servehttp.com/" />
+        <meta property="og:title" content="크립토그래프" />
+        <meta
+          property="og:image"
+          content="https://cryptograph.servehttp.com/doge_thumbnail.png"
+        />
+        <meta
+          property="og:description"
+          content="실시간 암호화폐 데이터 시각화 웹 서비스"
+        />
+        <meta property="og:site_name" content="CryptoGraph" />
+        <meta property="og:locale" content="ko_KR" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
       </Head>
       <body>
         <Main />
