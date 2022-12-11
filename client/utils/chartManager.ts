@@ -393,7 +393,6 @@ export function MainChartHandleMouseEvent(
   data: CoinRateContentType
 ) {
   if (event.type === 'mousemove') {
-    console.log(event)
     pointerPositionSetter({
       offsetX: event.offsetX,
       offsetY: event.clientY - 100,

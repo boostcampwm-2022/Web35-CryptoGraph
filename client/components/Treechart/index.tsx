@@ -92,7 +92,6 @@ const updateChart = (
             d3.select(this).style('opacity', '.70')
           })
           .on('mousemove', function (d, i) {
-            console.log(i, 'trree i')
             MainChartHandleMouseEvent(d, setPointerHandler, i.data)
           })
           .on('mouseout', function (d, i) {
@@ -301,7 +300,6 @@ export default function TreeChart({
     )
     setPointerInfo(DEFAULT_RUNNING_POINTER_DATA)
   }, [changeRate, width, height, selectedSort, modalOpenHandler])
-  console.log(pointerInfo)
   return (
     <div
       style={{ display: 'flex', width: '100%', height: '100%' }}
