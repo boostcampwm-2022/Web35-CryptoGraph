@@ -101,7 +101,9 @@ const updateChart = (
     .data(ArrayDataValue, d => d.name)
     .join(
       enter => {
-        const $g = enter.append('g')
+        const $g = enter.append('g').on('click', function (e, d) {
+          nodeOnclickHandler(d.ticker.split('-')[1])
+        })
         $g.attr(
           'transform',
           (d, i) => 'translate(0,' + i * (barHeight + barMargin) + ')'
@@ -122,9 +124,6 @@ const updateChart = (
             )
           })
           .attr('height', barHeight)
-          .on('click', function (this, e, d) {
-            nodeOnclickHandler(d.ticker.split('-')[1])
-          })
           .style('fill', d => {
             if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
