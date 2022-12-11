@@ -2,7 +2,7 @@ import {
   ChartPeriod,
   CandleChartOption,
   PointerData,
-  RunningPointerData
+  MainChartPointerData
 } from '@/types/ChartTypes'
 
 export const CHART_Y_AXIS_MARGIN = 70
@@ -29,7 +29,7 @@ export const DEFAULT_POINTER_DATA: PointerData = {
   data: null
 }
 
-export const DEFAULT_RUNNING_POINTER_DATA: RunningPointerData = {
+export const DEFAULT_RUNNING_POINTER_DATA: MainChartPointerData = {
   offsetX: -1,
   offsetY: -1,
   data: null

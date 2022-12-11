@@ -17,7 +17,7 @@ import {
   CandleData,
   PointerData,
   ChartPeriod,
-  RunningPointerData
+  MainChartPointerData
 } from '@/types/ChartTypes'
 import * as d3 from 'd3'
 import { makeDate } from './dateManager'
@@ -388,13 +388,12 @@ export const convertUnit = (unit: number) => {
 export function MainChartHandleMouseEvent(
   event: MouseEvent,
   pointerPositionSetter: React.Dispatch<
-    React.SetStateAction<RunningPointerData>
+    React.SetStateAction<MainChartPointerData>
   >,
   data: CoinRateContentType,
   height: number
 ) {
   if (event.type === 'mousemove') {
-    console.log(event.clientY, event.pageY, event.offsetY, event.screenY, event.movementY)
     pointerPositionSetter({
       offsetX: event.offsetX,
       offsetY: height / 2 > event.clientY - 100 ? event.clientY - 100 : event.clientY - 250,

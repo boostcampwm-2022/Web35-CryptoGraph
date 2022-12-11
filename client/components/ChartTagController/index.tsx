@@ -1,9 +1,9 @@
 import Box from '@mui/material/Box'
 import { convertUnit } from '@/utils/chartManager'
-import { RunningPointerData } from '@/types/ChartTypes'
+import { MainChartPointerData } from '@/types/ChartTypes'
 
 interface ChartTagControllerProps {
-  pointerInfo: RunningPointerData
+  pointerInfo: MainChartPointerData
 }
 
 export default function ChartTagController({
@@ -32,7 +32,7 @@ export default function ChartTagController({
         }}
       >
         <p>코인명 : {pointerInfo.data?.name}</p>
-        <p>종목코드 : {pointerInfo.data?.ticker?.split('-')[1]}</p>
+        <p>종목코드 : {pointerInfo.data?.ticker.split('-')[1]}</p>
         <p>시가총액 : {convertUnit(Number(pointerInfo.data?.market_cap))}</p>
       </Box>
     </>

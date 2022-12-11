@@ -4,7 +4,7 @@ import { useWindowSize } from '@/hooks/useWindowSize'
 import {
   CoinRateType,
   CoinRateContentType,
-  RunningPointerData
+  MainChartPointerData
 } from '@/types/ChartTypes'
 import { colorQuantizeScale } from '@/utils/chartManager'
 import { throttle } from 'lodash'
@@ -19,7 +19,7 @@ const updateChart = (
   height: number,
   selectedSort: string,
   nodeOnclickHandler: (market: string) => void,
-  setPointerHandler: React.Dispatch<React.SetStateAction<RunningPointerData>>
+  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>
 ) => {
   if (!svgRef.current) return
   const chartContainer = d3.select<SVGSVGElement, CoinRateContentType>(
@@ -262,7 +262,7 @@ export default function TreeChart({
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerSvg)
-  const [pointerInfo, setPointerInfo] = useState<RunningPointerData>(
+  const [pointerInfo, setPointerInfo] = useState<MainChartPointerData>(
     DEFAULT_RUNNING_POINTER_DATA
   )
 

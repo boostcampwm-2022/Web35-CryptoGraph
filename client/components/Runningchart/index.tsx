@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import {
   CoinRateContentType,
   CoinRateType,
-  RunningPointerData
+  MainChartPointerData
 } from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
 import {
@@ -45,7 +45,7 @@ const updateChart = (
   candleCount: number,
   selectedSort: string,
   nodeOnclickHandler: (market: string) => void,
-  setPointerHandler: React.Dispatch<React.SetStateAction<RunningPointerData>>
+  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>
 ) => {
   // if (!data || !svgRef) {
   //   return
@@ -286,7 +286,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   const { width, height } = useWindowSize(chartContainerRef)
   const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값, 모든 코인 값 보유
   const [changeRate, setchangeRate] = useState<CoinRateType>({}) //선택된 코인 값만 보유
-  const [pointerInfo, setPointerInfo] = useState<RunningPointerData>(
+  const [pointerInfo, setPointerInfo] = useState<MainChartPointerData>(
     DEFAULT_RUNNING_POINTER_DATA
   )
   useEffect(() => {

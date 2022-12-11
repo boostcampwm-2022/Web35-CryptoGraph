@@ -118,7 +118,7 @@ export interface PointerData {
   data: CandleData | null
 }
 
-export interface RunningPointerData {
+export interface MainChartPointerData {
   offsetX: number
   offsetY: number
   data: CoinRateContentType | null
