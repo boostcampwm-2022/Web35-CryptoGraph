@@ -143,7 +143,6 @@ const updateChart = (
             return `${(d.x1 - d.x0) / 9}px`
           })
           .attr('fill', 'white')
-        $g.append('text').attr('class', 'tag')
         return $g
       },
       update => {

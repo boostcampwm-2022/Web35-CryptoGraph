@@ -192,7 +192,6 @@ const updateChart = (
           .attr('dominant-baseline', 'middle')
           .style('font-size', `${barHeight * 0.6}px`)
           .text(d => d.ticker.split('-')[1])
-        $g.append('text').attr('class', 'tag')
         return $g
       },
       update => {
