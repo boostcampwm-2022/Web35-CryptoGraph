@@ -79,11 +79,10 @@ const updateChart = (
     )
     .join(
       enter => {
-        const $g = enter.append('g')
+        const $g = enter.append('g').on('click', function (this, e, d) {
+          nodeOnclickHandler(d.data.ticker.split('-')[1])
+        })
         $g.append('rect')
-          .on('click', function (this, e, d) {
-            nodeOnclickHandler(d.data.ticker.split('-')[1])
-          })
           .attr('x', function (d) {
             return d.x0
           })
