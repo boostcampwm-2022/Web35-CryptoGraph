@@ -92,10 +92,8 @@ const updateChart = (
             nodeOnclickHandler(d.data.ticker.split('-')[1])
           })
           //this 사용을 위해 함수 선언문 형식 사용
-          .on('mouseover', function (this) {
-            d3.select(this).style('opacity', '.70')
-          })
           .on('mousemove', (d, i) => {
+            d3.select('g').style('opacity', '.70')
             MainChartHandleMouseEvent(
               d,
               setPointerHandler,
