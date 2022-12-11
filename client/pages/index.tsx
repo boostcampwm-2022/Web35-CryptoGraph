@@ -167,7 +167,7 @@ const SideBarContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  background-color: '#ffffff';
+  background-color: #ffffff;
   align-items: center;
   min-width: 330px;
   max-width: 330px;
@@ -182,7 +182,7 @@ const SideBarContainer = styled(Box)`
 `
 const ChartContainer = styled(Box)`
   display: flex;
-  background: '#ffffff';
+  background: #ffffff;
   box-sizing: content-box; //얘가 차트 크기를 고정해준다. 이유는 아직 모르겠다..
   min-width: 300px;
   width: 100%;

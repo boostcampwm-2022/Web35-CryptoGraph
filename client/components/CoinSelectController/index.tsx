@@ -133,7 +133,7 @@ export default function CoinSelectController({
 
 const Container = styled('div')`
   display: flex;
-  background-color: '#ffffff';
+  background-color: #ffffff;
   flex-direction: column;
   width: 100%;
   height: 100%;

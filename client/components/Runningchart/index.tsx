@@ -13,7 +13,7 @@ import {
 import { convertUnit } from '@/utils/chartManager'
 import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
 import ChartTagController from '../ChartTagController'
-import { styled } from '@mui/system'
+import { styled } from '@mui/material'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
@@ -325,11 +325,10 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     </ChartContainer>
   )
 }
-
 const ChartContainer = styled('div')`
-  display: 'flex';
-  width: '100%';
-  background: '#ffffff';
-  height: '100%';
-  overflow: 'auto';
+  display: flex;
+  width: 100%;
+  background: #ffffff;
+  height: 100%;
+  overflow: auto;
 `

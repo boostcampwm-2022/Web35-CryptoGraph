@@ -76,6 +76,6 @@ export default function SearchInput() {
   )
 }
 const StyledSearchIcon = styled('a')`
-  display: 'flex';
-  align-items: 'center';
+  display: flex;
+  align-items: center;
 `
