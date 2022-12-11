@@ -42,10 +42,10 @@ export default function SortSelectController({
     'change rate': '등락률',
     'change rate(absolute)': '등락률(절대값)',
     'market capitalization': '시가총액',
-    'trade price': '거래량',
-    ascending: '오름차순',
-    descending: '내림차순',
-    absolute: '절대값'
+    'trade price': '24시간 거래량',
+    ascending: '등락률(오름차순)',
+    descending: '등락률(내림차순)',
+    absolute: '등락률(절대값)'
   }
   return (
     <SortSelectorContainer>
