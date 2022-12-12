@@ -9,19 +9,11 @@ export default function GNB() {
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
   return (
     <GNBContainer>
-      <Container
-        maxWidth="max"
-        id="GNBcontainer"
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingLeft: '16px'
-        }}
-      >
+      <Container maxWidth="max" id="GNBcontainer" sx={ContainerStyle}>
         {isMobile ? (
           <Link href="/">
             <Image
-              style={{ paddingRight: '16px' }}
+              style={MobileImageStyle}
               src="/logo-only-white.svg"
               alt=""
               width={40}
@@ -31,7 +23,7 @@ export default function GNB() {
         ) : (
           <Link href="/">
             <Image
-              style={{ margin: '0px 16px 0px 32px' }}
+              style={DesktopImageStyle}
               src="/logo-white.svg"
               alt=""
               width={200}
@@ -44,6 +36,13 @@ export default function GNB() {
     </GNBContainer>
   )
 }
+const ContainerStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  paddingLeft: '16px'
+}
+const MobileImageStyle = { paddingRight: '16px' }
+const DesktopImageStyle = { margin: '0px 16px 0px 32px' }
 
 const GNBContainer = styled('div')`
   position: fixed;

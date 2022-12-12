@@ -11,6 +11,7 @@ import { throttle } from 'lodash'
 import { convertUnit, MainChartHandleMouseEvent } from '@/utils/chartManager'
 import ChartTagController from '../ChartTagController'
 import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
+import { styled } from '@mui/system'
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -316,19 +317,18 @@ export default function TreeChart({
     setPointerInfo(DEFAULT_RUNNING_POINTER_DATA)
   }, [changeRate, width, height, selectedSort, modalOpenHandler])
   return (
-    <div
-      style={{
-        display: 'flex',
-        width: '100%',
-        height: '100%',
-        background: '#ffffff'
-      }}
-      ref={chartContainerSvg}
-    >
+    <ChartContainer ref={chartContainerSvg}>
       <svg id="tree-chart" ref={chartSvg}>
         <svg id="chart-area"></svg>
       </svg>
       <ChartTagController pointerInfo={pointerInfo} />
-    </div>
+    </ChartContainer>
   )
 }
+
+const ChartContainer = styled('div')`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+`
