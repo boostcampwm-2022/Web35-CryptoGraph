@@ -394,9 +394,10 @@ export function MainChartHandleMouseEvent(
 ) {
   if (event.type === 'mousemove') {
     pointerInfoSetter({
-      offsetX: width * 2 / 3 > event.offsetX ? event.offsetX : event.offsetX - 200,
+      offsetX:
+        (width * 2) / 3 > event.offsetX ? event.offsetX : event.offsetX - 200,
       offsetY:
-        height * 2 / 3 > event.clientY
+        (height * 2) / 3 > event.clientY
           ? event.clientY - 100
           : event.clientY - 250,
       data: data
