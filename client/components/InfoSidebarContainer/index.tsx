@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { ReactNode } from 'react'
+import { Children, ReactNode } from 'react'
 
 interface InfoSidebarContainerProps {
   children: ReactNode
@@ -9,7 +8,7 @@ export default function InfoSidebarContainer({
 }: InfoSidebarContainerProps) {
   return (
     <>
-      {React.Children.map(children, child => {
+      {Children.map(children, child => {
         return child
       })}
     </>

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import Document, {
   Html,
   Head,
@@ -12,9 +11,10 @@ import theme from '../style/theme'
 import createEmotionCache from '../style/createEmotionCache'
 import { EmotionCache } from '@emotion/react'
 import { AppType } from 'next/app'
+import { ReactNode } from 'react'
 
 interface DocumentProps extends DocumentInitialProps {
-  emotionStyleTags: React.ReactNode[]
+  emotionStyleTags: ReactNode[]
 }
 export default function MyDocument(props: DocumentProps) {
   return (

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import Head from 'next/head'
 import App, { AppContext, AppProps } from 'next/app'
 import { ThemeProvider } from '@mui/material/styles'
@@ -11,6 +10,7 @@ import GNB from '@/components/GNB'
 import { Container, styled } from '@mui/material'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
+import { createContext } from 'react'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -20,7 +20,7 @@ interface MyAppProps extends AppProps {
   data: MarketCapInfo[]
 }
 
-export const MyAppContext = React.createContext<MarketCapInfo[]>([])
+export const MyAppContext = createContext<MarketCapInfo[]>([])
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props

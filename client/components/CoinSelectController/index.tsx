@@ -1,12 +1,11 @@
-import * as React from 'react'
 import { styled } from '@mui/material/styles'
 import Checkbox from '@mui/material/Checkbox'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import SearchCoin from './SearchCoin'
 import MakeCoinDict from './MakeCoinDict'
-import { MyAppContext } from '../../pages/_app'
+import { MyAppContext } from '@/pages/_app'
 
 interface dict<T> {
   [key: string]: T
@@ -23,7 +22,7 @@ interface CoinSelectControllerProps {
 export default function CoinSelectController({
   selectedCoinListSetter
 }: CoinSelectControllerProps) {
-  const data = React.useContext(MyAppContext)
+  const data = useContext(MyAppContext)
   const [coinList, setCoinList] = useState<MarketCapInfo[] | null>(data)
   const [checked, setChecked] = useState<CoinChecked>(() => {
     const initCheckedList: CoinChecked = {

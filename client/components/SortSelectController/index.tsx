@@ -1,14 +1,14 @@
-import * as React from 'react'
 import { styled } from '@mui/material/styles'
 import InputLabel from '@mui/material/InputLabel'
 import Box from '@mui/material/Box'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
+import { Dispatch, SetStateAction } from 'react'
 
 interface SortSelectControllerProps {
   selectedSort: string
-  selectedSortSetter: React.Dispatch<React.SetStateAction<string>>
+  selectedSortSetter: Dispatch<SetStateAction<string>>
   selectedChart: string
 }
 

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { TabProps } from '@/components/TabContainer'
 import { styled } from '@mui/material'
 import Image from 'next/image'

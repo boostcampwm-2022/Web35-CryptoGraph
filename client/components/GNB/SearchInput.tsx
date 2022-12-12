@@ -1,4 +1,3 @@
-import * as React from 'react'
 import TextField from '@mui/material/TextField'
 import Stack from '@mui/material/Stack'
 import Autocomplete from '@mui/material/Autocomplete'
@@ -9,10 +8,11 @@ import { MyAppContext } from '../../pages/_app'
 import { useMediaQuery } from '@mui/material'
 import theme from '@/styles/theme'
 import { styled } from '@mui/system'
+import { useContext, useRef } from 'react'
 
 export default function SearchInput() {
-  const data = React.useContext(MyAppContext)
-  const inputRef = React.useRef<HTMLInputElement>()
+  const data = useContext(MyAppContext)
+  const inputRef = useRef<HTMLInputElement>()
   const isMobile = useMediaQuery(theme.breakpoints.down('tablet'))
   function goToDetail(value: string) {
     const inputCoinName = value
