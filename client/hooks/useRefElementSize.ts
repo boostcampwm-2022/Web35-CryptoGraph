@@ -1,6 +1,10 @@
+import {
+  CHART_X_AXIS_MARGIN,
+  CHART_Y_AXIS_MARGIN
+} from '@/constants/ChartConstants'
 import { useState, useEffect } from 'react'
 
-export interface WindowSize {
+export interface RefElementSize {
   width: number
   height: number
 }
@@ -10,10 +14,10 @@ export interface WindowSize {
  * @param ref width와 height를 얻길 원하는 html 태그의 ref
  * @returns  width와 height의 변화하는 상태값
  */
-export function useWindowSize(ref: React.RefObject<Element>) {
-  const [windowSize, setWindowSize] = useState<WindowSize>({
-    width: 100, //마진으로..
-    height: 100
+export function useRefElementSize(ref: React.RefObject<Element>) {
+  const [refElementSize, setRefElementSize] = useState<RefElementSize>({
+    width: CHART_Y_AXIS_MARGIN,
+    height: CHART_X_AXIS_MARGIN
   })
   useEffect(() => {
     function handleResize() {
@@ -21,7 +25,7 @@ export function useWindowSize(ref: React.RefObject<Element>) {
         console.error('useWindow 훅의 매개변수에 이상있음')
         return
       }
-      setWindowSize({
+      setRefElementSize({
         width: ref.current.clientWidth,
         height: ref.current.clientHeight
       })
@@ -30,5 +34,5 @@ export function useWindowSize(ref: React.RefObject<Element>) {
     handleResize()
     return () => window.removeEventListener('resize', handleResize)
   }, [ref, ref?.current?.clientWidth, ref?.current?.clientHeight])
-  return windowSize
+  return refElementSize
 }

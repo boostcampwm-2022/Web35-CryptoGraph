@@ -5,7 +5,7 @@ import {
   CoinRateType,
   MainChartPointerData
 } from '@/types/ChartTypes'
-import { useWindowSize } from 'hooks/useWindowSize'
+import { useRefElementSize } from 'hooks/useRefElementSize'
 import {
   colorQuantizeScale,
   MainChartHandleMouseEvent
@@ -314,7 +314,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const chartSvg = useRef(null)
-  const { width, height } = useWindowSize(chartContainerRef)
+  const { width, height } = useRefElementSize(chartContainerRef)
   const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값, 모든 코인 값 보유
   const [changeRate, setchangeRate] = useState<CoinRateType>({}) //선택된 코인 값만 보유
   const [pointerInfo, setPointerInfo] = useState<MainChartPointerData>(

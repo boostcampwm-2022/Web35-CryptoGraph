@@ -13,7 +13,7 @@ import {
   DEFAULT_MAX_RENDER_START_INDEX
 } from '@/constants/ChartConstants'
 import { DatePeriod } from '@/types/ChartTypes'
-import { WindowSize } from 'hooks/useWindowSize'
+import { RefElementSize } from 'hooks/useRefElementSize'
 import {
   CandleChartRenderOption,
   CandleData,
@@ -135,11 +135,11 @@ export function updatePointerUI(
   pointerInfo: PointerData,
   renderOpt: CandleChartRenderOption,
   data: CandleData[],
-  windowSize: WindowSize
+  refElementSize: RefElementSize
 ) {
   const [chartAreaXsize, chartAreaYsize] = [
-    windowSize.width - CHART_Y_AXIS_MARGIN,
-    windowSize.height - CHART_X_AXIS_MARGIN
+    refElementSize.width - CHART_Y_AXIS_MARGIN,
+    refElementSize.height - CHART_X_AXIS_MARGIN
   ]
   const { priceText, color } = getPriceInfo(pointerInfo)
   const yAxisScale = getYAxisScale(

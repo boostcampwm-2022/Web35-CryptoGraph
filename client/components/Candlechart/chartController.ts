@@ -6,7 +6,7 @@ import {
   CANDLE_COLOR_BLUE,
   DEFAULT_POINTER_DATA
 } from '@/constants/ChartConstants'
-import { WindowSize } from '@/hooks/useWindowSize'
+import { RefElementSize } from '@/hooks/useRefElementSize'
 import {
   CandleData,
   ChartPeriod,
@@ -30,24 +30,24 @@ export function initCandleChart(
   translateXSetter: React.Dispatch<React.SetStateAction<number>>,
   optionSetter: React.Dispatch<React.SetStateAction<CandleChartRenderOption>>,
   pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerData>>,
-  windowSize: WindowSize
+  refElementSize: RefElementSize
 ) {
-  initCandleChartSVG(svgRef, windowSize)
+  initCandleChartSVG(svgRef, refElementSize)
   addEventsToChart(
     svgRef,
     optionSetter,
     translateXSetter,
     pointerPositionSetter,
-    windowSize
+    refElementSize
   )
 }
 
 function initCandleChartSVG(
   svgRef: React.RefObject<SVGSVGElement>,
-  windowSize: WindowSize
+  refElementSize: RefElementSize
 ) {
-  const chartContainerXsize = windowSize.width
-  const chartContainerYsize = windowSize.height
+  const chartContainerXsize = refElementSize.width
+  const chartContainerYsize = refElementSize.height
   const chartAreaXsize = chartContainerXsize - CHART_Y_AXIS_MARGIN
   const chartAreaYsize = chartContainerYsize - CHART_X_AXIS_MARGIN
   //margin값도 크기에 맞춰 변수화 시켜야함.
@@ -76,10 +76,10 @@ export function addEventsToChart(
   optionSetter: React.Dispatch<React.SetStateAction<CandleChartRenderOption>>,
   translateXSetter: React.Dispatch<React.SetStateAction<number>>,
   pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerData>>,
-  windowSize: WindowSize
+  refElementSize: RefElementSize
 ) {
-  const chartContainerXsize = windowSize.width
-  const chartContainerYsize = windowSize.height
+  const chartContainerXsize = refElementSize.width
+  const chartContainerYsize = refElementSize.height
   const chartAreaXsize = chartContainerXsize - CHART_Y_AXIS_MARGIN
   const chartAreaYsize = chartContainerYsize - CHART_X_AXIS_MARGIN
   if (svgRef.current !== null) {
@@ -225,12 +225,12 @@ export function updateCandleChart(
   svgRef: React.RefObject<SVGSVGElement>,
   data: CandleData[],
   option: CandleChartRenderOption,
-  windowSize: WindowSize,
+  refElementSize: RefElementSize,
   candlePeriod: ChartPeriod,
   translateX: number
 ) {
-  const chartContainerXsize = windowSize.width
-  const chartContainerYsize = windowSize.height
+  const chartContainerXsize = refElementSize.width
+  const chartContainerYsize = refElementSize.height
   const chartAreaXsize = chartContainerXsize - CHART_Y_AXIS_MARGIN
   const chartAreaYsize = chartContainerYsize - CHART_X_AXIS_MARGIN
   const candleWidth = option.candleWidth
