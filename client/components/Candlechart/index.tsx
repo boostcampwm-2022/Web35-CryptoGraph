@@ -80,14 +80,19 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       })
       return
     }
+    if (option.renderStartDataIndex === option.maxRenderStartDataIndex) {
+      setTranslateX(0)
+      return
+    }
     if (translateX >= option.candleWidth) {
       setTranslateX(prev => prev % option.candleWidth)
       setOption(prev => {
-        const newOption = { ...prev }
-        newOption.renderStartDataIndex += Math.floor(
-          translateX / option.candleWidth
+        const newRenderStartDataIndex = Math.min(
+          prev.maxRenderStartDataIndex,
+          prev.renderStartDataIndex +
+            Math.floor(translateX / option.candleWidth)
         )
-        return newOption
+        return { ...prev, renderStartDataIndex: newRenderStartDataIndex }
       })
       return
     }
@@ -98,28 +103,38 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   // 더 최적화하려면 소켓을 통해 들어오는 0번 데이터 처리하기
   useEffect(() => {
     const needFetch = checkNeedFetch(props.candleData, option)
-    if (needFetch) {
+    if (needFetch && option.maxDataLength === Infinity) {
       if (!isFetching.current) {
         isFetching.current = true
         getCandleDataArray(
           props.chartOption.candlePeriod,
           props.chartOption.marketType,
           MAX_FETCH_CANDLE_COUNT,
-          props.candleData[props.candleData.length - 1].timestamp
+          props.candleData[props.candleData.length - 1].candle_date_time_utc
         ).then(res => {
-          //fetch완료된 newData를 기존 data와 병합
           if (res === null) {
             console.error('코인 쿼리 실패, 404에러')
             return
           }
-
+          if (res.length === 0) {
+            isFetching.current = false
+            setOption(prev => {
+              return {
+                ...prev,
+                maxDataLength: props.candleData.length,
+                maxRenderStartDataIndex:
+                  props.candleData.length - prev.renderCandleCount + 1
+              }
+            })
+            return
+          }
           isFetching.current = false
           props.candleDataSetter(prev => {
             const lastDate = new Date(
               prev[prev.length - 1].candle_date_time_kst
             )
             const newDate = new Date(res[0].candle_date_time_kst)
-            if (newDate <= lastDate) {
+            if (newDate < lastDate) {
               return [...prev, ...res]
             }
             return [...prev]
