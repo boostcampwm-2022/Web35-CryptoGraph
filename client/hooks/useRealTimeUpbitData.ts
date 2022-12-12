@@ -8,11 +8,10 @@ import {
   CoinPriceObj,
   SocketTickerData
 } from '@/types/CoinPriceTypes'
+import useInterval from '@/hooks/useInterval'
 let socket: WebSocket | undefined
 
 export const useRealTimeUpbitData = (
-  // period: ChartPeriod,
-  // market: string,
   candleChartOption: CandleChartOption,
   initData: CandleData[],
   priceInfo: CoinPriceObj
@@ -26,6 +25,14 @@ export const useRealTimeUpbitData = (
   const [realtimePriceInfo, setRealtimePriceInfo] =
     useState<CoinPriceObj>(priceInfo)
   const isInitialMount = useRef(true)
+  const priceStoreRef = useRef(priceStoreGenerator())
+
+  // 1초 간격으로 store에 저장된 가격정보 변동을 realtimePriceInfo상태에 반영 -> 실시간 가격정보 컴포넌트 리렌더링
+  useInterval(() => {
+    setRealtimePriceInfo(prev =>
+      getNewRealTimePrice(prev, priceStoreRef.current.getPrice())
+    )
+  }, 1000)
 
   useEffect(() => {
     connectWS(priceInfo)
@@ -50,7 +57,8 @@ export const useRealTimeUpbitData = (
         if (code === market) {
           setRealtimeCandleData(prevData => updateData(prevData, d, period))
         }
-        setRealtimePriceInfo(prev => updateRealTimePrice(prev, d, code))
+        // 소켓으로 정보가 전달되면 store에 저장
+        priceStoreRef.current.setPrice(d, code)
       }
     }
     const fetchData = async () => {
@@ -73,7 +81,6 @@ export const useRealTimeUpbitData = (
 }
 
 export function connectWS(priceInfo: CoinPriceObj) {
-  console.log('커넥트')
   if (socket !== undefined) {
     socket.close()
   }
@@ -130,25 +137,55 @@ function updateData(
     prevData[0].timestamp = newTickData.trade_timestamp
     return [...prevData]
   }
-  //잃어버린 30초
+
   const toInsert = newTickData
   toInsert.opening_price = toInsert.trade_price
   toInsert.low_price = toInsert.trade_price
   toInsert.high_price = toInsert.trade_price
   toInsert.timestamp = toInsert.trade_timestamp
-
-  return [toInsert, ...prevData] //한화면에 보여주는 캔들 * 2
+  return [toInsert, ...prevData]
 }
 
-function updateRealTimePrice(
+// 새로운 RealTimePrice상태를 반환
+function getNewRealTimePrice(
   prevData: CoinPriceObj,
-  newTickerData: SocketTickerData,
-  code: string
+  storedPrice: PriceStore
 ): CoinPriceObj {
-  const newCoinPrice: CoinPrice = { ...prevData[code] }
-  newCoinPrice.acc_trade_price_24h = newTickerData.acc_trade_price_24h
-  newCoinPrice.signed_change_price = newTickerData.signed_change_price
-  newCoinPrice.signed_change_rate = newTickerData.signed_change_rate
-  newCoinPrice.price = newTickerData.trade_price
-  return { ...prevData, [code]: newCoinPrice }
+  const newRealTimePrice = { ...prevData }
+  Object.keys(storedPrice).forEach(code => {
+    const newCoinPrice = { ...newRealTimePrice[code], ...storedPrice[code] }
+    newRealTimePrice[code] = newCoinPrice
+  })
+  return newRealTimePrice
+}
+
+interface PriceStore {
+  [key: string]: Partial<CoinPrice>
+}
+
+// 소켓으로 전달받는 가격정보를 임시로 저장할 store
+function priceStoreGenerator() {
+  let priceStore: PriceStore = {}
+  return {
+    setPrice: (newTickerData: SocketTickerData, code: string) => {
+      priceStore[code] = transToCoinPrice(newTickerData)
+      return
+    },
+    // 저장했던 가격정보를 반환하며 저장소를 비운다.
+    getPrice: () => {
+      const storedPrice: PriceStore = { ...priceStore }
+      priceStore = {}
+      return storedPrice
+    }
+  }
+}
+
+// 소켓으로 전달받은 데이터를 필요한 가격정보만 추출하여 store에 저장
+function transToCoinPrice(newTickerData: SocketTickerData): Partial<CoinPrice> {
+  return {
+    price: newTickerData.trade_price,
+    signed_change_price: newTickerData.signed_change_price,
+    signed_change_rate: newTickerData.signed_change_rate,
+    acc_trade_price_24h: newTickerData.acc_trade_price_24h
+  }
 }
