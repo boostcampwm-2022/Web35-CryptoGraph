@@ -184,6 +184,7 @@ const ChartContainer = styled('div')`
   width: 100%;
   background: #ffffff;
   ${props => props.theme.breakpoints.down('tablet')} {
-    height: calc(100% - 150px);
+    height: calc(100% - 50px);
+    min-height: 300px;
   }
 `

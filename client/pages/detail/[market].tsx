@@ -66,25 +66,27 @@ export default function Detail({
       </ChartAreaContainer>
       <InfoContainer>
         {isMobile ? (
-          <SwipeableTemporaryDrawer
-            buttonLabel="코인 상세 정보"
-            isDrawerOpened={isDrawerOpened}
-            setIsDrawerOpened={setIsDrawerOpened}
-          >
-            <TabContainer
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
+          <div style={{ position: 'absolute', bottom: '10px' }}>
+            <SwipeableTemporaryDrawer
+              buttonLabel="코인 상세 정보"
+              isDrawerOpened={isDrawerOpened}
+              setIsDrawerOpened={setIsDrawerOpened}
             >
-              <TabBox tabLabelInfo={'코인 디테일'}>
-                <CoinDetailedInfo market={market} />
-                <LinkButton goto="/" content="Go to Main" />
-              </TabBox>
-              <RealTimeCoinPrice
-                tabLabelInfo={'실시간 코인 정보'}
-                priceInfo={realtimePriceInfo}
-              />
-            </TabContainer>
-          </SwipeableTemporaryDrawer>
+              <TabContainer
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+              >
+                <TabBox tabLabelInfo={'코인 디테일'}>
+                  <CoinDetailedInfo market={market} />
+                  <LinkButton goto="/" content="Go to Main" />
+                </TabBox>
+                <RealTimeCoinPrice
+                  tabLabelInfo={'실시간 코인 정보'}
+                  priceInfo={realtimePriceInfo}
+                />
+              </TabContainer>
+            </SwipeableTemporaryDrawer>
+          </div>
         ) : (
           <>
             <CoinDetailedInfo market={market} />
@@ -184,5 +186,6 @@ const InfoContainer = styled(Box)`
     height: auto;
     margin: 0;
     width: 100%; //매직넘버 제거 및 반응형 관련 작업 필요(모바일에서는 100%)
+    min-width: 0px;
   }
 `
