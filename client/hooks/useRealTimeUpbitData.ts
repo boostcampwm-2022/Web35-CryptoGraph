@@ -73,7 +73,6 @@ export const useRealTimeUpbitData = (
 }
 
 export function connectWS(priceInfo: CoinPriceObj) {
-  console.log('커넥트')
   if (socket !== undefined) {
     socket.close()
   }
