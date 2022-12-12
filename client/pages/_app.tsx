@@ -5,6 +5,7 @@ import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { Global, css, CacheProvider, EmotionCache } from '@emotion/react'
 import theme from '../style/theme'
+import '../public/fonts/style.css'
 import createEmotionCache from '../style/createEmotionCache'
 import GNB from '@/components/GNB'
 import { Container, styled } from '@mui/material'
@@ -68,6 +69,7 @@ const GlobalStyle = css`
   body,
   div#__next {
     height: 100%;
+    font-family: 'LINESeedKR-Rg';
   }
 `
 

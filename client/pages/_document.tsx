@@ -8,7 +8,7 @@ import Document, {
   DocumentInitialProps
 } from 'next/document'
 import createEmotionServer from '@emotion/server/create-instance'
-import theme, { roboto } from '../style/theme'
+import theme from '../style/theme'
 import createEmotionCache from '../style/createEmotionCache'
 import { EmotionCache } from '@emotion/react'
 import { AppType } from 'next/app'
@@ -18,7 +18,7 @@ interface DocumentProps extends DocumentInitialProps {
 }
 export default function MyDocument(props: DocumentProps) {
   return (
-    <Html lang="ko" className={roboto.className}>
+    <Html lang="ko">
       <Head>
         {/* PWA primary color */}
         <meta name="theme-color" content={theme.palette.primary.main} />
