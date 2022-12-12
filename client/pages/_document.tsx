@@ -36,6 +36,10 @@ export default function MyDocument(props: DocumentProps) {
           property="og:description"
           content="실시간 암호화폐 데이터 시각화 웹 서비스"
         />
+        <meta
+          name="description"
+          content="실시간 암호화폐 데이터 시각화 웹 서비스 - CryptoGraph"
+        ></meta>
         <meta property="og:site_name" content="CryptoGraph" />
         <meta property="og:locale" content="ko_KR" />
         <meta property="og:image:width" content="1200" />
