@@ -16,7 +16,6 @@ export async function getCandleDataArray(
       }
     )
   } else {
-    // const endTime = makeDate(endTimeStamp, 60).toJSON().slice(0, -5).concat('Z')
     res = await fetch(
       `https://api.upbit.com/v1/candles/${period}?market=KRW-${market}&to=${
         lastTime + 'Z'
