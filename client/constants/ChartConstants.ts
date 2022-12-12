@@ -1,4 +1,9 @@
-import { ChartPeriod, CandleChartOption, PointerData } from '@/types/ChartTypes'
+import {
+  ChartPeriod,
+  CandleChartOption,
+  PointerData,
+  MainChartPointerData
+} from '@/types/ChartTypes'
 
 export const CHART_Y_AXIS_MARGIN = 70
 export const CHART_X_AXIS_MARGIN = 20
@@ -19,6 +24,12 @@ export const DEFAULT_CANDLE_CHART_OPTION: CandleChartOption = {
 export const DEFAULT_POINTER_DATA: PointerData = {
   positionX: -1,
   positionY: -1,
+  data: null
+}
+
+export const DEFAULT_RUNNING_POINTER_DATA: MainChartPointerData = {
+  offsetX: -1,
+  offsetY: -1,
   data: null
 }
 

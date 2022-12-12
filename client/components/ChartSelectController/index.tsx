@@ -7,20 +7,19 @@ import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { ChartTypeArr, ChartType } from '@/types/ChartTypes'
-import { TabProps } from '@/components/TabContainer'
-interface ChartSelectControllerProps extends TabProps {
+
+interface ChartSelectControllerProps {
   selected: ChartType
   selectedSetter: Dispatch<SetStateAction<ChartType>>
 }
-const ChartPeriodSelectorContainer = styled('div')`
+const ChartPeriodSelectorContainer = styled(Box)`
   display: flex;
   width: 100%;
   height: 10%;
-  background-color: #ffffff;
   box-sizing: border-box;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 `
 //메인페이지 트리맵/러닝차트 선택 컴포넌트
 export default function ChartSelectController({
@@ -37,14 +36,8 @@ export default function ChartSelectController({
     <ChartPeriodSelectorContainer>
       <Box sx={{ minWidth: 300 }}>
         <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">차트 선택</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={selected}
-            label="Age"
-            onChange={handleChange}
-          >
+          <InputLabel>차트 선택</InputLabel>
+          <Select value={selected} onChange={handleChange}>
             {ChartTypeArr.map(value => {
               return (
                 <MenuItem key={value} value={value}>

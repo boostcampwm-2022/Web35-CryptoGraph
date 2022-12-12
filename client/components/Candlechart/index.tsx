@@ -158,32 +158,22 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   }, [pointerInfo, windowSize, option, props])
 
   return (
-    <ChartContainer>
-      <div
-        id="chart"
-        ref={chartContainerRef}
-        style={{
-          display: 'flex',
-          width: '100%',
-          height: '100%'
-        }}
-      >
-        <svg id="chart-container" ref={chartSvg}>
-          <g id="y-axis" />
-          <svg id="x-axis-container">
-            <g id="x-axis" />
-          </svg>
-          <svg id="chart-area" />
-          <svg id="current-price">
-            <line />
-            <rect />
-            <text />
-          </svg>
-          <svg id="mouse-pointer-UI"></svg>
-          <svg id="volume-UI"></svg>
-          <text id="price-info"></text>
+    <ChartContainer ref={chartContainerRef}>
+      <svg id="chart-container" ref={chartSvg}>
+        <g id="y-axis" />
+        <svg id="x-axis-container">
+          <g id="x-axis" />
         </svg>
-      </div>
+        <svg id="chart-area" />
+        <svg id="current-price">
+          <line />
+          <rect />
+          <text />
+        </svg>
+        <svg id="mouse-pointer-UI"></svg>
+        <svg id="volume-UI"></svg>
+        <text id="price-info"></text>
+      </svg>
     </ChartContainer>
   )
 }
@@ -191,7 +181,9 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
 const ChartContainer = styled('div')`
   display: flex;
   height: 100%;
+  width: 100%;
+  background: #ffffff;
   ${props => props.theme.breakpoints.down('tablet')} {
-    height: 400px;
+    height: calc(100% - 150px);
   }
 `

@@ -8,6 +8,7 @@ import { matchNameKRwithENG, validateInputName } from '@/utils/inputBarManager'
 import { MyAppContext } from '../../pages/_app'
 import { useMediaQuery } from '@mui/material'
 import theme from '@/styles/theme'
+import { styled } from '@mui/system'
 
 export default function SearchInput() {
   const data = React.useContext(MyAppContext)
@@ -57,8 +58,7 @@ export default function SearchInput() {
               },
               placeholder: '검색어를 입력하세요',
               endAdornment: (
-                <a
-                  style={{ display: 'flex', alignItems: 'center' }}
+                <StyledSearchIcon
                   href=""
                   onClick={e => {
                     e.preventDefault()
@@ -66,7 +66,7 @@ export default function SearchInput() {
                   }}
                 >
                   <SearchIcon sx={{ opacity: 0.2 }} />
-                </a>
+                </StyledSearchIcon>
               )
             }}
           />
@@ -75,3 +75,7 @@ export default function SearchInput() {
     </Stack>
   )
 }
+const StyledSearchIcon = styled('a')`
+  display: flex;
+  align-items: center;
+`

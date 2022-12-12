@@ -1,10 +1,17 @@
 import * as d3 from 'd3'
 import { useState, useEffect, useRef } from 'react'
 import { useWindowSize } from '@/hooks/useWindowSize'
-import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
+import {
+  CoinRateType,
+  CoinRateContentType,
+  MainChartPointerData
+} from '@/types/ChartTypes'
 import { colorQuantizeScale } from '@/utils/chartManager'
 import { throttle } from 'lodash'
-import { convertUnit } from '@/utils/chartManager'
+import { convertUnit, MainChartHandleMouseEvent } from '@/utils/chartManager'
+import ChartTagController from '../ChartTagController'
+import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
+import { styled } from '@mui/system'
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -12,7 +19,9 @@ const updateChart = (
   width: number,
   height: number,
   selectedSort: string,
-  nodeOnclickHandler: (market: string) => void
+  nodeOnclickHandler: (market: string) => void,
+  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>,
+  isMobile: boolean
 ) => {
   if (!svgRef.current) return
   const chartContainer = d3.select<SVGSVGElement, CoinRateContentType>(
@@ -27,10 +36,10 @@ const updateChart = (
   ]
   const root: d3.HierarchyNode<CoinRateContentType> = d3
     .stratify<CoinRateContentType>()
-    .id(function (d): string {
+    .id((d): string => {
       return d.name
     })
-    .parentId(function (d): string {
+    .parentId((d): string => {
       return d.parent
     })(data)
   const sort = (
@@ -53,7 +62,7 @@ const updateChart = (
   }
 
   root
-    .sum(function (d): number {
+    .sum((d): number => {
       if (d.name === 'Origin') {
         return 0
       }
@@ -79,24 +88,52 @@ const updateChart = (
     )
     .join(
       enter => {
-        const $g = enter.append('g')
-        $g.append('rect')
-          .on('click', function (this, e, d) {
+        const $g = enter
+          .append('g')
+          .on('click', (e, d) => {
             nodeOnclickHandler(d.data.ticker.split('-')[1])
           })
-          .attr('x', function (d) {
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '.70')
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseleave', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '1')
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+          })
+        $g.append('rect')
+          .attr('x', d => {
             return d.x0
           })
-          .attr('y', function (d) {
+          .attr('y', d => {
             return d.y0
           })
-          .attr('width', function (d) {
+          .attr('width', d => {
             return d.x1 - d.x0
           })
-          .attr('height', function (d) {
+          .attr('height', d => {
             return d.y1 - d.y0
           })
-          .attr('fill', function (d) {
+          .attr('fill', d => {
             return d.data.value >= 0
               ? d.data.value > 0
                 ? colorQuantizeScale(max, d.data.value)
@@ -104,15 +141,16 @@ const updateChart = (
               : colorQuantizeScale(min, d.data.value)
           })
           .style('stroke', 'gray')
+
         $g.append('text')
-          .attr('x', function (d) {
+          .attr('x', d => {
             return d.x0 + Math.abs(d.x1 - d.x0) / 2
           })
-          .attr('y', function (d) {
+          .attr('y', d => {
             return d.y0 + Math.abs(d.y1 - d.y0) / 2
           })
           .attr('text-anchor', 'middle')
-          .text(function (d) {
+          .text(d => {
             // 초기값 changerate 아니라면 수정해줘야함
             return (
               d.data.ticker?.split('-')[1] +
@@ -121,7 +159,7 @@ const updateChart = (
               '%'
             )
           })
-          .style('font-size', function (d) {
+          .style('font-size', d => {
             return `${(d.x1 - d.x0) / 9}px`
           })
           .attr('fill', 'white')
@@ -129,22 +167,52 @@ const updateChart = (
       },
       update => {
         update
+          .on('click', (e, d) => {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '.70')
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+          })
+          .on('mouseleave', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '1')
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+          })
+        update
           .select('rect')
           .transition()
           .duration(500)
-          .attr('x', function (d) {
+          .attr('x', d => {
             return d.x0
           })
-          .attr('y', function (d) {
+          .attr('y', d => {
             return d.y0
           })
-          .attr('width', function (d) {
+          .attr('width', d => {
             return d.x1 - d.x0
           })
-          .attr('height', function (d) {
+          .attr('height', d => {
             return d.y1 - d.y0
           })
-          .attr('fill', function (d) {
+          .attr('fill', d => {
             return d.data.value >= 0
               ? d.data.value > 0
                 ? colorQuantizeScale(max, d.data.value)
@@ -154,18 +222,19 @@ const updateChart = (
           .transition()
           .duration(500)
           .style('stroke', 'gray')
+
         update
           .select('text')
           .transition()
           .duration(500)
-          .attr('x', function (d) {
+          .attr('x', d => {
             return d.x0 + Math.abs(d.x1 - d.x0) / 2
           })
-          .attr('y', function (d) {
+          .attr('y', d => {
             return d.y0 + Math.abs(d.y1 - d.y0) / 2
           })
           .attr('text-anchor', 'middle')
-          .text(function (d) {
+          .text(d => {
             const text =
               selectedSort !== 'trade price'
                 ? selectedSort === 'market capitalization'
@@ -174,7 +243,7 @@ const updateChart = (
                 : convertUnit(Number(d.data.acc_trade_price_24h))
             return d.data.ticker?.split('-')[1] + '\n' + text
           })
-          .style('font-size', function (d) {
+          .style('font-size', d => {
             return `${(d.x1 - d.x0) / 9}px`
           })
           .attr('fill', 'white')
@@ -222,12 +291,14 @@ export interface TreeChartProps {
   Market?: string[] //선택된 코인 리스트
   selectedSort: string
   modalOpenHandler: (market: string) => void
+  isMobile: boolean
 }
 export default function TreeChart({
   data,
   Market, //= ['CELO', 'ETH', 'MFT', 'WEMIX']
   selectedSort,
-  modalOpenHandler
+  modalOpenHandler,
+  isMobile
 }: TreeChartProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     {
@@ -242,6 +313,9 @@ export default function TreeChart({
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
   const { width, height } = useWindowSize(chartContainerSvg)
+  const [pointerInfo, setPointerInfo] = useState<MainChartPointerData>(
+    DEFAULT_RUNNING_POINTER_DATA
+  )
 
   useEffect(() => {
     initChart(chartSvg, width, height)
@@ -272,18 +346,24 @@ export default function TreeChart({
       width,
       height,
       selectedSort,
-      modalOpenHandler
+      modalOpenHandler,
+      setPointerInfo,
+      isMobile
     )
   }, [changeRate, width, height, selectedSort, modalOpenHandler])
-
   return (
-    <div
-      style={{ display: 'flex', width: '100%', height: '100%' }}
-      ref={chartContainerSvg}
-    >
+    <ChartContainer ref={chartContainerSvg}>
       <svg id="tree-chart" ref={chartSvg}>
         <svg id="chart-area"></svg>
       </svg>
-    </div>
+      <ChartTagController pointerInfo={pointerInfo} />
+    </ChartContainer>
   )
 }
+
+const ChartContainer = styled('div')`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+`

@@ -1,18 +1,28 @@
 import * as d3 from 'd3'
-import * as React from 'react'
-import { CoinRateContentType, CoinRateType } from '@/types/ChartTypes'
+import { useState, useEffect, useRef } from 'react'
+import {
+  CoinRateContentType,
+  CoinRateType,
+  MainChartPointerData
+} from '@/types/ChartTypes'
 import { useWindowSize } from 'hooks/useWindowSize'
-import { colorQuantizeScale } from '@/utils/chartManager'
+import {
+  colorQuantizeScale,
+  MainChartHandleMouseEvent
+} from '@/utils/chartManager'
 import { convertUnit } from '@/utils/chartManager'
+import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
+import ChartTagController from '../ChartTagController'
+import { styled } from '@mui/material'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
-  durationPeriod: number
-  candleCount: number
   data: CoinRateType //선택된 코인 리스트
   Market: string[]
   selectedSort: string
   modalOpenHandler: (market: string) => void
+  durationPeriod?: number
+  isMobile: boolean
 }
 
 //------------------------------setChartContainerSize------------------------------
@@ -35,12 +45,10 @@ const updateChart = (
   height: number,
   candleCount: number,
   selectedSort: string,
-  nodeOnclickHandler: (market: string) => void
+  nodeOnclickHandler: (market: string) => void,
+  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>,
+  isMobile: boolean
 ) => {
-  if (!data || !svgRef) {
-    return
-  }
-
   //ArrayDataValue : 기존 Object<object>이던 data를 data.value, 즉 실시간변동 퍼센테이지 값만 추출해서 Array<object>로 변경
   const ArrayDataValue: CoinRateContentType[] = [
     ...Object.values<CoinRateContentType>(data)
@@ -73,7 +81,7 @@ const updateChart = (
     }
   })()
 
-  if (!max) {
+  if (max === undefined) {
     console.error('정상적인 등락률 데이터가 아닙니다.')
     return
   }
@@ -102,18 +110,34 @@ const updateChart = (
     .data(ArrayDataValue, d => d.name)
     .join(
       enter => {
-        const $g = enter.append('g')
+        const $g = enter
+          .append('g')
+          .on('click', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          })
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          }) //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '.70')
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseleave', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '1')
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          })
         $g.attr(
           'transform',
           (d, i) => 'translate(0,' + i * (barHeight + barMargin) + ')'
         )
           .transition()
-          .duration(1000)
+          .duration(durationPeriod)
           .style('opacity', 1)
-
         $g.append('rect')
-          .attr('width', function (d) {
-            // console.log(d.acc_trade_price_24h)
+          .attr('width', d => {
             return scale(
               selectedSort !== 'trade price'
                 ? selectedSort !== 'market capitalization'
@@ -123,9 +147,6 @@ const updateChart = (
             )
           })
           .attr('height', barHeight)
-          .on('click', function (this, e, d) {
-            nodeOnclickHandler(d.ticker.split('-')[1])
-          })
           .style('fill', d => {
             if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
@@ -159,7 +180,7 @@ const updateChart = (
           )
 
         $g.append('text')
-          .attr('id', 'CoinName')
+          .attr('class', 'CoinName')
           .attr('x', d => {
             return scale(
               selectedSort !== 'trade price'
@@ -177,13 +198,31 @@ const updateChart = (
         return $g
       },
       update => {
-        update // 차트들
+        update
+          .on('click', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          })
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          }) //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '.70')
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          })
+          .on('mouseleave', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '1')
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          })
+        update
           .transition()
           .duration(durationPeriod)
           .attr(
             'transform',
             (d, i) => `translate(0,  ${i * (barHeight + barMargin)} )`
           )
+
         update
           .select('rect')
           .transition()
@@ -198,7 +237,7 @@ const updateChart = (
             )
           })
           .attr('height', barHeight)
-          .style('fill', (d, i) => {
+          .style('fill', d => {
             if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
             else return colorQuantizeScale(max, d.value)
@@ -219,7 +258,7 @@ const updateChart = (
           .attr('y', barHeight / 2)
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'middle')
-          .style('font-size', `${barHeight * 0.6}px`)
+          .style('font-size', `${barHeight * 0.3}px`)
           .text(d =>
             selectedSort !== 'trade price'
               ? selectedSort === 'market capitalization'
@@ -229,7 +268,7 @@ const updateChart = (
           )
 
         update
-          .select('#CoinName')
+          .select('.CoinName')
           .transition()
           .duration(durationPeriod)
           .attr('x', d => {
@@ -255,62 +294,67 @@ const updateChart = (
 }
 //------------------------------Component------------------------------
 export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
-  durationPeriod,
-  candleCount,
+  durationPeriod = 500,
   data,
   Market,
   selectedSort,
-  modalOpenHandler
+  modalOpenHandler,
+  isMobile
 }) => {
-  const chartContainerRef = React.useRef<HTMLDivElement>(null)
-  const chartSvg = React.useRef(null)
+  const chartContainerRef = useRef<HTMLDivElement>(null)
+  const chartSvg = useRef(null)
   const { width, height } = useWindowSize(chartContainerRef)
-  const [changeRate, setchangeRate] = React.useState<CoinRateType>(data) //선택된 코인 값만 보유
+  const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값, 모든 코인 값 보유
+  const [changeRate, setchangeRate] = useState<CoinRateType>({}) //선택된 코인 값만 보유
+  const [pointerInfo, setPointerInfo] = useState<MainChartPointerData>(
+    DEFAULT_RUNNING_POINTER_DATA
+  )
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (!Object.keys(changeRate).length) return
     updateChart(
       durationPeriod,
       chartSvg,
       changeRate,
       width,
       height,
-      candleCount,
+      Market.length,
       selectedSort,
-      modalOpenHandler
+      modalOpenHandler,
+      setPointerInfo,
+      isMobile
     )
   }, [
     width,
     height,
     changeRate,
-    candleCount,
     selectedSort,
     durationPeriod,
-    modalOpenHandler
+    Market.length,
+    modalOpenHandler,
+    isMobile
   ]) // 창크기에 따른 차트크기 조절
-
-  React.useEffect(() => {
-    if (!data || !Market[0]) return
+  useEffect(() => {
+    if (!coinRate || !Market[0]) return
     const newCoinData: CoinRateType = {}
     for (const tick of Market) {
-      newCoinData['KRW-' + tick] = data['KRW-' + tick]
+      newCoinData['KRW-' + tick] = coinRate['KRW-' + tick]
     }
     setchangeRate(newCoinData)
-  }, [data, Market])
-
+  }, [data, Market, coinRate])
   return (
-    <div
-      id="chart"
-      ref={chartContainerRef}
-      style={{
-        display: 'flex',
-        width: '100%',
-        height: '98%',
-        overflow: 'auto'
-      }}
-    >
+    <ChartContainer ref={chartContainerRef}>
       <svg id="chart-container" ref={chartSvg}>
         <svg id="running-chart" />
       </svg>
-    </div>
+      <ChartTagController pointerInfo={pointerInfo} />
+    </ChartContainer>
   )
 }
+const ChartContainer = styled('div')`
+  display: flex;
+  width: 100%;
+  background: #ffffff;
+  height: 100%;
+  overflow: auto;
+`

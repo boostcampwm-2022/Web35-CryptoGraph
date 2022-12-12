@@ -38,7 +38,12 @@ export default function MyApp(props: MyAppProps) {
             <Container
               disableGutters
               maxWidth="max"
-              sx={{ display: 'flex', width: '100%', height: '100%' }}
+              sx={{
+                display: 'flex',
+                width: '100%',
+                height: '100%',
+                padding: '8px'
+              }}
             >
               <Component {...pageProps} />
             </Container>
@@ -56,25 +61,36 @@ MyApp.getInitialProps = async (context: AppContext) => {
 }
 
 const GlobalStyle = css`
-  html {
-    font-size: 1rem;
-  }
   html,
   body,
   div#__next {
     height: 100%;
+    * {
+      ::-webkit-scrollbar {
+        width: 4px;
+        position: relative;
+      }
+      ::-webkit-scrollbar-track {
+        display: none;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: rgb(199, 199, 199);
+      }
+    }
   }
 `
 
 const ContainerHeightLimiter = styled('div')`
   display: flex;
+
   width: 100%;
   height: 100%;
+  overflow-y: auto;
   ${props => props.theme.breakpoints.down('tablet')} {
-    padding-top: calc(64px + 8px);
+    padding-top: calc(64px);
   }
   ${props => props.theme.breakpoints.up('tablet')} {
-    padding-top: calc(96px + 8px);
+    padding-top: calc(96px);
     //매직 넘버 상수화 필요
   }
 `

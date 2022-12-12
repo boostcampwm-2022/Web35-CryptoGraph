@@ -26,13 +26,18 @@ export const useRealTimeUpbitData = (
   const [realtimePriceInfo, setRealtimePriceInfo] =
     useState<CoinPriceObj>(priceInfo)
   const isInitialMount = useRef(true)
-  const marketRef = useRef(market)
-  const periodRef = useRef(period)
 
   useEffect(() => {
     connectWS(priceInfo)
+    return () => {
+      closeWS()
+    }
+  }, [])
+
+  useEffect(() => {
     if (!socket) {
       console.error('분봉 설정 관련 error')
+      location.reload()
       return
     }
     socket.onmessage = function (e) {
@@ -42,22 +47,12 @@ export const useRealTimeUpbitData = (
       const d = JSON.parse(str_d)
       if (d.type == 'ticker') {
         const code = d.code.split('-')[1]
-        if (code === marketRef.current) {
-          setRealtimeCandleData(prevData =>
-            updateData(prevData, d, periodRef.current)
-          )
+        if (code === market) {
+          setRealtimeCandleData(prevData => updateData(prevData, d, period))
         }
         setRealtimePriceInfo(prev => updateRealTimePrice(prev, d, code))
       }
     }
-    return () => {
-      closeWS()
-    }
-  }, [])
-
-  useEffect(() => {
-    marketRef.current = market
-    periodRef.current = period
     const fetchData = async () => {
       const fetched: CandleData[] | null = await getCandleDataArray(
         period,
@@ -72,12 +67,13 @@ export const useRealTimeUpbitData = (
     }
     if (!isInitialMount.current) fetchData() //첫 마운트면
     else isInitialMount.current = false
-  }, [market, period])
+  }, [market, period, priceInfo])
 
   return [realtimeCandleData, setRealtimeCandleData, realtimePriceInfo] //socket을 state해서 같이 뺀다. 변화감지 (끊길때) -> ui표시..
 }
 
 export function connectWS(priceInfo: CoinPriceObj) {
+  console.log('커넥트')
   if (socket !== undefined) {
     socket.close()
   }

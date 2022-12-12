@@ -69,6 +69,8 @@ function initCandleChartSVG(
   chartContainer.select('svg#mouse-pointer-UI').attr('pointer-events', 'none')
 }
 
+let prevDistance = -1
+//불가피하게 지역변수 사용.. ㅠㅠ IIFE를 활용한 클로저 사용해보고 싶었으나, 세개의 콜백에 대해서 묶을 수 없어 지역변수 사용함
 export function addEventsToChart(
   svgRef: React.RefObject<SVGSVGElement>,
   optionSetter: React.Dispatch<React.SetStateAction<CandleChartRenderOption>>,
@@ -80,17 +82,60 @@ export function addEventsToChart(
   const chartContainerYsize = windowSize.height
   const chartAreaXsize = chartContainerXsize - CHART_Y_AXIS_MARGIN
   const chartAreaYsize = chartContainerYsize - CHART_X_AXIS_MARGIN
-  //margin값도 크기에 맞춰 변수화 시켜야함.
-  // xAxis초기값 설정
-  // currentPrice초기값 설정
   if (svgRef.current !== null) {
+    const getEuclideanDistance = (touches: Touch[]): number => {
+      return Math.sqrt(
+        Math.pow(touches[0].clientX - touches[1].clientX, 2) +
+          Math.pow(touches[0].clientY - touches[1].clientY, 2)
+      )
+    }
     d3.select<SVGSVGElement, CandleData>(svgRef.current)
       .call(
         d3
           .drag<SVGSVGElement, CandleData>()
           .on(
+            'start',
+            (event: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
+              if (
+                event.identifier === 'mouse' ||
+                event.sourceEvent.touches.length !== 2
+              )
+                //마우스거나 (==데스크탑이거나), 2개의 멀티터치가 아니면 아무것도 하지 않음
+                return
+              prevDistance = getEuclideanDistance(event.sourceEvent.touches)
+            }
+          )
+          .on(
             'drag',
             (event: D3DragEvent<SVGSVGElement, CandleData, unknown>) => {
+              if (
+                event.identifier !== 'mouse' &&
+                event.sourceEvent.touches.length == 2
+              ) {
+                //여기는 줌 코드
+                const nowDistance = getEuclideanDistance(
+                  event.sourceEvent.touches
+                )
+                if (nowDistance === prevDistance) return
+                const isZoomIn = prevDistance < nowDistance ? 0.5 : -0.5
+                prevDistance = getEuclideanDistance(event.sourceEvent.touches)
+                optionSetter((prev: CandleChartRenderOption) => {
+                  const newCandleWidth = Math.min(
+                    Math.max(prev.candleWidth + isZoomIn, prev.minCandleWidth),
+                    prev.maxCandleWidth
+                  )
+                  const newRenderCandleCount = Math.ceil(
+                    chartAreaXsize / newCandleWidth
+                  )
+                  return {
+                    ...prev,
+                    renderCandleCount: newRenderCandleCount,
+                    candleWidth: newCandleWidth
+                  }
+                })
+                return
+              }
+              //여기는 패닝 코드
               translateXSetter(prev => prev + event.dx)
               handleMouseEvent(
                 event.sourceEvent,
@@ -100,6 +145,9 @@ export function addEventsToChart(
               )
             }
           )
+          .on('end', () => {
+            prevDistance = -1
+          })
       )
       .on('wheel', (e: WheelEvent) => {
         e.preventDefault()
