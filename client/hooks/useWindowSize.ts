@@ -12,8 +12,8 @@ export interface WindowSize {
  */
 export function useWindowSize(ref: React.RefObject<Element>) {
   const [windowSize, setWindowSize] = useState<WindowSize>({
-    width: 1000,
-    height: 900
+    width: 100, //마진으로..
+    height: 100
   })
   useEffect(() => {
     function handleResize() {
@@ -22,13 +22,13 @@ export function useWindowSize(ref: React.RefObject<Element>) {
         return
       }
       setWindowSize({
-        width: ref.current.getBoundingClientRect().width,
-        height: ref.current.getBoundingClientRect().height
+        width: ref.current.clientWidth,
+        height: ref.current.clientHeight
       })
     }
     window.addEventListener('resize', handleResize)
     handleResize()
     return () => window.removeEventListener('resize', handleResize)
-  }, [ref])
+  }, [ref, ref?.current?.clientWidth, ref?.current?.clientHeight])
   return windowSize
 }
