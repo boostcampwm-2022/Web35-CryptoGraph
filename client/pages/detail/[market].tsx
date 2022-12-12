@@ -78,7 +78,15 @@ export default function Detail({
               >
                 <TabBox tabLabelInfo={'코인 디테일'}>
                   <CoinDetailedInfo market={market} />
-                  <LinkButton goto="/" content="Go to Main" />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '0px',
+                      width: '100%'
+                    }}
+                  >
+                    <LinkButton goto="/" content="Go to Main" />
+                  </div>
                 </TabBox>
                 <RealTimeCoinPrice
                   tabLabelInfo={'실시간 코인 정보'}
