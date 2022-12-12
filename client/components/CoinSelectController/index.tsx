@@ -25,8 +25,15 @@ export default function CoinSelectController({
 }: CoinSelectControllerProps) {
   const data = React.useContext(MyAppContext)
   const [coinList, setCoinList] = useState<MarketCapInfo[] | null>(data)
-  const [checked, setChecked] = useState<CoinChecked>({
-    all: true
+  const [checked, setChecked] = useState<CoinChecked>(() => {
+    const initCheckedList: CoinChecked = {
+      all: true
+    }
+    if (coinList == null) return initCheckedList
+    for (const coin of coinList) {
+      initCheckedList[coin.name] = true
+    }
+    return initCheckedList
   })
   const [inputCoinName, setInputCoinName] = useState('')
   const [coinDict, setCoinDict] = useState<dict<Array<string>>>(
