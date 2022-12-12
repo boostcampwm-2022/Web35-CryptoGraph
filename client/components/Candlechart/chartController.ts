@@ -84,10 +84,11 @@ export function addEventsToChart(
   //margin값도 크기에 맞춰 변수화 시켜야함.
   // xAxis초기값 설정
   // currentPrice초기값 설정
-  function getEuclideanDistance(touches: Touch[]): number {
-    const disX = touches[0].clientX - touches[1].clientX
-    const disY = touches[0].clientY - touches[1].clientY
-    return Math.sqrt(Math.abs(disX * disX) + Math.abs(disY * disY))
+  const getEuclideanDistance = (touches: Touch[]): number => {
+    return Math.sqrt(
+      Math.pow(touches[0].clientX - touches[1].clientX, 2) +
+        Math.pow(touches[0].clientY - touches[1].clientY, 2)
+    )
   }
   d3.select<SVGSVGElement, CandleData>('svg#chart-container')
     .call(
