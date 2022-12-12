@@ -19,7 +19,8 @@ const updateChart = (
   height: number,
   selectedSort: string,
   nodeOnclickHandler: (market: string) => void,
-  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>
+  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>,
+  isMobile: boolean
 ) => {
   if (!svgRef.current) return
   const chartContainer = d3.select<SVGSVGElement, CoinRateContentType>(
@@ -86,35 +87,39 @@ const updateChart = (
     )
     .join(
       enter => {
-        const $g = enter
-          .append('g')
-          .on('click', (e, d) => {
-            nodeOnclickHandler(d.data.ticker.split('-')[1])
-          })
-          //this 사용을 위해 함수 선언문 형식 사용
-          .on('mousemove', (d, i) => {
-            d3.select('g').style('opacity', '.70')
-            MainChartHandleMouseEvent(
-              d,
-              setPointerHandler,
-              i.data,
-              width,
-              height
-            )
-          })
-          //this 사용을 위해 함수 선언문 형식 사용
-          .on('mouseout', function (d, i) {
-            MainChartHandleMouseEvent(
-              d,
-              setPointerHandler,
-              i.data,
-              width,
-              height
-            )
-            d3.select(this).style('opacity', '1')
-          })
+        const $g = isMobile
+          ? enter.append('g').on('touchend', function (e, d) {
+              nodeOnclickHandler(d.data.ticker.split('-')[1])
+            }) //this 사용을 위해 함수 선언문 형식 사용
+          : enter
+              .append('g')
+              .on('click', (e, d) => {
+                nodeOnclickHandler(d.data.ticker.split('-')[1])
+              })
+              //this 사용을 위해 함수 선언문 형식 사용
+              .on('mousemove', (d, i) => {
+                if (isMobile) return
+                d3.select('g').style('opacity', '.70')
+                MainChartHandleMouseEvent(
+                  d,
+                  setPointerHandler,
+                  i.data,
+                  width,
+                  height
+                )
+              })
+              //this 사용을 위해 함수 선언문 형식 사용
+              .on('mouseout', function (d, i) {
+                MainChartHandleMouseEvent(
+                  d,
+                  setPointerHandler,
+                  i.data,
+                  width,
+                  height
+                )
+                d3.select(this).style('opacity', '1')
+              })
         $g.append('rect')
-
           .attr('x', d => {
             return d.x0
           })
@@ -255,12 +260,14 @@ export interface TreeChartProps {
   Market?: string[] //선택된 코인 리스트
   selectedSort: string
   modalOpenHandler: (market: string) => void
+  isMobile: boolean
 }
 export default function TreeChart({
   data,
   Market, //= ['CELO', 'ETH', 'MFT', 'WEMIX']
   selectedSort,
-  modalOpenHandler
+  modalOpenHandler,
+  isMobile
 }: TreeChartProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     {
@@ -309,9 +316,9 @@ export default function TreeChart({
       height,
       selectedSort,
       modalOpenHandler,
-      setPointerInfo
+      setPointerInfo,
+      isMobile
     )
-    setPointerInfo(DEFAULT_RUNNING_POINTER_DATA)
   }, [changeRate, width, height, selectedSort, modalOpenHandler])
   return (
     <div

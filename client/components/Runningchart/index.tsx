@@ -21,6 +21,7 @@ interface RunningChartProps {
   selectedSort: string
   modalOpenHandler: (market: string) => void
   durationPeriod?: number
+  isMobile: boolean
 }
 
 //------------------------------setChartContainerSize------------------------------
@@ -44,7 +45,8 @@ const updateChart = (
   candleCount: number,
   selectedSort: string,
   nodeOnclickHandler: (market: string) => void,
-  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>
+  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>,
+  isMobile: boolean
 ) => {
   // if (!data || !svgRef) {
   //   return
@@ -111,20 +113,37 @@ const updateChart = (
     .data(ArrayDataValue, d => d.name)
     .join(
       enter => {
-        const $g = enter
-          .append('g')
-          .on('click', function (e, d) {
-            nodeOnclickHandler(d.ticker.split('-')[1])
-          }) //this 사용을 위해 함수 선언문 형식 사용
-          .on('mousemove', (d, i) => {
-            d3.select('g').style('opacity', '.70')
-            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
-          })
-          //this 사용을 위해 함수 선언문 형식 사용
-          .on('mouseout', function (d, i) {
-            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
-            d3.select(this).style('opacity', '1')
-          })
+        const $g = isMobile
+          ? enter.append('g').on('touchend', function (e, d) {
+              nodeOnclickHandler(d.ticker.split('-')[1])
+            }) //this 사용을 위해 함수 선언문 형식 사용
+          : enter
+              .append('g')
+              .on('click', function (e, d) {
+                nodeOnclickHandler(d.ticker.split('-')[1])
+              }) //this 사용을 위해 함수 선언문 형식 사용
+              .on('mousemove', (d, i) => {
+                if (isMobile) return
+                d3.select('g').style('opacity', '.70')
+                MainChartHandleMouseEvent(
+                  d,
+                  setPointerHandler,
+                  i,
+                  width,
+                  height
+                )
+              })
+              //this 사용을 위해 함수 선언문 형식 사용
+              .on('mouseout', function (d, i) {
+                MainChartHandleMouseEvent(
+                  d,
+                  setPointerHandler,
+                  i,
+                  width,
+                  height
+                )
+                d3.select(this).style('opacity', '1')
+              })
         $g.attr(
           'transform',
           (d, i) => 'translate(0,' + i * (barHeight + barMargin) + ')'
@@ -276,7 +295,8 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   data,
   Market,
   selectedSort,
-  modalOpenHandler
+  modalOpenHandler,
+  isMobile
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const chartSvg = useRef(null)
@@ -297,9 +317,9 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       Market.length,
       selectedSort,
       modalOpenHandler,
-      setPointerInfo
+      setPointerInfo,
+      isMobile
     )
-    setPointerInfo(DEFAULT_RUNNING_POINTER_DATA)
   }, [
     width,
     height,
