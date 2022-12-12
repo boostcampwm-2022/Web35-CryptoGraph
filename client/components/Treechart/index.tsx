@@ -108,7 +108,7 @@ const updateChart = (
             )
           })
           //this 사용을 위해 함수 선언문 형식 사용
-          .on('mouseout', function (d, i) {
+          .on('mouseleave', function (d, i) {
             if (isMobile) return
             d3.select(this).style('opacity', '1')
             MainChartHandleMouseEvent(
@@ -184,9 +184,16 @@ const updateChart = (
               height
             )
           })
-          .on('mouseout', function (d, i) {
+          .on('mouseleave', function (d, i) {
             if (isMobile) return
             d3.select(this).style('opacity', '1')
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
           })
         update
           .select('rect')
