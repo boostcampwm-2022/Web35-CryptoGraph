@@ -87,38 +87,38 @@ const updateChart = (
     )
     .join(
       enter => {
-        const $g = isMobile
-          ? enter.append('g').on('touchend', function (e, d) {
-              nodeOnclickHandler(d.data.ticker.split('-')[1])
-            }) //this 사용을 위해 함수 선언문 형식 사용
-          : enter
-              .append('g')
-              .on('click', (e, d) => {
-                nodeOnclickHandler(d.data.ticker.split('-')[1])
-              })
-              //this 사용을 위해 함수 선언문 형식 사용
-              .on('mousemove', (d, i) => {
-                if (isMobile) return
-                d3.select('g').style('opacity', '.70')
-                MainChartHandleMouseEvent(
-                  d,
-                  setPointerHandler,
-                  i.data,
-                  width,
-                  height
-                )
-              })
-              //this 사용을 위해 함수 선언문 형식 사용
-              .on('mouseout', function (d, i) {
-                MainChartHandleMouseEvent(
-                  d,
-                  setPointerHandler,
-                  i.data,
-                  width,
-                  height
-                )
-                d3.select(this).style('opacity', '1')
-              })
+        const $g = enter
+          .append('g')
+          .on('click', (e, d) => {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', (d, i) => {
+            if (isMobile) return
+            d3.select('g').style('opacity', '.70')
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseout', function (d, i) {
+            if (isMobile) return
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+            d3.select(this).style('opacity', '1')
+          })
         $g.append('rect')
           .attr('x', d => {
             return d.x0
@@ -165,6 +165,37 @@ const updateChart = (
         return $g
       },
       update => {
+        update
+          .on('click', (e, d) => {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', (d, i) => {
+            if (isMobile) return
+            d3.select('g').style('opacity', '.70')
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseout', function (d, i) {
+            if (isMobile) return
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+            d3.select(this).style('opacity', '1')
+          })
         update
           .select('rect')
           .transition()

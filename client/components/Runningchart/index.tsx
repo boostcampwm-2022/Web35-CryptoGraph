@@ -113,37 +113,25 @@ const updateChart = (
     .data(ArrayDataValue, d => d.name)
     .join(
       enter => {
-        const $g = isMobile
-          ? enter.append('g').on('touchend', function (e, d) {
-              nodeOnclickHandler(d.ticker.split('-')[1])
-            }) //this 사용을 위해 함수 선언문 형식 사용
-          : enter
-              .append('g')
-              .on('click', function (e, d) {
-                nodeOnclickHandler(d.ticker.split('-')[1])
-              }) //this 사용을 위해 함수 선언문 형식 사용
-              .on('mousemove', (d, i) => {
-                if (isMobile) return
-                d3.select('g').style('opacity', '.70')
-                MainChartHandleMouseEvent(
-                  d,
-                  setPointerHandler,
-                  i,
-                  width,
-                  height
-                )
-              })
-              //this 사용을 위해 함수 선언문 형식 사용
-              .on('mouseout', function (d, i) {
-                MainChartHandleMouseEvent(
-                  d,
-                  setPointerHandler,
-                  i,
-                  width,
-                  height
-                )
-                d3.select(this).style('opacity', '1')
-              })
+        const $g = enter
+          .append('g')
+          .on('click', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          })
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          }) //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '.70')
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseout', function (d, i) {
+            if (isMobile) return
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+            d3.select(this).style('opacity', '1')
+          })
         $g.attr(
           'transform',
           (d, i) => 'translate(0,' + i * (barHeight + barMargin) + ')'
@@ -213,13 +201,32 @@ const updateChart = (
         return $g
       },
       update => {
-        update // 차트들
+        update
+          .on('click', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          })
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          }) //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '.70')
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mouseout', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '1')
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          })
+        update
           .transition()
           .duration(durationPeriod)
           .attr(
             'transform',
             (d, i) => `translate(0,  ${i * (barHeight + barMargin)} )`
           )
+
         update
           .select('rect')
           .transition()
@@ -306,6 +313,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   const [pointerInfo, setPointerInfo] = useState<MainChartPointerData>(
     DEFAULT_RUNNING_POINTER_DATA
   )
+
   useEffect(() => {
     if (!Object.keys(changeRate).length) return
     updateChart(
@@ -327,7 +335,8 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     selectedSort,
     durationPeriod,
     Market.length,
-    modalOpenHandler
+    modalOpenHandler,
+    isMobile
   ]) // 창크기에 따른 차트크기 조절
   useEffect(() => {
     if (!coinRate || !Market[0]) return
