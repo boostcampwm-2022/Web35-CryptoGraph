@@ -6,18 +6,17 @@ interface ChartButtonProps {
   content: string
   style?: object
 }
+const LinkStyle = { textDecoration: 'none', width: '100%', marginTop: '8px' }
+
 export default function Chartbutton({
   goto = '/',
   content = 'default',
   style = {}
 }: ChartButtonProps) {
   return (
-    <Link
-      href={goto}
-      style={{ textDecoration: 'none', width: '100%', marginTop: '8px' }}
-    >
+    <Link href={goto} style={LinkStyle}>
       <Button
-        style={{
+        sx={{
           width: '100%',
 
           ...style

@@ -11,6 +11,7 @@ import { throttle } from 'lodash'
 import { convertUnit, MainChartHandleMouseEvent } from '@/utils/chartManager'
 import ChartTagController from '../ChartTagController'
 import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
+import { styled } from '@mui/system'
 
 const updateChart = (
   svgRef: React.RefObject<SVGSVGElement>,
@@ -19,7 +20,8 @@ const updateChart = (
   height: number,
   selectedSort: string,
   nodeOnclickHandler: (market: string) => void,
-  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>
+  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>,
+  isMobile: boolean
 ) => {
   if (!svgRef.current) return
   const chartContainer = d3.select<SVGSVGElement, CoinRateContentType>(
@@ -91,11 +93,13 @@ const updateChart = (
           .on('click', (e, d) => {
             nodeOnclickHandler(d.data.ticker.split('-')[1])
           })
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
           //this 사용을 위해 함수 선언문 형식 사용
-          .on('mouseover', function (this) {
+          .on('mousemove', function (d, i) {
+            if (isMobile) return
             d3.select(this).style('opacity', '.70')
-          })
-          .on('mousemove', (d, i) => {
             MainChartHandleMouseEvent(
               d,
               setPointerHandler,
@@ -105,7 +109,9 @@ const updateChart = (
             )
           })
           //this 사용을 위해 함수 선언문 형식 사용
-          .on('mouseout', function (d, i) {
+          .on('mouseleave', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '1')
             MainChartHandleMouseEvent(
               d,
               setPointerHandler,
@@ -113,10 +119,8 @@ const updateChart = (
               width,
               height
             )
-            d3.select(this).style('opacity', '1')
           })
         $g.append('rect')
-
           .attr('x', d => {
             return d.x0
           })
@@ -162,6 +166,36 @@ const updateChart = (
         return $g
       },
       update => {
+        update
+          .on('click', (e, d) => {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.data.ticker.split('-')[1])
+          })
+          //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '.70')
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+          })
+          .on('mouseleave', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '1')
+            MainChartHandleMouseEvent(
+              d,
+              setPointerHandler,
+              i.data,
+              width,
+              height
+            )
+          })
         update
           .select('rect')
           .transition()
@@ -257,12 +291,14 @@ export interface TreeChartProps {
   Market?: string[] //선택된 코인 리스트
   selectedSort: string
   modalOpenHandler: (market: string) => void
+  isMobile: boolean
 }
 export default function TreeChart({
   data,
   Market, //= ['CELO', 'ETH', 'MFT', 'WEMIX']
   selectedSort,
-  modalOpenHandler
+  modalOpenHandler,
+  isMobile
 }: TreeChartProps) {
   const [changeRate, setChangeRate] = useState<CoinRateContentType[]>([
     {
@@ -311,24 +347,23 @@ export default function TreeChart({
       height,
       selectedSort,
       modalOpenHandler,
-      setPointerInfo
+      setPointerInfo,
+      isMobile
     )
-    setPointerInfo(DEFAULT_RUNNING_POINTER_DATA)
   }, [changeRate, width, height, selectedSort, modalOpenHandler])
   return (
-    <div
-      style={{
-        display: 'flex',
-        width: '100%',
-        height: '100%',
-        background: '#ffffff'
-      }}
-      ref={chartContainerSvg}
-    >
+    <ChartContainer ref={chartContainerSvg}>
       <svg id="tree-chart" ref={chartSvg}>
         <svg id="chart-area"></svg>
       </svg>
       <ChartTagController pointerInfo={pointerInfo} />
-    </div>
+    </ChartContainer>
   )
 }
+
+const ChartContainer = styled('div')`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+`

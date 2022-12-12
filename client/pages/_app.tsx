@@ -62,14 +62,23 @@ MyApp.getInitialProps = async (context: AppContext) => {
 }
 
 const GlobalStyle = css`
-  html {
-    font-size: 1rem;
-  }
   html,
   body,
   div#__next {
     height: 100%;
     font-family: 'LINESeedKR-Rg';
+    * {
+      ::-webkit-scrollbar {
+        width: 4px;
+        position: relative;
+      }
+      ::-webkit-scrollbar-track {
+        display: none;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: rgb(199, 199, 199);
+      }
+    }
   }
 `
 

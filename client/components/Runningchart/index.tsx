@@ -17,6 +17,7 @@ import {
   RUNNING_CHART_NAME_MULTIPLIER
 } from '@/constants/ChartConstants'
 import ChartTagController from '../ChartTagController'
+import { styled } from '@mui/material'
 
 //------------------------------interface------------------------------
 interface RunningChartProps {
@@ -25,6 +26,7 @@ interface RunningChartProps {
   selectedSort: string
   modalOpenHandler: (market: string) => void
   durationPeriod?: number
+  isMobile: boolean
 }
 
 //------------------------------setChartContainerSize------------------------------
@@ -48,12 +50,9 @@ const updateChart = (
   candleCount: number,
   selectedSort: string,
   nodeOnclickHandler: (market: string) => void,
-  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>
+  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>,
+  isMobile: boolean
 ) => {
-  // if (!data || !svgRef) {
-  //   return
-  // }
-
   //ArrayDataValue : 기존 Object<object>이던 data를 data.value, 즉 실시간변동 퍼센테이지 값만 추출해서 Array<object>로 변경
   const ArrayDataValue: CoinRateContentType[] = [
     ...Object.values<CoinRateContentType>(data)
@@ -119,17 +118,20 @@ const updateChart = (
           .append('g')
           .on('click', function (e, d) {
             nodeOnclickHandler(d.ticker.split('-')[1])
-          }) //this 사용을 위해 함수 선언문 형식 사용
-          .on('mouseover', function () {
-            d3.select(this).style('opacity', '.70')
           })
-          .on('mousemove', (d, i) => {
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          }) //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '.70')
             MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
           })
           //this 사용을 위해 함수 선언문 형식 사용
-          .on('mouseout', function (d, i) {
-            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          .on('mouseleave', function (d, i) {
+            if (isMobile) return
             d3.select(this).style('opacity', '1')
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
           })
         $g.attr(
           'transform',
@@ -207,13 +209,31 @@ const updateChart = (
         return $g
       },
       update => {
-        update // 차트들
+        update
+          .on('click', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          })
+          .on('touchend', function (e, d) {
+            nodeOnclickHandler(d.ticker.split('-')[1])
+          }) //this 사용을 위해 함수 선언문 형식 사용
+          .on('mousemove', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '.70')
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          })
+          .on('mouseleave', function (d, i) {
+            if (isMobile) return
+            d3.select(this).style('opacity', '1')
+            MainChartHandleMouseEvent(d, setPointerHandler, i, width, height)
+          })
+        update
           .transition()
           .duration(durationPeriod)
           .attr(
             'transform',
             (d, i) => `translate(0,  ${i * (barHeight + barMargin)} )`
           )
+
         update
           .select('rect')
           .transition()
@@ -289,7 +309,8 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
   data,
   Market,
   selectedSort,
-  modalOpenHandler
+  modalOpenHandler,
+  isMobile
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const chartSvg = useRef(null)
@@ -311,9 +332,9 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
       Market.length,
       selectedSort,
       modalOpenHandler,
-      setPointerInfo
+      setPointerInfo,
+      isMobile
     )
-    setPointerInfo(DEFAULT_RUNNING_POINTER_DATA)
   }, [
     width,
     height,
@@ -321,7 +342,8 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     selectedSort,
     durationPeriod,
     Market.length,
-    modalOpenHandler
+    modalOpenHandler,
+    isMobile
   ]) // 창크기에 따른 차트크기 조절
   useEffect(() => {
     if (!coinRate || !Market[0]) return
@@ -332,21 +354,18 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
     setchangeRate(newCoinData)
   }, [data, Market, coinRate])
   return (
-    <div
-      id="chart"
-      ref={chartContainerRef}
-      style={{
-        display: 'flex',
-        width: '100%',
-        background: '#ffffff',
-        height: '100%',
-        overflow: 'auto'
-      }}
-    >
+    <ChartContainer ref={chartContainerRef}>
       <svg id="chart-container" ref={chartSvg}>
         <svg id="running-chart" />
       </svg>
       <ChartTagController pointerInfo={pointerInfo} />
-    </div>
+    </ChartContainer>
   )
 }
+const ChartContainer = styled('div')`
+  display: flex;
+  width: 100%;
+  background: #ffffff;
+  height: 100%;
+  overflow: auto;
+`

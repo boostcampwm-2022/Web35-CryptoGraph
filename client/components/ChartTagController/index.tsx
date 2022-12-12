@@ -17,6 +17,7 @@ export default function ChartTagController({
         sx={{
           width: 'auto',
           height: 'auto',
+          scroll: 'no',
           backgroundColor: 'white',
           border: 'solid',
           borderWidth: '1px',

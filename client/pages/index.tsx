@@ -91,7 +91,7 @@ export default function Home() {
                 <LinkButton
                   goto={`detail/${selectedMarket}`}
                   content={`${selectedMarket}(으)로 바로가기`}
-                  style={{ position: 'absolute', bottom: 0 }}
+                  style={LinkButtonStyle}
                 />
               </TabBox>
             </TabContainer>
@@ -135,6 +135,7 @@ export default function Home() {
                 Market={selectedMarketList}
                 selectedSort={selectedSort}
                 modalOpenHandler={chartNodeHandler}
+                isMobile={isMobile}
               />
             ) : (
               <TreeChart
@@ -142,6 +143,7 @@ export default function Home() {
                 Market={selectedMarketList}
                 selectedSort={selectedSort}
                 modalOpenHandler={chartNodeHandler}
+                isMobile={isMobile}
               />
             )}
           </>
@@ -167,7 +169,7 @@ const SideBarContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  background-color: '#ffffff';
+  background-color: #ffffff;
   align-items: center;
   min-width: 330px;
   max-width: 330px;
@@ -182,10 +184,11 @@ const SideBarContainer = styled(Box)`
 `
 const ChartContainer = styled(Box)`
   display: flex;
-  background: '#ffffff';
+  background: #ffffff;
   box-sizing: content-box; //얘가 차트 크기를 고정해준다. 이유는 아직 모르겠다..
   min-width: 300px;
   width: 100%;
   height: 100%;
   flex-direction: column;
 `
+const LinkButtonStyle = { position: 'absolute', bottom: 0 }
