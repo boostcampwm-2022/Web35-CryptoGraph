@@ -3,7 +3,8 @@ import {
   CHART_X_AXIS_MARGIN,
   CANDLE_CHART_GRID_COLOR,
   CANDLE_COLOR_RED,
-  CANDLE_COLOR_BLUE
+  CANDLE_COLOR_BLUE,
+  DEFAULT_POINTER_DATA
 } from '@/constants/ChartConstants'
 import { WindowSize } from '@/hooks/useWindowSize'
 import {
@@ -145,6 +146,11 @@ export function addEventsToChart(
         )
       }, 50)
     )
+    d3.select<SVGSVGElement, null>(svgRef.current)
+      .select('svg#chart-area')
+      .on('mouseleave', () => {
+        pointerPositionSetter(DEFAULT_POINTER_DATA)
+      })
   }
 }
 
