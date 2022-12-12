@@ -127,6 +127,8 @@ const updateChart = (
           .attr('y', d => {
             return d.y0
           })
+          .transition()
+          .duration(500)
           .attr('width', d => {
             return d.x1 - d.x0
           })
