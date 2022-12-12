@@ -1,8 +1,7 @@
-import Image from 'next/image'
 import { styled } from '@mui/material/styles'
 import { Container, useMediaQuery, useTheme } from '@mui/material'
 import SearchInput from './SearchInput'
-import Link from 'next/link'
+import LogoImg from './LogoImg'
 
 export default function GNB() {
   const theme = useTheme()
@@ -10,27 +9,7 @@ export default function GNB() {
   return (
     <GNBContainer>
       <Container maxWidth="max" id="GNBcontainer" sx={ContainerStyle}>
-        {isMobile ? (
-          <Link href="/">
-            <Image
-              style={MobileImageStyle}
-              src="/logo-only-white.svg"
-              alt=""
-              width={40}
-              height={40}
-            />
-          </Link>
-        ) : (
-          <Link href="/">
-            <Image
-              style={DesktopImageStyle}
-              src="/logo-white.svg"
-              alt=""
-              width={200}
-              height={48}
-            />
-          </Link>
-        )}
+        <LogoImg isMobile={isMobile} />
         <SearchInput />
       </Container>
     </GNBContainer>
@@ -41,8 +20,6 @@ const ContainerStyle = {
   alignItems: 'center',
   paddingLeft: '16px'
 }
-const MobileImageStyle = { paddingRight: '16px' }
-const DesktopImageStyle = { margin: '0px 16px 0px 32px' }
 
 const GNBContainer = styled('div')`
   position: fixed;
