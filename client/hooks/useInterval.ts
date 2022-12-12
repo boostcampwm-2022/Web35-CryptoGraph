@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
 
 export default function useInterval(callback: () => unknown, delay: number) {
-  if (!delay) { //딜레이가 undefined, null , 0초인경우 예외처리
+  if (!delay) {
+    //딜레이가 undefined, null , 0초인경우 예외처리
     console.error('정상적인 setInterval 딜레이값이 아닙니다.')
     return
   }

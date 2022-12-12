@@ -135,6 +135,7 @@ export default function Home() {
                 Market={selectedMarketList}
                 selectedSort={selectedSort}
                 modalOpenHandler={chartNodeHandler}
+                isMobile={isMobile}
               />
             ) : (
               <TreeChart
@@ -142,6 +143,7 @@ export default function Home() {
                 Market={selectedMarketList}
                 selectedSort={selectedSort}
                 modalOpenHandler={chartNodeHandler}
+                isMobile={isMobile}
               />
             )}
           </>

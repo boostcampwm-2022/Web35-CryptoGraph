@@ -387,17 +387,19 @@ export const convertUnit = (unit: number) => {
 }
 export function MainChartHandleMouseEvent(
   event: MouseEvent,
-  pointerInfoSetter: React.Dispatch<
-    React.SetStateAction<MainChartPointerData>
-  >,
+  pointerInfoSetter: React.Dispatch<React.SetStateAction<MainChartPointerData>>,
   data: CoinRateContentType,
   width: number,
   height: number
 ) {
   if (event.type === 'mousemove') {
     pointerInfoSetter({
-      offsetX: width * 4 > event.offsetX * 5 ? event.offsetX : event.offsetX - 150,
-      offsetY: height / 2 > event.clientY - 100 ? event.clientY - 100 : event.clientY - 250,
+      offsetX:
+        (width * 2) / 3 > event.offsetX ? event.offsetX : event.offsetX - 200,
+      offsetY:
+        (height * 2) / 3 > event.clientY
+          ? event.clientY - 100
+          : event.clientY - 250,
       data: data
     })
   } else {
