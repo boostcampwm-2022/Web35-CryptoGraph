@@ -401,9 +401,7 @@ export function MainChartHandleMouseEvent(
       offsetX:
         (width * 2) / 3 > event.offsetX ? event.offsetX : event.offsetX - 200,
       offsetY:
-        (height * 2) / 3 > event.clientY
-          ? event.clientY - 100
-          : event.clientY - 250,
+        height - 50 > event.clientY ? event.clientY - 100 : event.clientY - 270,
       data: data
     })
   } else {
