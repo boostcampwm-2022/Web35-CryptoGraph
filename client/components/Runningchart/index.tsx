@@ -133,7 +133,9 @@ const updateChart = (
         $g.attr(
           'transform',
           (d, i) => 'translate(0,' + i * (barHeight + barMargin) + ')'
-        ).style('opacity', 1)
+        )
+          .style('opacity', 1)
+          .style('cursor', 'pointer')
         $g.append('rect')
           .attr('height', barHeight)
           .transition()

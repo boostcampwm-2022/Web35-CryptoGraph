@@ -161,6 +161,7 @@ const Header = styled('div')`
     }
 
     & > div {
+      cursor: pointer;
       :hover {
         background-color: ${props => props.theme.palette.primary.main};
         color: #ffffff;
