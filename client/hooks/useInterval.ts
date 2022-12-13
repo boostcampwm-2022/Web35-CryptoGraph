@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react'
 
 export default function useInterval(callback: () => unknown, delay: number) {
-  if (!delay) {
-    //딜레이가 undefined, null , 0초인경우 예외처리
-    console.error('정상적인 setInterval 딜레이값이 아닙니다.')
-    return
-  }
+  // if (!delay) {
+  //   //딜레이가 undefined, null , 0초인경우 예외처리
+  //   console.error('정상적인 setInterval 딜레이값이 아닙니다.')
+  //   return
+  // }
   const savedCallback = useRef(callback) // 최근에 들어온 callback을 저장할 ref를 하나 만든다.
 
   useEffect(() => {
@@ -16,9 +16,9 @@ export default function useInterval(callback: () => unknown, delay: number) {
     const executeCallback = () => {
       savedCallback.current()
     }
-
-    const timerId = setInterval(executeCallback, delay)
-
-    return () => clearInterval(timerId)
+    if (!!delay) {
+      const timerId = setInterval(executeCallback, delay)
+      return () => clearInterval(timerId)
+    }
   }, [])
 }
