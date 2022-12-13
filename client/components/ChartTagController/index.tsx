@@ -29,7 +29,8 @@ export default function ChartTagController({
           display:
             pointerInfo.offsetX === -1 || pointerInfo.offsetY === -1
               ? 'none'
-              : 'block'
+              : 'block',
+          pointerEvents: 'none'
         }}
       >
         <p>코인명 : {pointerInfo.data?.name}</p>
