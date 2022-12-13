@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { TabProps } from '@/components/TabContainer'
 import { styled } from '@mui/material'
 import Image from 'next/image'
@@ -8,7 +9,7 @@ import { useCoinMetaData } from 'hooks/useCoinMetaData'
 interface CoinDetailedInfoProps extends TabProps {
   market: string
 }
-export default function CoinDetailedInfo({ market }: CoinDetailedInfoProps) {
+function CoinDetailedInfo({ market }: CoinDetailedInfoProps) {
   const coinMetaData: CoinMetaData | null = useCoinMetaData(market)
   return coinMetaData === null ? (
     <Container></Container>
@@ -54,6 +55,9 @@ export default function CoinDetailedInfo({ market }: CoinDetailedInfoProps) {
     </Container>
   )
 }
+
+export default memo(CoinDetailedInfo)
+
 const Container = styled('div')`
   display: flex;
   flex-direction: column;

@@ -1,5 +1,6 @@
 import { Button } from '@mui/material'
 import Link from 'next/link'
+import { memo } from 'react'
 
 interface ChartButtonProps {
   goto: string
@@ -8,7 +9,7 @@ interface ChartButtonProps {
 }
 const LinkStyle = { textDecoration: 'none', width: '100%', marginTop: '8px' }
 
-export default function Chartbutton({
+function Chartbutton({
   goto = '/',
   content = 'default',
   style = {}
@@ -29,3 +30,5 @@ export default function Chartbutton({
     </Link>
   )
 }
+
+export default memo(Chartbutton)

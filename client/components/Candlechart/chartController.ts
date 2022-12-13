@@ -163,13 +163,21 @@ export function addEventsToChart(
             chartAreaXsize / newCandleWidth
           )
           if (prev.maxDataLength !== Infinity) {
-            const newMaxRenderStartDataIndex =
+            const newMaxRenderStartDataIndex = Math.max(
+              0,
               prev.maxDataLength - newRenderCandleCount + 1
+            )
             return {
               ...prev,
-              renderCandleCount: newRenderCandleCount,
-              candleWidth: newCandleWidth,
               maxRenderStartDataIndex: newMaxRenderStartDataIndex,
+              renderCandleCount:
+                newMaxRenderStartDataIndex === 0
+                  ? prev.renderCandleCount
+                  : newRenderCandleCount,
+              candleWidth:
+                newMaxRenderStartDataIndex === 0
+                  ? prev.candleWidth
+                  : newCandleWidth,
               renderStartDataIndex: Math.min(
                 prev.renderStartDataIndex,
                 newMaxRenderStartDataIndex
