@@ -24,7 +24,8 @@ import {
 import * as d3 from 'd3'
 import { makeDate } from './dateManager'
 import { blueColorScale, redColorScale } from '@/styles/colorScale'
-import { CoinRateType, CoinRateContentType } from '@/types/ChartTypes'
+import { CoinRateContentType } from '@/types/ChartTypes'
+import { Dispatch, SetStateAction } from 'react'
 
 export function getVolumeHeightScale(
   data: CandleData[],
@@ -315,7 +316,7 @@ function transPointerInfoToArray(pointerInfo: PointerData) {
 // 마우스 이벤트 핸들러 포인터의 위치를 파악하고 pointerPosition을 갱신한다.
 export function handleMouseEvent(
   event: MouseEvent,
-  pointerPositionSetter: React.Dispatch<React.SetStateAction<PointerData>>,
+  pointerPositionSetter: Dispatch<SetStateAction<PointerData>>,
   chartAreaXsize: number,
   chartAreaYsize: number
 ) {
@@ -391,7 +392,7 @@ export const convertUnit = (unit: number) => {
 }
 export function MainChartHandleMouseEvent(
   event: MouseEvent,
-  pointerInfoSetter: React.Dispatch<React.SetStateAction<MainChartPointerData>>,
+  pointerInfoSetter: Dispatch<SetStateAction<MainChartPointerData>>,
   data: CoinRateContentType,
   width: number,
   height: number

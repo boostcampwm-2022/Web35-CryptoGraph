@@ -1,6 +1,13 @@
 import { styled } from '@mui/material/styles'
 import Checkbox from '@mui/material/Checkbox'
-import { useContext, useEffect, useState } from 'react'
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 import Image from 'next/image'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import SearchCoin from './SearchCoin'
@@ -15,7 +22,7 @@ interface CoinChecked {
   [key: string]: boolean
 }
 interface CoinSelectControllerProps {
-  selectedCoinListSetter: React.Dispatch<React.SetStateAction<string[]>>
+  selectedCoinListSetter: Dispatch<SetStateAction<string[]>>
   tabLabelInfo?: string
 }
 
@@ -58,7 +65,7 @@ export default function CoinSelectController({
     )
   }, [checked])
 
-  const coinCheckAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const coinCheckAll = (event: ChangeEvent<HTMLInputElement>) => {
     if (checked['all']) {
       for (const coin in checked) {
         checked[coin] = event.target.checked
@@ -80,7 +87,7 @@ export default function CoinSelectController({
     })
   }
 
-  const coinCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const coinCheck = (event: ChangeEvent<HTMLInputElement>) => {
     setChecked({
       ...checked,
       [event.target.name]: event.target.checked

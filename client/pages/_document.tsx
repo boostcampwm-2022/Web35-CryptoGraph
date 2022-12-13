@@ -11,7 +11,7 @@ import theme from '../style/theme'
 import createEmotionCache from '../style/createEmotionCache'
 import { EmotionCache } from '@emotion/react'
 import { AppType } from 'next/app'
-import { ReactNode } from 'react'
+import { ComponentType, ReactNode } from 'react'
 
 interface DocumentProps extends DocumentInitialProps {
   emotionStyleTags: ReactNode[]
@@ -90,7 +90,7 @@ MyDocument.getInitialProps = async (
   ctx.renderPage = () =>
     originalRenderPage({
       enhanceApp: (
-        App: AppType | React.ComponentType<{ emotionCache: EmotionCache }>
+        App: AppType | ComponentType<{ emotionCache: EmotionCache }>
       ) =>
         function EnhanceApp(props) {
           return <App emotionCache={cache} {...props} />

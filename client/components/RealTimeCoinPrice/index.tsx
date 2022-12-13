@@ -3,7 +3,7 @@ import { TabProps } from '@/components/TabContainer'
 import Image from 'next/image'
 import { CoinPrice } from '@/types/CoinPriceTypes'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, FunctionComponent } from 'react'
 //코인 실시간 정보
 
 export const sortTypeArr = [
@@ -78,9 +78,7 @@ interface CoinPriceTabProps {
   coinPrice: CoinPrice
 }
 
-const CoinPriceTab: React.FunctionComponent<CoinPriceTabProps> = ({
-  coinPrice
-}) => {
+const CoinPriceTab: FunctionComponent<CoinPriceTabProps> = ({ coinPrice }) => {
   const theme = useTheme()
   const isMinus = coinPrice.signed_change_price <= 0
   const textColor =

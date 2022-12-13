@@ -1,5 +1,12 @@
 import * as d3 from 'd3'
-import { useState, useEffect, useRef } from 'react'
+import {
+  useState,
+  useEffect,
+  useRef,
+  SetStateAction,
+  Dispatch,
+  RefObject
+} from 'react'
 import { useRefElementSize } from '@/hooks/useRefElementSize'
 import {
   CoinRateType,
@@ -7,20 +14,19 @@ import {
   MainChartPointerData
 } from '@/types/ChartTypes'
 import { colorQuantizeScale } from '@/utils/chartManager'
-import { throttle } from 'lodash'
 import { convertUnit, MainChartHandleMouseEvent } from '@/utils/chartManager'
 import ChartTagController from '../ChartTagController'
 import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
 import { styled } from '@mui/system'
 
 const updateChart = (
-  svgRef: React.RefObject<SVGSVGElement>,
+  svgRef: RefObject<SVGSVGElement>,
   data: CoinRateContentType[],
   width: number,
   height: number,
   selectedSort: string,
   nodeOnclickHandler: (market: string) => void,
-  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>,
+  setPointerHandler: Dispatch<SetStateAction<MainChartPointerData>>,
   isMobile: boolean
 ) => {
   if (!svgRef.current) return
@@ -252,7 +258,7 @@ const updateChart = (
 }
 
 const initChart = (
-  svgRef: React.RefObject<SVGSVGElement>,
+  svgRef: RefObject<SVGSVGElement>,
   width: number,
   height: number
 ) => {

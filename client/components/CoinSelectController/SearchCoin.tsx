@@ -1,8 +1,9 @@
 import TextField from '@mui/material/TextField'
 import { debounce } from 'lodash'
+import { Dispatch, SetStateAction } from 'react'
 
 interface SearchCoinProps {
-  setInputCoinNameSetter: React.Dispatch<React.SetStateAction<string>>
+  setInputCoinNameSetter: Dispatch<SetStateAction<string>>
 }
 
 export default function SearchCoin({
