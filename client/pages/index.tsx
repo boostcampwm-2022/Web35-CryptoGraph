@@ -21,12 +21,14 @@ import { NoSelectedCoinAlertView } from '@/components/NoSelectedCoinAlertView'
 
 export default function Home() {
   const data = useContext(MyAppContext)
-  const [selectedChart, setSelectedChart] = useState<ChartType>('RunningChart')
+  const [selectedChart, setSelectedChart] = useState<ChartType>('TreeChart')
   const [selectedMarketList, setSelectedMarketList] = useState<string[]>(
     data.map(coin => coin.name)
   ) //선택된 market 컨트롤
   const [selectedMarket, setSelectedMarket] = useState<string>('btc')
-  const [selectedSort, setSelectedSort] = useState<string>('descending')
+  const [selectedSort, setSelectedSort] = useState<string>(
+    'market capitalization'
+  )
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [isDrawerOpened, setIsDrawerOpened] = useState<boolean>(false)
   const [isModalOpened, setIsModalOpened] = useState<boolean>(false)
@@ -37,7 +39,7 @@ export default function Home() {
     if (selectedChart === 'RunningChart') {
       setSelectedSort('descending')
     } else {
-      setSelectedSort('change rate')
+      setSelectedSort('market capitalization')
     }
   }, [selectedChart])
 

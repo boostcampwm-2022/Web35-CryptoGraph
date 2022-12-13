@@ -16,7 +16,7 @@ import {
   MAX_FETCH_CANDLE_COUNT
 } from '@/constants/ChartConstants'
 import { getCandleDataArray } from '@/utils/upbitManager'
-import { useWindowSize } from 'hooks/useWindowSize'
+import { useRefElementSize } from 'hooks/useRefElementSize'
 import { styled } from '@mui/material'
 import {
   initCandleChart,
@@ -32,10 +32,10 @@ export interface CandleChartProps {
 export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerRef = useRef<HTMLDivElement>(null)
-  const windowSize = useWindowSize(chartContainerRef)
+  const refElementSize = useRefElementSize(chartContainerRef)
   // 렌더링에 관여하는 모든 속성들
   const [option, setOption] = useState<CandleChartRenderOption>(
-    getInitRenderOption(windowSize.width)
+    getInitRenderOption(refElementSize.width)
   )
   // 캔들유닛들이 얼마나 translate되어있는지 분리
   const [translateX, setTranslateX] = useState<number>(0)
@@ -50,15 +50,15 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       setTranslateX,
       setOption,
       setPointerInfo,
-      windowSize
+      refElementSize
     )
-    setOption(prev => getRenderOptionByWindow(windowSize.width, prev))
+    setOption(prev => getRenderOptionByWindow(refElementSize.width, prev))
     setPointerInfo(DEFAULT_POINTER_DATA)
-  }, [windowSize])
+  }, [refElementSize])
 
   // period혹은 market이 변경되면 모든 렌더옵션 초기화
   useEffect(() => {
-    setOption(getInitRenderOption(windowSize.width))
+    setOption(getInitRenderOption(refElementSize.width))
   }, [props.chartOption])
 
   // translateX의 변경에 따라 기존의 문서요소들을 이동만 시킨다.
@@ -97,7 +97,7 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       return
     }
     translateCandleChart(chartSvg, translateX)
-  }, [translateX, windowSize, option])
+  }, [translateX, refElementSize, option])
 
   // 문서요소들을 다시 join해야할때
   // 더 최적화하려면 소켓을 통해 들어오는 0번 데이터 처리하기
@@ -147,15 +147,15 @@ export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
       chartSvg,
       props.candleData,
       option,
-      windowSize,
+      refElementSize,
       props.chartOption.candlePeriod,
       translateX
     )
-  }, [props, option, windowSize])
+  }, [props, option, refElementSize])
 
   useEffect(() => {
-    updatePointerUI(pointerInfo, option, props.candleData, windowSize)
-  }, [pointerInfo, windowSize, option, props])
+    updatePointerUI(pointerInfo, option, props.candleData, refElementSize)
+  }, [pointerInfo, refElementSize, option, props])
 
   return (
     <ChartContainer ref={chartContainerRef}>
@@ -184,6 +184,7 @@ const ChartContainer = styled('div')`
   width: 100%;
   background: #ffffff;
   ${props => props.theme.breakpoints.down('tablet')} {
-    height: calc(100% - 150px);
+    height: calc(100% - 50px);
+    min-height: 300px;
   }
 `

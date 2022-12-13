@@ -33,6 +33,8 @@ export const DEFAULT_RUNNING_POINTER_DATA: MainChartPointerData = {
   data: null
 }
 
+export const RUNNING_CHART_RATE_MULTIPLIER = 0.3
+export const RUNNING_CHART_NAME_MULTIPLIER = 0.6
 export const CANDLE_COLOR_RED = '#D24F45'
 export const CANDLE_COLOR_BLUE = '#1D61C4'
 export const CANDLE_CHART_GRID_COLOR = '#EEEFEE'

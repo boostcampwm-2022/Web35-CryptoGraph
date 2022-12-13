@@ -1,4 +1,3 @@
-import * as React from 'react'
 import Document, {
   Html,
   Head,
@@ -8,17 +7,18 @@ import Document, {
   DocumentInitialProps
 } from 'next/document'
 import createEmotionServer from '@emotion/server/create-instance'
-import theme, { roboto } from '../style/theme'
+import theme from '../style/theme'
 import createEmotionCache from '../style/createEmotionCache'
 import { EmotionCache } from '@emotion/react'
 import { AppType } from 'next/app'
+import { ReactNode } from 'react'
 
 interface DocumentProps extends DocumentInitialProps {
-  emotionStyleTags: React.ReactNode[]
+  emotionStyleTags: ReactNode[]
 }
 export default function MyDocument(props: DocumentProps) {
   return (
-    <Html lang="ko" className={roboto.className}>
+    <Html lang="ko">
       <Head>
         {/* PWA primary color */}
         <meta name="theme-color" content={theme.palette.primary.main} />
@@ -36,6 +36,10 @@ export default function MyDocument(props: DocumentProps) {
           property="og:description"
           content="실시간 암호화폐 데이터 시각화 웹 서비스"
         />
+        <meta
+          name="description"
+          content="실시간 암호화폐 데이터 시각화 웹 서비스 - CryptoGraph"
+        ></meta>
         <meta property="og:site_name" content="CryptoGraph" />
         <meta property="og:locale" content="ko_KR" />
         <meta property="og:image:width" content="1200" />

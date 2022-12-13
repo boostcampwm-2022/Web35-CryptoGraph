@@ -1,6 +1,7 @@
 import { useMediaQuery, useTheme } from '@mui/material'
 import { styled } from '@mui/material'
 import Image from 'next/image'
+import dogeImage from '@/pages/doge.svg'
 
 const Container = styled('div')`
   width: 100%;
@@ -27,7 +28,7 @@ export function NoSelectedCoinAlertView() {
     <Container>
       <h1>선택된 코인이 없습니다..</h1>
       <Image
-        src={'/doge.svg'}
+        src={dogeImage}
         alt="/logo-only-white.svg"
         width={300}
         height={300}

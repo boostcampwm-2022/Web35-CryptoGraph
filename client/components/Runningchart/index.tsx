@@ -5,13 +5,17 @@ import {
   CoinRateType,
   MainChartPointerData
 } from '@/types/ChartTypes'
-import { useWindowSize } from 'hooks/useWindowSize'
+import { useRefElementSize } from 'hooks/useRefElementSize'
 import {
   colorQuantizeScale,
   MainChartHandleMouseEvent
 } from '@/utils/chartManager'
 import { convertUnit } from '@/utils/chartManager'
-import { DEFAULT_RUNNING_POINTER_DATA } from '@/constants/ChartConstants'
+import {
+  DEFAULT_RUNNING_POINTER_DATA,
+  RUNNING_CHART_RATE_MULTIPLIER,
+  RUNNING_CHART_NAME_MULTIPLIER
+} from '@/constants/ChartConstants'
 import ChartTagController from '../ChartTagController'
 import { styled } from '@mui/material'
 
@@ -132,11 +136,11 @@ const updateChart = (
         $g.attr(
           'transform',
           (d, i) => 'translate(0,' + i * (barHeight + barMargin) + ')'
-        )
+        ).style('opacity', 1)
+        $g.append('rect')
+          .attr('height', barHeight)
           .transition()
           .duration(durationPeriod)
-          .style('opacity', 1)
-        $g.append('rect')
           .attr('width', d => {
             return scale(
               selectedSort !== 'trade price'
@@ -146,7 +150,7 @@ const updateChart = (
                 : d.acc_trade_price_24h
             )
           })
-          .attr('height', barHeight)
+
           .style('fill', d => {
             if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
@@ -156,6 +160,21 @@ const updateChart = (
           })
 
         $g.append('text')
+
+          .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'middle')
+
+          .text(d =>
+            selectedSort !== 'trade price'
+              ? selectedSort === 'market capitalization'
+                ? convertUnit(Number(d.market_cap))
+                : String(Number(d.value).toFixed(2)) + '%'
+              : convertUnit(Number(d.acc_trade_price_24h))
+          )
+          .attr('y', barHeight / 2)
+          .transition()
+          .duration(durationPeriod * 2)
+          .style('font-size', `${barHeight * RUNNING_CHART_RATE_MULTIPLIER}px`)
           .attr('x', d => {
             return (
               scale(
@@ -167,20 +186,16 @@ const updateChart = (
               ) / 2
             )
           })
-          .attr('y', barHeight / 2)
-          .attr('text-anchor', 'middle')
-          .attr('dominant-baseline', 'middle')
-          .style('font-size', `${barHeight * 0.6}px`)
-          .text(d =>
-            selectedSort !== 'trade price'
-              ? selectedSort === 'market capitalization'
-                ? convertUnit(Number(d.market_cap))
-                : String(Number(d.value).toFixed(2)) + '%'
-              : convertUnit(Number(d.acc_trade_price_24h))
-          )
 
         $g.append('text')
           .attr('class', 'CoinName')
+          .style('font-size', `${barHeight * RUNNING_CHART_NAME_MULTIPLIER}px`)
+          .attr('text-anchor', 'start')
+          .attr('dominant-baseline', 'middle')
+          .text(d => d.ticker.split('-')[1])
+          .attr('y', barHeight / 2)
+          .transition()
+          .duration(durationPeriod * 1)
           .attr('x', d => {
             return scale(
               selectedSort !== 'trade price'
@@ -190,11 +205,7 @@ const updateChart = (
                 : d.acc_trade_price_24h
             )
           })
-          .attr('y', barHeight / 2)
-          .attr('text-anchor', 'start')
-          .attr('dominant-baseline', 'middle')
-          .style('font-size', `${barHeight * 0.6}px`)
-          .text(d => d.ticker.split('-')[1])
+
         return $g
       },
       update => {
@@ -227,6 +238,7 @@ const updateChart = (
           .select('rect')
           .transition()
           .duration(durationPeriod)
+          .attr('height', barHeight)
           .attr('width', d => {
             return scale(
               selectedSort !== 'trade price'
@@ -236,7 +248,6 @@ const updateChart = (
                 : d.acc_trade_price_24h
             )
           })
-          .attr('height', barHeight)
           .style('fill', d => {
             if (d.value > 0) return colorQuantizeScale(max, d.value)
             else if (d.value === 0) return 'gray'
@@ -258,7 +269,7 @@ const updateChart = (
           .attr('y', barHeight / 2)
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'middle')
-          .style('font-size', `${barHeight * 0.3}px`)
+          .style('font-size', `${barHeight * RUNNING_CHART_RATE_MULTIPLIER}px`)
           .text(d =>
             selectedSort !== 'trade price'
               ? selectedSort === 'market capitalization'
@@ -283,7 +294,7 @@ const updateChart = (
           .attr('y', barHeight / 2)
           .attr('text-anchor', 'start')
           .attr('dominant-baseline', 'middle')
-          .style('font-size', `${barHeight * 0.6}px`)
+          .style('font-size', `${barHeight * RUNNING_CHART_NAME_MULTIPLIER}px`)
           .text(d => d.ticker.split('-')[1])
         return update
       },
@@ -303,7 +314,7 @@ export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const chartSvg = useRef(null)
-  const { width, height } = useWindowSize(chartContainerRef)
+  const { width, height } = useRefElementSize(chartContainerRef)
   const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값, 모든 코인 값 보유
   const [changeRate, setchangeRate] = useState<CoinRateType>({}) //선택된 코인 값만 보유
   const [pointerInfo, setPointerInfo] = useState<MainChartPointerData>(

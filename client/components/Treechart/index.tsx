@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import { useState, useEffect, useRef } from 'react'
-import { useWindowSize } from '@/hooks/useWindowSize'
+import { useRefElementSize } from '@/hooks/useRefElementSize'
 import {
   CoinRateType,
   CoinRateContentType,
@@ -127,6 +127,8 @@ const updateChart = (
           .attr('y', d => {
             return d.y0
           })
+          .transition()
+          .duration(500)
           .attr('width', d => {
             return d.x1 - d.x0
           })
@@ -312,7 +314,7 @@ export default function TreeChart({
   ]) //coin의 등락률 값에 parentNode가 추가된 값
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerSvg = useRef<HTMLDivElement>(null)
-  const { width, height } = useWindowSize(chartContainerSvg)
+  const { width, height } = useRefElementSize(chartContainerSvg)
   const [pointerInfo, setPointerInfo] = useState<MainChartPointerData>(
     DEFAULT_RUNNING_POINTER_DATA
   )

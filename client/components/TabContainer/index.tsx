@@ -1,8 +1,14 @@
-import * as React from 'react'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
 import { CoinPriceObj } from '@/types/CoinPriceTypes'
+import {
+  Dispatch,
+  SetStateAction,
+  ReactNode,
+  Children,
+  isValidElement
+} from 'react'
 
 export interface TabProps {
   tabLabelInfo?: string
@@ -10,11 +16,11 @@ export interface TabProps {
 }
 interface TabContainerProps {
   selectedTab: number
-  setSelectedTab: React.Dispatch<React.SetStateAction<number>>
-  children: React.ReactNode
+  setSelectedTab: Dispatch<SetStateAction<number>>
+  children: ReactNode
 }
 interface TabPanelProps {
-  children?: React.ReactNode
+  children?: ReactNode
   index: number
   value: number
 }
@@ -59,8 +65,8 @@ export default function TabContainer({
           variant="fullWidth"
           aria-label="basic tabs example"
         >
-          {React.Children.map(children, (child, index) => {
-            if (!React.isValidElement(child)) {
+          {Children.map(children, (child, index) => {
+            if (!isValidElement(child)) {
               console.error('올바른 리액트 노드가 아님')
               return false
             }
@@ -73,8 +79,8 @@ export default function TabContainer({
           })}
         </Tabs>
       </Box>
-      {React.Children.map(children, (child, index) => {
-        if (!React.isValidElement(child)) {
+      {Children.map(children, (child, index) => {
+        if (!isValidElement(child)) {
           console.error('올바른 리액트 노드가 아님')
           return false
         }

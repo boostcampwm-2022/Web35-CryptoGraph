@@ -1,6 +1,6 @@
-import * as React from 'react'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
+import { Dispatch, ReactNode, SetStateAction } from 'react'
 
 const boxStyle = {
   position: 'absolute',
@@ -15,8 +15,8 @@ const boxStyle = {
 }
 interface MuiModalProps {
   isModalOpened: boolean
-  setIsModalOpened: React.Dispatch<React.SetStateAction<boolean>>
-  children: React.ReactNode
+  setIsModalOpened: Dispatch<SetStateAction<boolean>>
+  children: ReactNode
 }
 export default function MuiModal({
   isModalOpened,

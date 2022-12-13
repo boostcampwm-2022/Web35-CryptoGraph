@@ -1,15 +1,16 @@
-import * as React from 'react'
 import Head from 'next/head'
 import App, { AppContext, AppProps } from 'next/app'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { Global, css, CacheProvider, EmotionCache } from '@emotion/react'
 import theme from '../style/theme'
+import '../public/fonts/style.css'
 import createEmotionCache from '../style/createEmotionCache'
 import GNB from '@/components/GNB'
 import { Container, styled } from '@mui/material'
 import { MarketCapInfo } from '@/types/CoinDataTypes'
 import { getMarketCapInfo } from '@/utils/metaDataManages'
+import { createContext } from 'react'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -19,7 +20,7 @@ interface MyAppProps extends AppProps {
   data: MarketCapInfo[]
 }
 
-export const MyAppContext = React.createContext<MarketCapInfo[]>([])
+export const MyAppContext = createContext<MarketCapInfo[]>([])
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
@@ -27,6 +28,7 @@ export default function MyApp(props: MyAppProps) {
   return (
     <CacheProvider value={emotionCache}>
       <Head>
+        <title>CryptoGraph</title>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <ThemeProvider theme={theme}>
@@ -65,6 +67,7 @@ const GlobalStyle = css`
   body,
   div#__next {
     height: 100%;
+    font-family: 'LINESeedKR-Rg';
     * {
       ::-webkit-scrollbar {
         width: 4px;
