@@ -1,4 +1,11 @@
-import { useRef, useState, useEffect } from 'react'
+import {
+  useRef,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  FunctionComponent
+} from 'react'
 import {
   CandleChartOption,
   CandleChartRenderOption,
@@ -26,10 +33,10 @@ import {
 export interface CandleChartProps {
   chartOption: CandleChartOption
   candleData: CandleData[]
-  candleDataSetter: React.Dispatch<React.SetStateAction<CandleData[]>>
+  candleDataSetter: Dispatch<SetStateAction<CandleData[]>>
 }
 
-export const CandleChart: React.FunctionComponent<CandleChartProps> = props => {
+export const CandleChart: FunctionComponent<CandleChartProps> = props => {
   const chartSvg = useRef<SVGSVGElement>(null)
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const refElementSize = useRefElementSize(chartContainerRef)

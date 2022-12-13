@@ -1,5 +1,13 @@
 import * as d3 from 'd3'
-import { useState, useEffect, useRef } from 'react'
+import {
+  useState,
+  useEffect,
+  useRef,
+  RefObject,
+  FunctionComponent,
+  SetStateAction,
+  Dispatch
+} from 'react'
 import {
   CoinRateContentType,
   CoinRateType,
@@ -31,7 +39,7 @@ interface RunningChartProps {
 
 //------------------------------setChartContainerSize------------------------------
 const setChartContainerSize = (
-  svgRef: React.RefObject<SVGSVGElement>,
+  svgRef: RefObject<SVGSVGElement>,
   width: number,
   height: number
 ) => {
@@ -43,14 +51,14 @@ const setChartContainerSize = (
 //------------------------------updateChart------------------------------
 const updateChart = (
   durationPeriod: number,
-  svgRef: React.RefObject<SVGSVGElement>,
+  svgRef: RefObject<SVGSVGElement>,
   data: CoinRateType,
   width: number,
   height: number,
   candleCount: number,
   selectedSort: string,
   nodeOnclickHandler: (market: string) => void,
-  setPointerHandler: React.Dispatch<React.SetStateAction<MainChartPointerData>>,
+  setPointerHandler: Dispatch<SetStateAction<MainChartPointerData>>,
   isMobile: boolean
 ) => {
   //ArrayDataValue : 기존 Object<object>이던 data를 data.value, 즉 실시간변동 퍼센테이지 값만 추출해서 Array<object>로 변경
@@ -300,7 +308,7 @@ const updateChart = (
     )
 }
 //------------------------------Component------------------------------
-export const RunningChart: React.FunctionComponent<RunningChartProps> = ({
+export const RunningChart: FunctionComponent<RunningChartProps> = ({
   durationPeriod = 500,
   data,
   Market,

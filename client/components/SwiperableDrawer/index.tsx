@@ -22,8 +22,6 @@ export default function SwipeableTemporaryDrawer({
   setIsDrawerOpened,
   children
 }: SwipeableTemporaryDrawerProps) {
-  // const [isDrawerOpened, setIsDrawerOpened] = React.useState(false)
-
   const toggleDrawer =
     (open: boolean) => (event: KeyboardEvent | MouseEvent) => {
       if (

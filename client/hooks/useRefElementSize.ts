@@ -2,7 +2,7 @@ import {
   CHART_X_AXIS_MARGIN,
   CHART_Y_AXIS_MARGIN
 } from '@/constants/ChartConstants'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, RefObject } from 'react'
 
 export interface RefElementSize {
   width: number
@@ -14,7 +14,7 @@ export interface RefElementSize {
  * @param ref width와 height를 얻길 원하는 html 태그의 ref
  * @returns  width와 height의 변화하는 상태값
  */
-export function useRefElementSize(ref: React.RefObject<Element>) {
+export function useRefElementSize(ref: RefObject<Element>) {
   const [refElementSize, setRefElementSize] = useState<RefElementSize>({
     width: CHART_Y_AXIS_MARGIN,
     height: CHART_X_AXIS_MARGIN

@@ -7,7 +7,8 @@ import {
   SetStateAction,
   ReactNode,
   Children,
-  isValidElement
+  isValidElement,
+  SyntheticEvent
 } from 'react'
 
 export interface TabProps {
@@ -52,8 +53,7 @@ export default function TabContainer({
   setSelectedTab,
   children
 }: TabContainerProps) {
-  // const [selectedTab, setSelectedTab] = React.useState<number>(0)
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (event: SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue)
   }
   return (
