@@ -1,6 +1,7 @@
 import LinkButton from '@/components/LinkButton'
 import { styled, useMediaQuery, useTheme } from '@mui/material'
 import Image from 'next/image'
+import dogeImage from './doge.svg'
 
 const StyledNotFound = styled('div')`
   width: 100%;
@@ -26,7 +27,7 @@ export default function My404Page() {
     <StyledNotFound>
       <h1>404 - 존재하지 않는 페이지</h1>
       <Image
-        src={'/doge.svg'}
+        src={dogeImage}
         alt="/logo-only-white.svg"
         width={isMobile ? 200 : 500}
         height={isMobile ? 200 : 500}
