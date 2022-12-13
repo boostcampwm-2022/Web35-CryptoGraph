@@ -118,9 +118,6 @@ const updateChart = (
           .append('g')
           .on('click', function (e, d) {
             nodeOnclickHandler(d.ticker.split('-')[1])
-          })
-          .on('touchend', function (e, d) {
-            nodeOnclickHandler(d.ticker.split('-')[1])
           }) //this 사용을 위해 함수 선언문 형식 사용
           .on('mousemove', function (d, i) {
             if (isMobile) return
@@ -211,9 +208,6 @@ const updateChart = (
       update => {
         update
           .on('click', function (e, d) {
-            nodeOnclickHandler(d.ticker.split('-')[1])
-          })
-          .on('touchend', function (e, d) {
             nodeOnclickHandler(d.ticker.split('-')[1])
           }) //this 사용을 위해 함수 선언문 형식 사용
           .on('mousemove', function (d, i) {

@@ -93,9 +93,6 @@ const updateChart = (
           .on('click', (e, d) => {
             nodeOnclickHandler(d.data.ticker.split('-')[1])
           })
-          .on('touchend', function (e, d) {
-            nodeOnclickHandler(d.data.ticker.split('-')[1])
-          })
           //this 사용을 위해 함수 선언문 형식 사용
           .on('mousemove', function (d, i) {
             if (isMobile) return
@@ -170,9 +167,6 @@ const updateChart = (
       update => {
         update
           .on('click', (e, d) => {
-            nodeOnclickHandler(d.data.ticker.split('-')[1])
-          })
-          .on('touchend', function (e, d) {
             nodeOnclickHandler(d.data.ticker.split('-')[1])
           })
           //this 사용을 위해 함수 선언문 형식 사용
@@ -264,7 +258,7 @@ const initChart = (
 ) => {
   const zoom = d3
     .zoom<SVGSVGElement, CoinRateContentType>()
-    .on('zoom', throttle(handleZoom, 50))
+    .on('zoom', handleZoom)
     .scaleExtent([1, 30]) //scale 제한
     .translateExtent([
       [0, 0], // top-left-corner 좌표
