@@ -69,12 +69,9 @@ export function getXAxisScale(
       makeDate(
         data[option.renderStartDataIndex].timestamp -
           DatePeriod[candlePeriod] * (option.renderCandleCount + 1) * 1000,
-        DatePeriod[candlePeriod]
+        candlePeriod
       ),
-      makeDate(
-        data[option.renderStartDataIndex].timestamp,
-        DatePeriod[candlePeriod]
-      )
+      makeDate(data[option.renderStartDataIndex].timestamp, candlePeriod)
     ])
     .range([
       chartAreaXsize - (option.renderCandleCount + 1) * option.candleWidth,
