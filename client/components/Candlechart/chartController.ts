@@ -378,8 +378,10 @@ function placeCandleRect(
   $g.append('rect')
     .classed('candleRect', true)
     .attr('width', candleWidth * 0.6)
-    .attr('height', d =>
-      Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price))
+    .attr(
+      'height',
+      d =>
+        Math.abs(yAxisScale(d.trade_price) - yAxisScale(d.opening_price)) || 0.1
     )
     .attr(
       'x',

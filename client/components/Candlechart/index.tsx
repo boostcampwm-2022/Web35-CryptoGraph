@@ -161,7 +161,13 @@ export const CandleChart: FunctionComponent<CandleChartProps> = props => {
   }, [props, option, refElementSize])
 
   useEffect(() => {
-    updatePointerUI(pointerInfo, option, props.candleData, refElementSize)
+    updatePointerUI(
+      pointerInfo,
+      option,
+      props.candleData,
+      refElementSize,
+      props.chartOption.candlePeriod
+    )
   }, [pointerInfo, refElementSize, option, props])
 
   return (
