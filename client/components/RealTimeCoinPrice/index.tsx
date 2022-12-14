@@ -3,71 +3,53 @@ import { TabProps } from '@/components/TabContainer'
 import Image from 'next/image'
 import { CoinPrice } from '@/types/CoinPriceTypes'
 import Link from 'next/link'
-import { useState, FunctionComponent } from 'react'
+import { useState, FunctionComponent, memo, useCallback } from 'react'
 //코인 실시간 정보
 
-export const sortTypeArr = [
+const sortTypeArr = [
   'signed_change_rate',
   'acc_trade_price_24h',
   'price'
 ] as const
-export type sortType = typeof sortTypeArr[number]
+type sortType = typeof sortTypeArr[number]
+
+interface SortManual {
+  toSort: sortType
+  sortDirection: boolean
+}
 
 export default function RealTimeCoinPrice(props: TabProps) {
-  const [toSort, setToSort] = useState<sortType>('acc_trade_price_24h')
-  const [sortDirection, setSortDirection] = useState<boolean>(true) //true <- 큰거부터, false <- 작은거부터
+  const [sortManual, setSortManual] = useState<SortManual>({
+    toSort: 'acc_trade_price_24h',
+    sortDirection: true
+  })
 
-  const sortHandler = (clicked: sortType) => {
-    if (clicked === toSort) {
-      setSortDirection(prev => !prev)
-      return
-    }
-    setToSort(clicked)
-    setSortDirection(true)
-  }
+  const sortHandler = useCallback(
+    (clicked: sortType) => {
+      setSortManual(prev => {
+        if (prev.toSort === clicked) {
+          return { toSort: clicked, sortDirection: !prev.sortDirection }
+        }
+        return { toSort: clicked, sortDirection: true }
+      })
+    },
+    [setSortManual]
+  )
 
   return (
     <Container>
-      <Header>
-        <div className="header">
-          <div className="name">코인명</div>
-          <div
-            className="price"
-            onClick={() => {
-              sortHandler('price')
-            }}
-          >
-            현재가
-          </div>
-          <div
-            className="yesterday"
-            onClick={() => {
-              sortHandler('signed_change_rate')
-            }}
-          >
-            전일대비
-          </div>
-          <div
-            className="amount"
-            onClick={() => {
-              sortHandler('acc_trade_price_24h')
-            }}
-          >
-            거래대금
-          </div>
-        </div>
-      </Header>
+      <MemoCoinPriceHeader sortHandler={sortHandler} />
       <CoinPriceContainer>
         {props.priceInfo &&
           Object.values(props.priceInfo)
             .sort((a, b) => {
-              return (sortDirection ? 1 : -1) * (b[toSort] - a[toSort])
+              return (
+                (sortManual.sortDirection ? 1 : -1) *
+                (b[sortManual.toSort] - a[sortManual.toSort])
+              )
             })
             .map(coinPrice => (
-              <CoinPriceTab
-                key={coinPrice.name}
-                coinPrice={coinPrice}
-              ></CoinPriceTab>
+              <MemoCoinPriceTab key={coinPrice.name} coinPrice={coinPrice} />
             ))}
       </CoinPriceContainer>
     </Container>
@@ -125,6 +107,50 @@ const CoinPriceTab: FunctionComponent<CoinPriceTabProps> = ({ coinPrice }) => {
     </Link>
   )
 }
+
+const MemoCoinPriceTab = memo(CoinPriceTab)
+
+interface CoinPriceHeaderProps {
+  sortHandler: (clicked: sortType) => void
+}
+
+const CoinPriceHeader: FunctionComponent<CoinPriceHeaderProps> = ({
+  sortHandler
+}) => {
+  return (
+    <Header>
+      <div className="header">
+        <div className="name">코인명</div>
+        <div
+          className="price"
+          onClick={() => {
+            sortHandler('price')
+          }}
+        >
+          현재가
+        </div>
+        <div
+          className="yesterday"
+          onClick={() => {
+            sortHandler('signed_change_rate')
+          }}
+        >
+          전일대비
+        </div>
+        <div
+          className="amount"
+          onClick={() => {
+            sortHandler('acc_trade_price_24h')
+          }}
+        >
+          거래대금
+        </div>
+      </div>
+    </Header>
+  )
+}
+
+const MemoCoinPriceHeader = memo(CoinPriceHeader)
 
 const Container = styled('div')`
   display: flex;
