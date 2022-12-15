@@ -87,7 +87,7 @@
 ---
 
 |아이디|이름|역할|해결 이슈|
-|--|----|---|--|
+|---|----|---|---|
 |J006|강재민|Running Bar 차트 개발, 상단바 검색창 자동완성 적용|[github](https://github.com/boostcampwm-2022/Web35-CryptoGraph/issues?q=is%3Aissue+assignee%3Arkdwoals159)|
 |J013|공윤배|캔들차트 개발, 실시간 코인정보 컴포넌트 개발|[github](https://github.com/boostcampwm-2022/Web35-CryptoGraph/issues?q=is%3Aissue+assignee%3Akongyb)|
 |J038|김상훈|레이아웃 마크업 제작 및 미디어 쿼리 활용한 반응형 적용, 캔들차트 개발, 프로젝트 리딩|[github](https://github.com/boostcampwm-2022/Web35-CryptoGraph/issues?q=is%3Aissue+assignee%3AbaldwinIV+)|
@@ -102,24 +102,21 @@
 ### 1. 캔들차트
 
 ---
-
- ![캔들차트](https://user-images.githubusercontent.com/60903175/207755794-941ce2d4-8940-4520-891d-cde74bf7f6db.gif)
+<img src="https://user-images.githubusercontent.com/60903175/207755794-941ce2d4-8940-4520-891d-cde74bf7f6db.gif" width=600px>
 
 1. 익숙한 주식 봉차트를 D3.js로 구현했습니다. 분봉선택 및 줌/패닝 기능이 지원되며, 이평선 및 거래량또한 표시됩니다.(개발예정)
 
 ### 2.트리맵 차트
 
 ---
-
-![트리맵](https://user-images.githubusercontent.com/60903175/207755748-72eeb90b-96f3-4003-95e2-030b53abc951.gif)
+<img src="https://user-images.githubusercontent.com/60903175/207755748-72eeb90b-96f3-4003-95e2-030b53abc951.gif" width=600px>
 
 시총/거래량/등락률에 대해 선택된 코인들을 트리맵으로 보여주는 차트입니다. 줌/패닝 기능이 지원됩니다.
 
 ### 러닝 바 차트
 
 ---
-
-![바차트](https://user-images.githubusercontent.com/60903175/207755762-bd5b7426-1f34-48f5-a7e0-d9e0add1d0bc.gif)
+<img src="https://user-images.githubusercontent.com/60903175/207755762-bd5b7426-1f34-48f5-a7e0-d9e0add1d0bc.gif" width=600px>
 
 선택된 코인에 대해 실시간 등락률을 보여주는 차트입니다.
 
