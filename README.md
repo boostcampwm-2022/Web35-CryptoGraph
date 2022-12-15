@@ -14,9 +14,9 @@
 ### 프로젝트 소개
 
 ---
-![트리맵](https://user-images.githubusercontent.com/60903175/207756598-1a08b536-8ef4-4da5-a9a6-2c53121c85eb.gif)
-- CryptoGraph는 Upbit Open API, CoinMarketCap API를 이용하여 암호화폐 데이터들을 차트로 시각화하는 서비스입니다.
-- 트리맵 차트, 러닝 바 차트를 통해 전체적인 코인 시황을 파악할 수 있습니다. 각 코인을 선택하여 그 코인의 가격 추이를 캔들 차트로 확인할 수 있습니다.
+<img alt="트리맵" src="https://user-images.githubusercontent.com/60903175/207756598-1a08b536-8ef4-4da5-a9a6-2c53121c85eb.gif" width="600">
+- CryptoGraph는 Upbit Open API, CoinMarketCap API를 이용하여 암호화폐 데이터들을 차트로 시각화하는 서비스입니다.<br/>
+- 트리맵 차트, 러닝 바 차트를 통해 전체적인 코인 시황을 파악할 수 있습니다. 각 코인을 선택하여 그 코인의 가격 추이를 캔들 차트로 확인할 수 있습니다.<br/>
 - 반응형 디자인을 적용하여 여러 크기의 디바이스에 대응합니다.
 
 
