@@ -164,9 +164,16 @@
 ## Environment setup
  
 1. ```git clone https://github.com/boostcampwm-2022/Web35-CryptoGraph.git```
-     
-2. ```npm i api_server```
-     
+2. ```npm i api_server``` 
 3. ```npm i client```
+4. ```touch client/.env```
+5. ```NEXT_PUBLIC_SERVER_URL=http://localhost:{클라이언트 포트번호}```
+6. ```touch api_server/.env```
+7. ```COINMARKETCAP_API_KEY={코인마켓캡 API 키}```
+8. ```CLIENT_URL=http://localhost:{서버 포트번호}```
+9. ```npm run client/build```
 
-4. ```npm run build```
+## 실행방법
+
+1. ```npm start api_server```
+2. ```npm start client```
