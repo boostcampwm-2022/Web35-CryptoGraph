@@ -22,10 +22,14 @@
     메인페이지 : D3.js를 통해 구현된 캔들차트, upbit open API의 데이터를 실시간으로 렌더링합니다.
 
     [트리맵]
+    ![image](https://user-images.githubusercontent.com/79131091/207751854-494a5f06-398a-44a0-8263-b148610c5ae8.png)
+
 
     코인 실시간 변동률 시각화 Treemap 차트
 
     [러닝차트]
+    ![image](https://user-images.githubusercontent.com/79131091/207751864-1b659316-7bab-4e20-86db-4454b7732874.png)
+
 
     코인 실시간 변동률 시각화 running bar 차트
 
@@ -47,14 +51,16 @@
 [깃헙 바로가기 💻](http://github.com/rkdwoals159)
 
 </td>
-<td align="center"><a href=""><img src="width="100px;" alt=""/><br /><sub>
+<td align="center"><a href=""><img src="width="100px;" alt=""/><sub>
 
 ### J013 공윤배
 
 <img src="https://user-images.githubusercontent.com/60903175/205962656-71b83106-1f56-42fa-b96b-3e9f00e8cdf7.jpg" width="250"/>
 
 ### 항상 즐겁게 개발하는 개발자
-
+   
+[이력서 바로가기] <br/>
+   
 [깃헙 바로가기 💻](https://github.com/kongyb)
 
 </td>
@@ -82,7 +88,7 @@
 
 [이력서 바로가기](https://www.notion.so/438ec182c25847df84ef53186a387fde)
 
-[깃헙 바로가기](https://github.com/sronger)</td>
+[깃헙 바로가기 💻](https://github.com/sronger)</td>
 
   </tr>
   </tbody>
