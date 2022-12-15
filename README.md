@@ -21,16 +21,12 @@
 
     메인페이지 : D3.js를 통해 구현된 캔들차트, upbit open API의 데이터를 실시간으로 렌더링합니다.
 
-    [트리맵]
-    ![image](https://user-images.githubusercontent.com/79131091/207751854-494a5f06-398a-44a0-8263-b148610c5ae8.png)
-
+    [트리맵 차트 사진]
 
     코인 실시간 변동률 시각화 Treemap 차트
 
-    [러닝차트]
-    ![image](https://user-images.githubusercontent.com/79131091/207751864-1b659316-7bab-4e20-86db-4454b7732874.png)
-
-
+    [러닝차트 사진]
+   
     코인 실시간 변동률 시각화 running bar 차트
 
 # 🥈팀원 소개 🧑‍💻
@@ -164,3 +160,13 @@
 
 -   트리맵 차트 개발
 -   코인 선택 컴포넌트 개발
+     
+## Environment setup
+ 
+1. ```git clone https://github.com/boostcampwm-2022/Web35-CryptoGraph.git```
+     
+2. ```npm i api_server```
+     
+3. ```npm i client```
+
+4. ```npm run build```
