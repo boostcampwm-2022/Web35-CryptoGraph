@@ -124,7 +124,9 @@
 
 ---
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/73c67135-2a16-477d-b8d8-b495b1cc8f63/Untitled.png)
+![image](https://user-images.githubusercontent.com/79131091/207750186-186d6a92-d218-415d-9835-5ef9aff1fe5d.png)
+
+
 
 # 📚 기술 스택
 
