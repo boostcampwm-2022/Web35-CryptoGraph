@@ -90,6 +90,41 @@
   </tbody>
 </table>
 
+
+# 👨‍💻 역할
+
+---
+
+### J006 강재민
+
+-   Running Bar 차트 개발
+-   상단바 검색창 자동완성 적용
+
+### J013 공윤배
+
+-   캔들차트 개발
+-   실시간 코인정보 컴포넌트 개발
+
+### J038 김상훈
+
+-   [해결한 깃헙 이슈 바로가기](https://github.com/boostcampwm-2022/Web35-CryptoGraph/issues?q=is%3Aissue+assignee%3AbaldwinIV+)
+-   레이아웃 마크업 제작 및 미디어 쿼리 활용한 반응형 적용
+-   캔들차트 개발
+-   프로젝트 리딩
+
+### J054 김준태
+
+-   트리맵 차트 개발
+-   코인 선택 컴포넌트 개발
+     
+     
+|아이디|이름|역할|해결한 이슈|
+|--|------|---|---|
+|J006|강재민|Running Bar 차트 개발, 상단바 검색창 자동완성 적용|
+|J013|공윤배|캔들차트 개발, 실시간 코인정보 컴포넌트 개발|
+|J038|김상훈|레이아웃 마크업 제작 및 미디어 쿼리 활용한 반응형 적용, 캔들차트 개발, 프로젝트 리딩|https://github.com/boostcampwm-2022/Web35-CryptoGraph/issues?q=is%3Aissue+assignee%3AbaldwinIV+|
+|J054|김준태|트리맵 차트 개발, 코인 선택 컴포넌트 개발|
+     
 # 📈 주요 기능
 
 ---
@@ -133,33 +168,6 @@
 ---
      
 <img src="https://user-images.githubusercontent.com/60903175/205963033-51126c6f-6069-4b64-8858-a2c3bdde9163.png" width=650px>
-
-
-# 👨‍💻 역할
-
----
-
-### J006 강재민
-
--   Running Bar 차트 개발
--   상단바 검색창 자동완성 적용
-
-### J013 공윤배
-
--   캔들차트 개발
--   실시간 코인정보 컴포넌트 개발
-
-### J038 김상훈
-
--   [해결한 깃헙 이슈 바로가기](https://github.com/boostcampwm-2022/Web35-CryptoGraph/issues?q=is%3Aissue+assignee%3AbaldwinIV+)
--   레이아웃 마크업 제작 및 미디어 쿼리 활용한 반응형 적용
--   캔들차트 개발
--   프로젝트 리딩
-
-### J054 김준태
-
--   트리맵 차트 개발
--   코인 선택 컴포넌트 개발
      
 ## Environment setup
  
