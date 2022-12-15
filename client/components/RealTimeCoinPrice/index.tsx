@@ -184,7 +184,7 @@ const Header = styled('div')`
       flex: 1;
     }
 
-    & > div {
+    & > div:not(:first-of-type) {
       cursor: pointer;
       :hover {
         background-color: ${props => props.theme.palette.primary.main};
