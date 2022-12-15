@@ -165,6 +165,15 @@
 
 ## 실행방법
 ### Web Server Run
-```npm start api_server```
+```
+터미널 1
+cd api_server
+npm i
+npm run start```
 ### Web Client Server Run
-```npm start client```
+```
+터미널 2
+cd client
+npm i
+npm run build
+npm run start```
