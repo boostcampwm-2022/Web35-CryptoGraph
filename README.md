@@ -32,7 +32,7 @@
 
 <img src="https://user-images.githubusercontent.com/60903175/205962455-bbdf1bbd-44d3-406e-86e4-152d19a54467.png" width="150"/>
 
-### 불편함을 불편해할 줄 아는 프론트엔드 개발자
+### 뱃살과 실력이 비례하고 싶은 프론트엔드 개발자
 
 [이력서 바로가기](https://www.notion.so/010dc5a42f8b4c08a2f2592682eba48c)
 
