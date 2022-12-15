@@ -319,7 +319,6 @@ export const RunningChart: FunctionComponent<RunningChartProps> = ({
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const chartSvg = useRef(null)
   const { width, height } = useRefElementSize(chartContainerRef)
-  const [coinRate, setCoinRate] = useState<CoinRateType>(data) //coin의 등락률 값, 모든 코인 값 보유
   const [changeRate, setchangeRate] = useState<CoinRateType>({}) //선택된 코인 값만 보유
   const [pointerInfo, setPointerInfo] = useState<MainChartPointerData>(
     DEFAULT_RUNNING_POINTER_DATA
@@ -350,13 +349,13 @@ export const RunningChart: FunctionComponent<RunningChartProps> = ({
     isMobile
   ]) // 창크기에 따른 차트크기 조절
   useEffect(() => {
-    if (!coinRate || !Market[0]) return
+    if (!data || !Market[0]) return
     const newCoinData: CoinRateType = {}
     for (const tick of Market) {
-      newCoinData['KRW-' + tick] = coinRate['KRW-' + tick]
+      newCoinData['KRW-' + tick] = data['KRW-' + tick]
     }
     setchangeRate(newCoinData)
-  }, [data, Market, coinRate])
+  }, [data, Market])
   return (
     <ChartContainer ref={chartContainerRef}>
       <svg id="chart-container" ref={chartSvg}>
