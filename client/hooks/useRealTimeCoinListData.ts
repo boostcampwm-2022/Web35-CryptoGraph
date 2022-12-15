@@ -4,7 +4,7 @@ import { SocketTickerData } from '@/types/CoinPriceTypes'
 import { useRef, useState, useEffect } from 'react'
 import useInterval from './useInterval'
 
-const COIN_INTERVAL_RATE = 5000
+const COIN_INTERVAL_RATE = 1000
 let socket: WebSocket | undefined
 const getInitData = (data: MarketCapInfo[]): CoinRateType => {
   //initData
@@ -35,14 +35,36 @@ export function useRealTimeCoinListData(data: MarketCapInfo[]) {
   const [coinData, setCoinData] = useState<CoinRateType>(getInitData(data))
   const coinDataStoreRef = useRef(coinDataStoreGenerator())
 
+  const updateClosure = (() => {
+    let doVisualUpdates = true
+    return {
+      setCoinData: () => {
+        if (!doVisualUpdates) {
+          return
+        }
+        const storedCoinData = coinDataStoreRef.current.getCoinData()
+        setCoinData(prev => getNewCoinData(prev, storedCoinData))
+      },
+      setVisibilty: () => {
+        if (socket === undefined) {
+          connectWS(data, coinDataStoreRef.current.setCoinData)
+        }
+        doVisualUpdates = !document.hidden
+      }
+    }
+  })()
   useInterval(() => {
-    const storedCoinData = coinDataStoreRef.current.getCoinData()
-    setCoinData(prev => getNewCoinData(prev, storedCoinData))
+    updateClosure.setCoinData()
   }, COIN_INTERVAL_RATE)
 
   useEffect(() => {
-    connectWS(data, coinDataStoreRef.current.setCoinData)
+    document.addEventListener('visibilitychange', updateClosure.setVisibilty)
+    // connectWS(data, coinDataStoreRef.current.setCoinData) 여기 잘몰루
     return () => {
+      document.removeEventListener(
+        'visibilitychange',
+        updateClosure.setVisibilty
+      )
       closeWS()
     }
   }, [])
