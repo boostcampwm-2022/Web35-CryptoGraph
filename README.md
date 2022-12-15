@@ -123,16 +123,14 @@
 # 📚 프로젝트 구조
 
 ---
-
-![image](https://user-images.githubusercontent.com/79131091/207750186-186d6a92-d218-415d-9835-5ef9aff1fe5d.png)
-
-
+     
+<img src="https://user-images.githubusercontent.com/79131091/207750186-186d6a92-d218-415d-9835-5ef9aff1fe5d.png" width=600px>
 
 # 📚 기술 스택
 
 ---
-
-![Untitled 3](https://user-images.githubusercontent.com/60903175/205963033-51126c6f-6069-4b64-8858-a2c3bdde9163.png)
+     
+<img src="https://user-images.githubusercontent.com/60903175/205963033-51126c6f-6069-4b64-8858-a2c3bdde9163.png" width=650px>
 
 
 # 👨‍💻 역할
