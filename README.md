@@ -169,11 +169,13 @@
 4. ```touch client/.env```
 5. ```NEXT_PUBLIC_SERVER_URL=http://localhost:{클라이언트 포트번호}```
 6. ```touch api_server/.env```
-7. ```COINMARKETCAP_API_KEY={코인마켓캡 API 키}```
+
+7. ```COINMARKETCAP_API_KEY={코인마켓캡 API 키}``` (https://coinmarketcap.com/api/)
 8. ```CLIENT_URL=http://localhost:{서버 포트번호}```
 9. ```npm run client/build```
 
 ## 실행방법
-
-1. ```npm start api_server```
-2. ```npm start client```
+### Web Server Run
+```npm start api_server```
+### Web Client Server Run
+```npm start client```
