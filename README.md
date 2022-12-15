@@ -47,7 +47,7 @@
 
 ### 항상 즐겁게 개발하는 개발자
    
-[이력서 바로가기] <br/>
+[이력서 바로가기] (https://kongyb.notion.site/d9ecf75afb6245b9b558e3e7db6dc1dd)<br/>
    
 [깃헙 바로가기 💻](https://github.com/kongyb)
 
