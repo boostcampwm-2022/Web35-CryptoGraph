@@ -124,7 +124,7 @@
 
 ---
 
-![%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98-removebg-preview_(2)](https://user-images.githubusercontent.com/60903175/205962974-0ef2a271-62c1-4dfb-94da-7741cfeec9cf.png)
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/73c67135-2a16-477d-b8d8-b495b1cc8f63/Untitled.png)
 
 # 📚 기술 스택
 
@@ -132,48 +132,6 @@
 
 ![Untitled 3](https://user-images.githubusercontent.com/60903175/205963033-51126c6f-6069-4b64-8858-a2c3bdde9163.png)
 
-# 👊 **기술적 도전**
-
----
-
-### 반응형
-
-1. 페이지 레이아웃
-2. 차트 반응형 대응
-
-### D3.js SVG 최적화
-
-1. 화면에 보이는 캔들만 그리기
-
-### 실시간 데이터 관리
-
-2. 커스텀 훅 사용하여 관리한다.
-
-### 캔들차트 그리기
-
-1. drag와 wheel이벤트
-
-2. 실시간으로 변경되는 데이터에 맞추어 캔들을 새로 그리기
-
--   pre-fetching한 데이터와 웹소켓 데이터의 유기적 연결
-
-###
-
-# 💫 **트러블 슈팅**
-
----
-
--   nextjs와 styled-component
-    -   styled-component + mui → emotion + mui 로 기술스택을 변경했습니다.
-    1. mui는 emotion을 기본 스타일 엔진으로 사용합니다. 그래서 emotion친화적이고, 만일 styled-component를 사용할 경우 mui를 같이 사용하려면 기본적인 npm emotion라이브러리도 같이 설치되어야 합니다.
-    2. styled-component를 mui와 같이 쓰려면 기존 babel-plugin을 설치해야하는데 next12에서 babel → swc로 마이그레이션 됐기 때문에 레거시 코드가 생기는 이슈가 있습니다.
--   실시간 데이터가 조금씩 늦게 반영되는 에러 (API 관련)
--   Link vs useNevigate vs window.location.href
--   5.  interface augmentation
--   모바일 퍼스트? 반응형 레이아웃 제작 순서
--   svg vs canvas
-    -   캔들차트 dom element를 일정개수 이하로 제한을 두어 성능개선에 집중했습니다.(예정)
-    -   이건 트러블 슈팅보다는 공부한 것 쪽으로 보내는게 낫지 않을까요? 딱히 트러블슈팅같지는 않아 보여요
 
 # 👨‍💻 역할
 
