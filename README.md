@@ -152,30 +152,28 @@
      
 ## Environment setup
  
-1. ```git clone https://github.com/boostcampwm-2022/Web35-CryptoGraph.git```
-2. ```npm i api_server``` 
-3. ```npm i client```
-4. ```touch client/.env```
-5. ```NEXT_PUBLIC_SERVER_URL=http://localhost:{클라이언트 포트번호}```
-6. ```touch api_server/.env```
+1. ```git clone https://github.com/boostcampwm-2022/Web35-CryptoGraph.git CryptoGraph```
+2. ```cd CryptoGraph```
+3. ```npm i api_server``` 
+4. ```npm i client```
+5. ```touch client/.env```
+6. ```NEXT_PUBLIC_SERVER_URL=http://localhost:{클라이언트 포트번호}```
+7. ```touch api_server/.env```
 
-7. ```COINMARKETCAP_API_KEY={코인마켓캡 API 키}``` (https://coinmarketcap.com/api/)
-8. ```CLIENT_URL=http://localhost:{서버 포트번호}```
-9. ```npm run client/build```
+8. ```COINMARKETCAP_API_KEY={코인마켓캡 API 키}``` (https://coinmarketcap.com/api/)
+9. ```CLIENT_URL=http://localhost:{서버 포트번호}```
+10. ```npm run client/build```
 
 ## 실행방법
 ### Web Server Run
 터미널 1
 ```
-cd api_server
-npm i
-npm run start
+cd CryptoGraph
+npm run start api_server
 ```
 ### Web Client Server Run
 터미널 2
 ```
-cd client
-npm i
-npm run build
-npm run start
+cd CryptoGraph
+npm run start client
 ```
