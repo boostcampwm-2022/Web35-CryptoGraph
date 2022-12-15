@@ -16,16 +16,19 @@
 ---
 
 -   CryptoGraph는 Upbit Open API, CoinMarketCap API를 이용하여 암호화폐 데이터들을 차트로 시각화하는 서비스입니다.
+    ![캔들차트](https://user-images.githubusercontent.com/60903175/207755794-941ce2d4-8940-4520-891d-cde74bf7f6db.gif)
 
     [메인페이지 사진]
 
     메인페이지 : D3.js를 통해 구현된 캔들차트, upbit open API의 데이터를 실시간으로 렌더링합니다.
 
-    [트리맵 차트 사진]
+   ![트리맵](https://user-images.githubusercontent.com/60903175/207755748-72eeb90b-96f3-4003-95e2-030b53abc951.gif)
+
 
     코인 실시간 변동률 시각화 Treemap 차트
 
-    [러닝차트 사진]
+   ![바차트](https://user-images.githubusercontent.com/60903175/207755762-bd5b7426-1f34-48f5-a7e0-d9e0add1d0bc.gif)
+
    
     코인 실시간 변동률 시각화 running bar 차트
 
