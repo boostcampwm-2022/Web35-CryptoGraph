@@ -165,15 +165,17 @@
 
 ## 실행방법
 ### Web Server Run
-```
 터미널 1
+```
 cd api_server
 npm i
-npm run start```
-### Web Client Server Run
+npm run start
 ```
+### Web Client Server Run
 터미널 2
+```
 cd client
 npm i
 npm run build
-npm run start```
+npm run start
+```
