@@ -34,40 +34,29 @@ const getInitData = (data: MarketCapInfo[]): CoinRateType => {
 export function useRealTimeCoinListData(data: MarketCapInfo[]) {
   const [coinData, setCoinData] = useState<CoinRateType>(getInitData(data))
   const coinDataStoreRef = useRef(coinDataStoreGenerator())
-
-  const updateClosure = (() => {
-    let doVisualUpdates = true
-    return {
-      setCoinData: () => {
-        if (!doVisualUpdates) {
-          return
-        }
-        const storedCoinData = coinDataStoreRef.current.getCoinData()
-        setCoinData(prev => getNewCoinData(prev, storedCoinData))
-      },
-      setVisibilty: () => {
-        if (socket === undefined) {
-          connectWS(data, coinDataStoreRef.current.setCoinData)
-        }
-        doVisualUpdates = !document.hidden
-      }
-    }
-  })()
-  useInterval(() => {
-    updateClosure.setCoinData()
-  }, COIN_INTERVAL_RATE)
-
+  const isWindowForeGround = useRef<boolean>(true)
   useEffect(() => {
-    document.addEventListener('visibilitychange', updateClosure.setVisibilty)
-    // connectWS(data, coinDataStoreRef.current.setCoinData) 여기 잘몰루
+    const setVisibilityCallback = () => {
+      if (socket === undefined) location.reload()
+      isWindowForeGround.current = !document.hidden
+      //안보이면 false, 보이면 true
+    }
+    document.addEventListener('visibilitychange', setVisibilityCallback)
+    connectWS(data, coinDataStoreRef.current.setCoinData)
     return () => {
-      document.removeEventListener(
-        'visibilitychange',
-        updateClosure.setVisibilty
-      )
+      document.removeEventListener('visibilitychange', setVisibilityCallback)
       closeWS()
     }
   }, [])
+
+  useInterval(() => {
+    if (!isWindowForeGround.current) {
+      //창이 background 상태면 바로 return
+      return
+    }
+    const storedCoinData = coinDataStoreRef.current.getCoinData()
+    setCoinData(prev => getNewCoinData(prev, storedCoinData))
+  }, COIN_INTERVAL_RATE)
   return coinData
 }
 
