@@ -80,7 +80,7 @@ export const useRealTimeUpbitData = (
   return [realtimeCandleData, setRealtimeCandleData, realtimePriceInfo] //socket을 state해서 같이 뺀다. 변화감지 (끊길때) -> ui표시..
 }
 
-export function connectWS(priceInfo: CoinPriceObj) {
+function connectWS(priceInfo: CoinPriceObj) {
   if (socket !== undefined) {
     socket.close()
   }

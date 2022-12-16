@@ -26,9 +26,7 @@ export default function Home() {
     data.map(coin => coin.name)
   ) //선택된 market 컨트롤
   const [selectedMarket, setSelectedMarket] = useState<string>('btc')
-  const [selectedSort, setSelectedSort] = useState<string>(
-    'market capitalization'
-  )
+  const [selectedSort, setSelectedSort] = useState<string>('change rate')
   const [selectedTab, setSelectedTab] = useState<number>(0)
   const [isDrawerOpened, setIsDrawerOpened] = useState<boolean>(false)
   const [isModalOpened, setIsModalOpened] = useState<boolean>(false)
@@ -39,7 +37,7 @@ export default function Home() {
     if (selectedChart === 'RunningChart') {
       setSelectedSort('descending')
     } else {
-      setSelectedSort('market capitalization')
+      setSelectedSort('change rate')
     }
   }, [selectedChart])
 

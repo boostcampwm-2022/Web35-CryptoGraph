@@ -26,6 +26,7 @@ import { makeDate } from './dateManager'
 import { blueColorScale, redColorScale } from '@/styles/colorScale'
 import { CoinRateContentType } from '@/types/ChartTypes'
 import { Dispatch, SetStateAction } from 'react'
+import { transDate } from '@/utils/dateManager'
 
 export function getVolumeHeightScale(
   data: CandleData[],
@@ -53,7 +54,11 @@ export function getYAxisScale(data: CandleData[], CHART_AREA_Y_SIZE: number) {
     console.error('데이터에 문제가 있다. 서버에서 잘못 쏨')
     return undefined
   }
-  return d3.scaleLinear().domain([min, max]).range([CHART_AREA_Y_SIZE, 0])
+  const diff = max - min
+  return d3
+    .scaleLinear()
+    .domain([min - 0.03 * diff, max + 0.03 * diff])
+    .range([CHART_AREA_Y_SIZE, 0])
 }
 
 // scale함수 updateChart에서만 호출
@@ -69,12 +74,9 @@ export function getXAxisScale(
       makeDate(
         data[option.renderStartDataIndex].timestamp -
           DatePeriod[candlePeriod] * (option.renderCandleCount + 1) * 1000,
-        DatePeriod[candlePeriod]
+        candlePeriod
       ),
-      makeDate(
-        data[option.renderStartDataIndex].timestamp,
-        DatePeriod[candlePeriod]
-      )
+      makeDate(data[option.renderStartDataIndex].timestamp, candlePeriod)
     ])
     .range([
       chartAreaXsize - (option.renderCandleCount + 1) * option.candleWidth,
@@ -136,7 +138,8 @@ export function updatePointerUI(
   pointerInfo: PointerData,
   renderOpt: CandleChartRenderOption,
   data: CandleData[],
-  refElementSize: RefElementSize
+  refElementSize: RefElementSize,
+  period: ChartPeriod
 ) {
   const [chartAreaXsize, chartAreaYsize] = [
     refElementSize.width - CHART_Y_AXIS_MARGIN,
@@ -150,7 +153,8 @@ export function updatePointerUI(
     ),
     chartAreaYsize
   )
-  if (!yAxisScale) {
+  const xAxisScale = getXAxisScale(renderOpt, data, chartAreaXsize, period)
+  if (!yAxisScale || !xAxisScale) {
     return
   }
   d3.select('text#price-info')
@@ -213,6 +217,14 @@ export function updatePointerUI(
           )
           .text((d, i) => {
             if (i === 0) {
+              const unitData = pointerInfo.data
+              if (!unitData || !unitData.candle_date_time_kst) {
+                return getTimeTextByPosX(
+                  pointerInfo.positionX,
+                  xAxisScale,
+                  period
+                )
+              }
               return getTimeText(pointerInfo.data)
             }
             return Math.round(yAxisScale.invert(d)).toLocaleString()
@@ -272,17 +284,30 @@ function getTimeText(unitData: CandleData | null) {
   return `${timeString.substring(5, 10)} ${timeString.substring(11, 16)}`
 }
 
+function getTimeTextByPosX(
+  posX: number,
+  xAxisScale: d3.ScaleTime<number, number, never>,
+  period: ChartPeriod
+) {
+  const dateString = transDate(xAxisScale.invert(posX).getTime(), period)
+  return `${dateString.substring(5, 10)} ${dateString.substring(11, 16)}`
+}
+
 // 마우스 포인터가 가리키는 위치의 분봉데이터를 찾아 렌더링될 가격정보를 반환
 function getPriceInfo(pointerInfo: PointerData) {
   if (pointerInfo.positionX < 0) {
     return { priceText: '' }
   }
-  if (!pointerInfo.data) {
-    // console.error(pointerInfo)
-    // console.error('예외상황')
+  const candleUnitData = pointerInfo.data
+  if (
+    !candleUnitData ||
+    !candleUnitData.high_price ||
+    !candleUnitData.low_price ||
+    !candleUnitData.opening_price ||
+    !candleUnitData.trade_price
+  ) {
     return { priceText: '' }
   }
-  const candleUnitData = pointerInfo.data
   return {
     priceText: [
       `고가: ${candleUnitData.high_price}`,
