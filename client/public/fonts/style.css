@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'LINESeedKR-Rg';
-  src: local('LINESeedKR-Rg.woff') format('opentype');
+  src: url('LINESeedKR-Rg.woff') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
