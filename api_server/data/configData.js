@@ -18,6 +18,27 @@ async function getCoinInfo() {
     const coinInfo = {};
     // coinData를 순회하며 알맞은 info를 찾아 저장한다.
     for (const data of coinDatas) {
+      // MFT => HIFI 예외처리 (수정필요)
+      if (data.symbol === "MFT" && code === "HIFI") {
+        coinInfo.id = data.id;
+        coinInfo.symbol = code;
+        coinInfo.name = data.name;
+        coinInfo.name_kr = name_kr;
+        coinInfo.slug = data.slug;
+        coinInfo.market_cap_dominance = data.quote.KRW.market_cap_dominance;
+        coinInfo.market_cap = data.quote.KRW.market_cap;
+        coinInfo.percent_change_24h = data.quote.KRW.percent_change_24h;
+        coinInfo.market_cap_kr = transPrice(data.quote.KRW.market_cap);
+        coinInfo.max_supply = data.max_supply;
+        coinInfo.circulating_supply = data.circulating_supply;
+        coinInfo.total_supply = data.total_supply;
+        coinInfo.cmc_rank = data.cmc_rank;
+        coinInfo.time = time;
+        coinInfo.volume_24h = transPrice(data.quote.KRW.volume_24h);
+        coinIds.push(data.id);
+        break;
+      }
+
       // FCT2 예외처리
       if (data.symbol === code || data.name === name) {
         coinInfo.id = data.id;
@@ -47,8 +68,7 @@ async function getCoinInfo() {
     const coinInfo = result[code];
     const id = coinInfo.id;
     const metaData = coinMetaDatas[id];
-    coinInfo.website =
-      metaData.urls.website.length === 0 ? "" : metaData.urls.website[0];
+    coinInfo.website = metaData.urls.website.length === 0 ? "" : metaData.urls.website[0];
     coinInfo.logo = metaData.logo;
     coinInfo.description = metaData.description;
   }
@@ -61,9 +81,7 @@ function getTime() {
   const utcCurr = curr.getTime() + curr.getTimezoneOffset() * 60 * 1000;
   const diffFromKst = 9 * 60 * 60 * 1000;
   const kstCurr = new Date(utcCurr + diffFromKst);
-  const dateString = `${
-    kstCurr.getMonth() + 1
-  }/${kstCurr.getDate()} ${kstCurr.getHours()}시`;
+  const dateString = `${kstCurr.getMonth() + 1}/${kstCurr.getDate()} ${kstCurr.getHours()}시`;
   return dateString;
 }
 
